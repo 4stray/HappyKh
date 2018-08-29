@@ -1,6 +1,7 @@
-import pytest
+from tests.utils import BaseTestCase
+from django.urls import is_valid_path
 
 
-@pytest.mark.urls('happykh.urls')
-def test_index_url(client):
-    assert client.get('/').status_code == 404
+class UrlsTestCase(BaseTestCase):
+    def test_index_url(self):
+        self.assertNotEqual(is_valid_path('/'), True)
