@@ -8,5 +8,6 @@ py==1.6.0
 pytest==3.7.3
 pytest-cov==2.5.1
 pytest-django==3.4.2
+psycopg2==2.7.5
 pytz==2018.5
 six==1.11.0
