@@ -11,3 +11,4 @@ pytest-django==3.4.2
 psycopg2==2.7.5
 pytz==2018.5
 six==1.11.0
+pylint==2.1.1
