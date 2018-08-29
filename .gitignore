@@ -109,3 +109,6 @@ env_happykh
 .mypy_cache/
 .dmypy.json
 dmypy.json
+
+# custome ignore
+.idea
