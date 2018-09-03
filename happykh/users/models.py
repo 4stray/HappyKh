@@ -41,7 +41,6 @@ class User(AbstractBaseUser):
     age = models.PositiveSmallIntegerField(blank=True, null=True,)
     gender = models.CharField(choices=(('Ж', 'woman'), ('М', 'man')), max_length=2, default='Ж')
     profile_image = models.ImageField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     objects = UserManager()
 
