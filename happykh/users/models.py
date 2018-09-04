@@ -52,3 +52,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+    def get_full_name(self):
+        '''
+        Returns the first_name plus the last_name, with a space in between.
+        '''
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        if full_name.strip():
+            return full_name.strip()
+        else:
+            return self.email
+
+    def get_short_name(self):
+        '''
+        Returns the short name for the user. (only first_name)
+        '''
+        return self.first_name
