@@ -1,6 +1,7 @@
-from django.conf.urls import url
+"""Urls to views for app users"""
+from django.urls import path
 from users import views
 
 urlpatterns = [
-    url(r'^api/users/login$', views.UserLogin.as_view()),
+    path('api/users/login/', views.UserLogin.as_view()),
 ]

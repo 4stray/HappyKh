@@ -49,6 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     profile_image = models.ImageField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -58,13 +59,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         Returns the first_name plus the last_name, with a space in between.
         '''
         full_name = '%s %s' % (self.first_name, self.last_name)
-        if full_name.strip():
-            return full_name.strip()
-        else:
+        if not full_name.strip():
             return self.email
+        return full_name.strip()
 
     def get_short_name(self):
         '''
         Returns the short name for the user. (only first_name)
         '''
+        if self.first_name:
+            return self.email
         return self.first_name

@@ -1,6 +1,7 @@
-from users.models import User
+"""Views for app users"""
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from users.models import User
 
 
 class UserLogin(APIView):
