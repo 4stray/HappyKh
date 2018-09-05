@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users.apps.UsersConfig',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +55,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'happykh.urls'
@@ -86,7 +89,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'happykh',
         'USER': 'admin',
-        'PASSWORD': 'admin123',
+        'PASSWORD': 'abc12345',
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -129,3 +132,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CORS_ORIGIN_REGEX_WHITELIST = (
+    r'http://localhost*',
+)
