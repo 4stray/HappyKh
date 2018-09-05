@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
-import logging
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -29,7 +29,10 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
+
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -38,7 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users.apps.UsersConfig',
+    'customlogger',
+    'users.apps.UsersConfig'
+
 ]
 
 MIDDLEWARE = [
@@ -86,6 +91,7 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '',
     }
+
 }
 
 # Logger settings
@@ -95,7 +101,7 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
     'formatters': {
-        'console': {
+        'default': {
             'format': '%(asctime)s ::: %(levelname)s ::: %(message)s'
         },
         'file': {
@@ -106,7 +112,7 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'console'
+            'formatter': 'default'
         },
         'file': {
             'level': 'WARNING',
@@ -116,16 +122,18 @@ LOGGING = {
             'filename': 'logs/warnings.log',
             'formatter': 'file'
         },
-
+        'db': {
+            'level': 'CRITICAL',
+            'class': 'customlogger.dbhandler.DataBaseHandler',
+            'formatter': 'default'
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['console', 'file'],
+            'handlers': ['console', 'file', 'db'],
             'level': 'DEBUG',
             'propagate': True,
         },
-
-
     },
 }
 
