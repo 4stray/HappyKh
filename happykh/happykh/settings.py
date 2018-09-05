@@ -33,7 +33,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -41,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'customlogger',
+    'customlogger.apps.CustomloggerConfig',
     'users.apps.UsersConfig'
 
 ]
@@ -87,7 +86,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'happykh',
         'USER': 'admin',
-        'PASSWORD': 'admin123',
+        'PASSWORD': 'admin',
         'HOST': 'localhost',
         'PORT': '',
     }
