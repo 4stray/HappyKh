@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'customlogger.apps.CustomloggerConfig',
-    'users.apps.UsersConfig'
     'users.apps.UsersConfig',
     'rest_framework',
 
@@ -92,7 +91,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'happykh',
         'USER': 'admin',
-        'PASSWORD': 'admin',
+        'PASSWORD': 'admin123',
         'HOST': 'localhost',
         'PORT': '',
     }
