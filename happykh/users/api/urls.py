@@ -1,7 +1,9 @@
-"""Urls to views for app users"""
-from django.urls import path
+"""Urls to api's views for app users"""
+from django.urls import path, include
 from users.api import views
 
 urlpatterns = [
-    path('api/users/login/', views.UserLogin.as_view()),
+    path('users/', include([
+        path('login/', views.UserLogin.as_view()),
+    ])),
 ]
