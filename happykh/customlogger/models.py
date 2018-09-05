@@ -1,3 +1,4 @@
+"""Model for special logs to DB"""
 from django.db import models
 
 

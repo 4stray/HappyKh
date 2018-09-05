@@ -1,3 +1,4 @@
+"""Custom handler for special logs"""
 from logging import Handler
 
 
@@ -11,4 +12,3 @@ class DataBaseHandler(Handler):
 
         templog = DataBaseLog(message=record.getMessage())
         templog.save()
-
