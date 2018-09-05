@@ -1,27 +1,43 @@
 <template>
  <div id="login">
    <h1>Sign up</h1>
-   <input type="text" name="username" v-model="input.username" placeholder="Username" />
-   <input type="password" name="password" v-model="input.password" placeholder="Password" />
+   <input type="text" name="username" v-model="userEmail" placeholder="Email" />
+   <input type="password" name="password" v-model="userPassword" placeholder="Password" />
    <button class="btn-login" type="button" v-on:click="login()">Login</button>
  </div>
 </template>
 
 <script>
-   export default {
-       name: 'LoginComponent',
-       data() {
-           return {
-               input: {
-                   username: '',
-                   password: '',
-               },
-           };
-       },
-       methods: {
-           login() {},
-       },
-   };
+import axios from 'axios';
+
+export default {
+  name: 'LoginComponent',
+  data() {
+    return {
+      userEmail: '',
+      userPassword: '',
+    };
+  },
+  methods: {
+    login() {
+      const userCredentials = {
+        user_email: this.userEmail,
+        user_password: this.userPassword,
+      };
+
+      axios.post('http://localhost:8000/api/users/login/', userCredentials)
+        .then((response) => {
+          if (response.data.status) {
+            alert(`User exists. Full name: ${response.data.full_name}`);
+          } else {
+            alert(response.data.message);
+          }
+        }).catch((error) => {
+          alert(error);
+        });
+    },
+  },
+};
 </script>
 
 <style scoped>

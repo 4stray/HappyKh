@@ -5,12 +5,12 @@
 </template>
 
 <script>
-   export default {
-       name: 'HomeComponent',
-       props: {
-           msg: String,
-       },
-   };
+export default {
+  name: 'HomeComponent',
+  props: {
+    msg: String,
+  },
+};
 </script>
 
 <style scoped lang="scss">
