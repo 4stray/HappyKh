@@ -1,8 +1,8 @@
 <template>
- <div class="home">
-   <img alt="Vue logo" src="../assets/logo.png">
-   <HomeComponent msg="Welcome to HappyKh"/>
- </div>
+  <div class="home">
+    <img alt="Vue logo" src="../assets/logo.png">
+    <HomeComponent msg="Welcome to HappyKh"/>
+  </div>
 </template>
 
 <script>

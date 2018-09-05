@@ -1,4 +1,4 @@
-  <template>
+<template>
   <LoginComponent/>
 </template>
 
@@ -7,19 +7,6 @@ import LoginComponent from '../components/LoginComponent.vue';
 
 export default {
   name: 'Login',
-  data() {
-    return {
-      input: {
-        username: '',
-        password: '',
-      },
-    };
-  },
-  methods: {
-    login() {
-      /* Validation */
-    },
-  },
   components: {
     LoginComponent,
   },
