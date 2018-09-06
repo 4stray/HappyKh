@@ -1,10 +1,10 @@
 <template>
- <div id="login">
-   <h1>Sign up</h1>
-   <input type="text" name="username" v-model="userEmail" placeholder="Email" />
-   <input type="password" name="password" v-model="userPassword" placeholder="Password" />
-   <button class="btn-login" type="button" v-on:click="login()">Login</button>
- </div>
+  <form id="login">
+    <h1>Sign up</h1>
+    <input type="email" name="username" v-model="userEmail" placeholder="Email" />
+    <input type="password" name="password" v-model="userPassword" placeholder="Password" />
+    <button class="btn-login" type="button" v-on:click="login()">Login</button>
+  </form>
 </template>
 
 <script>
@@ -29,6 +29,7 @@ export default {
         .then((response) => {
           if (response.data.status) {
             alert(`User exists. Full name: ${response.data.full_name}`);
+            this.$router.push('/');
           } else {
             alert(response.data.message);
           }
