@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'customlogger.apps.CustomloggerConfig',
     'users.apps.UsersConfig',
     'rest_framework',
-
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'happykh.urls'
@@ -171,3 +173,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CORS_ORIGIN_REGEX_WHITELIST = (
+    r'http://localhost*',
+    r'http://127.0.0.1:*',
+)
