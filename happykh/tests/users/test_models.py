@@ -47,3 +47,9 @@ class UserTestCase(BaseTestCase):
         user = User.objects.get(email='no@pass.com')
         self.assertEqual(user.check_password(''), True)
         self.assertEqual(user.has_usable_password(), False)
+
+    def test_get_name_functions(self):
+        """Test 'get_short_name' and 'get_full_name' functions"""
+        user = User.objects.get(email='any@mail.com')
+        self.assertEqual(user.get_short_name(), user.first_name)
+        self.assertEqual(user.get_full_name(), f'{user.first_name} {user.last_name}')
