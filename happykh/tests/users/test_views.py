@@ -14,7 +14,7 @@ class LoginViewTestCase(BaseTestCase, APITestCase):
         """Create user objects"""
         User.objects.create_user(email='test@mail.com', password='testpassword')
 
-    def tets_invalid_email(self):
+    def test_invalid_email(self):
         """Test view response for invalid email"""
         data = CORRECT_DATA.copy()
         data['user_email'] = 'fakemail.com'
