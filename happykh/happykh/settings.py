@@ -100,7 +100,7 @@ DATABASES = {
 
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': True,
+    'disable_existing_loggers': False,
     'formatters': {
         'default': {
             'format': '%(asctime)s ::: %(levelname)s ::: %(message)s'
@@ -130,7 +130,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
+        'happy_logger': {
             'handlers': ['console', 'file', 'db'],
             'level': 'DEBUG',
             'propagate': True,
