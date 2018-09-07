@@ -1,28 +1,20 @@
 <template>
   <div id="panel">
    <ul class="ul-tabs">
-     <li><router-link to="/login" class="active" >Sign in</router-link></li>
-     <li><router-link to="/registration"> Sign Up</router-link></li>
-   </ul>
-      <LoginComponent />
-  </div>
-</template>
-<template>
-  <div id="panel">
-   <ul class="ul-tabs">
      <li><router-link to="/login"  >Sign in</router-link></li>
      <li><router-link to="/registration" class="active"> Sign Up</router-link></li>
    </ul>
       <RegistrationComponent />
   </div>
 </template>
+
 <script>
-import LoginComponent from '../components/LoginComponent.vue';
+import RegistrationComponent from '../components/RegistrationComponent.vue';
 
 export default {
-  name: 'Login',
+  name: 'Registration',
   components: {
-    LoginComponent,
+    RegistrationComponent,
   },
 };
 </script>
