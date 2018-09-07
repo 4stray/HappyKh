@@ -8,28 +8,46 @@ class UserManager(BaseUserManager):
     Customized manager for customized user model
     """
 
-    def create_user(self, email, password=None, **extra_fields):
+    def _create_user(self, email, password=None, **extra_fields):
         """
         Creates and saves a User with the given email and password.
+        :param email: str - user's email
+        :param password: str - user's password
+        :param extra_fields: class User fields except of 'email', 'password'
+        :return: User object
         """
         if not email:
-            raise ValueError('Users must have an email address')
-        extra_fields.setdefault('is_staff', False)
-        extra_fields.setdefault('is_superuser', False)
+            raise ValueError('Users must have an non-empty email address')
+        if not password:
+            raise ValueError('Users must have an non-empty password')
         user = self.model(email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
+    def create_user(self, email, password, **extra_fields):
+        """
+        Creates and saves a User with the given email and password and sets is_staff and is_superuser as False.
+        :param email: str - user's email
+        :param password: str - user's password
+        :param extra_fields: class User fields except of 'email', 'password'
+        :return: User object
+        """
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
     def create_superuser(self, email, password, **extra_fields):
         """
-        Creates and saves a superuser with the given email and password.
+        Creates and saves a User with the given email and password and sets is_staff and is_superuser as True.
+        :param email: str - user's email
+        :param password: str - user's password
+        :param extra_fields: class User fields except of email, password, is_staff, is_superuser
+        :return: User object
         """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        user = self.create_user(email, password=password, **extra_fields)
-        user.save(using=self._db)
-        return user
+        return self._create_user(email, password, **extra_fields)
 
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -59,14 +77,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         Returns the first_name plus the last_name, with a space in between.
         '''
         full_name = '%s %s' % (self.first_name, self.last_name)
-        if not full_name.strip():
-            return self.email
         return full_name.strip()
 
     def get_short_name(self):
         '''
         Returns the short name for the user. (only first_name)
         '''
-        if self.first_name:
-            return self.email
         return self.first_name
