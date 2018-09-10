@@ -1,17 +1,19 @@
 <template>
-  <div id="panel">
-    <div class="tabs">
-      <a
-          v-for="tab in tabs"
-          v-bind:key="tab.name"
-          v-bind:class="[{ active: currentTab.name === tab.name }]"
-          v-on:click="currentTab = tab"
-      >{{ tab.name }}
-      </a>
+    <div>
+        <p id="message" v-if="response">{{ response.message }}</p>
+        <div id="panel">
+            <div class="tabs">
+                <a
+                        v-for="tab in tabs"
+                        v-bind:key="tab.name"
+                        v-bind:class="[{ active: currentTab.name === tab.name }]"
+                        v-on:click="currentTab = tab"
+                >{{ tab.name }}
+                </a>
+            </div>
+            <component v-bind:is="currentTab.component" @serverResponse="showResponse"></component>
+        </div>
     </div>
-    <component v-bind:is="currentTab.component"></component>
-    <p id="message" @serverResponse="showResponse">{{ response }}</p>
-  </div>
 </template>
 <script scoped>
     import LoginComponent from '../components/LoginComponent.vue';
@@ -38,8 +40,8 @@
             }
         },
         methods: {
-            showResponse(message) {
-                this.response = message || '';
+            showResponse(serverResponse) {
+                this.response = serverResponse || '';
             },
         },
         components: {
@@ -93,5 +95,14 @@
       border-bottom: 3px solid #ff8383;
     }
   }
+
+    #message {
+      width: 350px;
+      //background-color: #ff8383;
+     // padding: 5px 10px;
+     // border-bottom: 3px solid #dc143c;
+      font-size: 16px;
+      margin: 10px auto;
+    }
 
 </style>

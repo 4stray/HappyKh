@@ -46,10 +46,10 @@
                             if (response.data.status) {
                                 this.$router.push('/');
                             } else {
-                                this.$emit('serverResponse', response.data.message);
+                                this.$emit('serverResponse', {'message': response.data.message, 'status': response.data.status });
                             }
                         }).catch((error) => {
-                        this.$emit('serverResponse', error);
+                        this.$emit('serverResponse', {'message': error.message, 'status': false });
                     });
                 }
             },
