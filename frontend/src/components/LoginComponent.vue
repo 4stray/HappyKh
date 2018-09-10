@@ -1,15 +1,11 @@
 <template>
-  <form id="login"
-        @submit.prevent="login"
-        action="/home"
-        method="post"
-        novalidate>
-    <div id="content">
-      <input type="email" name="username" v-model.trim="userEmail" placeholder="EMAIL"/>
-      <input type="password" name="password" v-model="userPassword" placeholder="PASSWORD"/>
-    </div>
-    <input id="btn-login" type="submit" :disabled="isDisabled" value="Login"/>
-  </form>
+    <form id="login" @submit.prevent="login">
+        <div id="content">
+            <input type="email" name="username" v-model.trim="userEmail" placeholder="EMAIL"/>
+            <input type="password" name="password" v-model="userPassword" placeholder="PASSWORD"/>
+        </div>
+        <input id="btn-login" type="submit" :disabled="isDisabled" value="Login"/>
+    </form>
 </template>
 
 <script>
@@ -39,11 +35,9 @@
                         if (response.data.status) {
                             this.$router.push('/');
                         } else {
-                            console.exception(response.data.message);
                             this.$emit('serverResponse', response.data.message)
                         }
                     }).catch((error) => {
-                    console.error(error);
                     this.$emit('serverResponse', error)
                 });
             },
@@ -56,44 +50,44 @@
 </script>
 
 <style scoped lang="scss">
-  #login {
-    display: flex;
-    flex-direction: column;
-    height: 80%;
-  }
-
-  #content {
-    height: 200px;
-    flex: 1 1 auto;
-
-    input {
-      background-color: transparent;
-      border: none;
-      border-bottom: 2px solid #ff8383;
-      font-size: 16px;
-      outline: none;
-      margin: 15px 0;
-      width: 100%;
+    #login {
+        display: flex;
+        flex-direction: column;
+        height: 80%;
     }
 
-    input:focus {
-      border-bottom: 2px solid #b71c1c;
+    #content {
+        height: 200px;
+        flex: 1 1 auto;
+
+        input {
+            background-color: transparent;
+            border: none;
+            border-bottom: 2px solid #ff8383;
+            font-size: 16px;
+            outline: none;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        input:focus {
+            border-bottom: 2px solid #b71c1c;
+        }
     }
-  }
 
-  #btn-login {
-    width: 100%;
-    border: none;
-    padding: 10px 25px;
-    color: #fff;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-family: 'Liberation Sans', sans, sans-serif;
-    cursor: pointer;
-    background-color: #ffb6c1;
-  }
+    #btn-login {
+        width: 100%;
+        border: none;
+        padding: 10px 25px;
+        color: #fff;
+        text-transform: uppercase;
+        font-weight: 600;
+        font-family: 'Liberation Sans', sans, sans-serif;
+        cursor: pointer;
+        background-color: #ffb6c1;
+    }
 
-  #btn-login:disabled {
-    background-color: #d3d3d3;
-  }
+    #btn-login:disabled {
+        background-color: #d3d3d3;
+    }
 </style>
