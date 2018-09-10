@@ -2,8 +2,10 @@
 from django.urls import path, include
 from users.api import views
 
+
 urlpatterns = [
     path('users/', include([
         path('login/', views.UserLogin.as_view()),
+        path('activate/<uidb64>/<token>/', views.UserActivation.as_view()),
     ])),
 ]

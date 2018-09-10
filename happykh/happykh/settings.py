@@ -124,6 +124,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+SENDGRID_API_KEY = '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'
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+EMAIL_HOST_USER = 'manager@happykh.com'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
