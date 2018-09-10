@@ -19,10 +19,5 @@ export default new Router({
       // which is lazy-loaded when the route is visited.
       component: () => import('./views/Login.vue'),
     },
-    {
-      path: '/registration',
-      name: 'registration',
-      component: () => import('./views/Registration.vue'),
-    },
   ],
 });

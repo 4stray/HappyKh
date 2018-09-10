@@ -1,73 +1,97 @@
 <template>
   <div id="panel">
-   <ul class="ul-tabs">
-     <li><router-link to="/login" class="active" >Sign in</router-link></li>
-     <li><router-link to="/registration"> Sign Up</router-link></li>
-   </ul>
-      <LoginComponent />
+    <div class="tabs">
+      <a
+          v-for="tab in tabs"
+          v-bind:key="tab.name"
+          v-bind:class="[{ active: currentTab.name === tab.name }]"
+          v-on:click="currentTab = tab"
+      >{{ tab.name }}
+      </a>
+    </div>
+    <component v-bind:is="currentTab.component"></component>
+    <p id="message" @serverResponse="showResponse">{{ response }}</p>
   </div>
 </template>
-<template>
-  <div id="panel">
-   <ul class="ul-tabs">
-     <li><router-link to="/login"  >Sign in</router-link></li>
-     <li><router-link to="/registration" class="active"> Sign Up</router-link></li>
-   </ul>
-      <RegistrationComponent />
-  </div>
-</template>
-<script>
-import LoginComponent from '../components/LoginComponent.vue';
+<script scoped>
+    import LoginComponent from '../components/LoginComponent.vue';
+    import RegistrationComponent from '../components/RegistrationComponent.vue';
 
-export default {
-  name: 'Login',
-  components: {
-    LoginComponent,
-  },
-};
+    const tabs = [
+        {
+            name: 'Sign in',
+            component: LoginComponent
+        },
+        {
+            name: 'Sign up',
+            component: RegistrationComponent
+        },
+    ];
+
+    export default {
+        name: 'Login',
+        data() {
+            return {
+                tabs: tabs,
+                currentTab: tabs[0],
+                response: '',
+            }
+        },
+        methods: {
+            showResponse(message) {
+                this.response = message || '';
+            },
+        },
+        components: {
+            LoginComponent,
+            RegistrationComponent,
+        },
+    };
 </script>
 
-<style scoped>
+<style lang="scss">
+  #panel {
+    background-color: #ffe4c4;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12), 0 3px 4px rgba(0, 0, 0, 0.24);
+    -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12), 0 3px 4px rgba(0, 0, 0, 0.24);
+    -moz-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12), 0 3px 4px rgba(0, 0, 0, 0.24);
+    height: 350px;
+    width: 70%;
+    margin: 30px auto;
+    padding: 30px 40px;
+  }
 
- #panel {
-        display: flex;
-        flex-direction: column;
-        background-color: #ffe4c4;
-        height: 350px;
-        width: 55%;
-        margin: 100px auto;
-        padding: 50px 40px;
-        box-shadow: 5px 5px 10px 0px rgba(0, 0, 0, 0.21);
-        border-radius: 10px;
+  /* Small devices (portrait tablets and large phones, 600px and up) */
+  @media only screen and (min-width: 600px) {
+    #panel {
+      width: 300px;
     }
+  }
 
-    .ul-tabs {
-        padding: 0;
-        display: flex;
-        justify-content: space-evenly;
-        margin-bottom: 15px;
-    }
-
-    .ul-tabs > li {
-        width: 50%;
-        list-style: none;
-        text-align: center;
-    }
+  .tabs {
+    display: flex;
+    padding: 0;
+    margin-bottom: 15px;
+    justify-content: space-evenly;
 
     a {
-        text-decoration: none;
-        text-transform: uppercase;
-        font-size: 18px;
-        color: #999;
-        font-weight: 600;
-        padding: 10px;
-        display: block;
-        border-bottom: 3px solid #999;
+      display: block;
+      list-style: none;
+      padding: 10px;
+      width: 50%;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      text-transform: uppercase;
+      border-bottom: 3px solid #999;
+      color: #999;
     }
 
     .active {
-        color: #ff8383;
-        border-bottom: 3px solid #ff8383;
+      color: #ff8383;
+      border-bottom: 3px solid #ff8383;
     }
+  }
 
 </style>

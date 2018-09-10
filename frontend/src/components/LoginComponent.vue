@@ -1,87 +1,99 @@
 <template>
- <form id="login">
-   <h1>Sign up</h1>
-   <input type="email" name="username" v-model="userEmail" placeholder="Email" />
-   <input type="password" name="password" v-model="userPassword" placeholder="Password" />
-   <button class="btn-login" type="button" v-on:click="login()">Login</button>
- </form>
+  <form id="login"
+        @submit.prevent="login"
+        action="/home"
+        method="post"
+        novalidate>
+    <div id="content">
+      <input type="email" name="username" v-model.trim="userEmail" placeholder="EMAIL"/>
+      <input type="password" name="password" v-model="userPassword" placeholder="PASSWORD"/>
+    </div>
+    <input id="btn-login" type="submit" :disabled="isDisabled" value="Login"/>
+  </form>
 </template>
 
 <script>
-import axios from 'axios';
+    import axios from 'axios';
 
-export default {
-  name: 'LoginComponent',
-  data() {
-    return {
-      userEmail: '',
-      userPassword: '',
+    export default {
+        name: 'LoginComponent',
+        data() {
+            return {
+                userEmail: '',
+                userPassword: '',
+            };
+        },
+        computed: {
+            isDisabled: function () {
+                return !(this.validEmail(this.userEmail) && this.userPassword)
+            }
+        },
+        methods: {
+            login() {
+                const userCredentials = {
+                    user_email: this.userEmail,
+                    user_password: this.userPassword,
+                };
+                axios.post('http://localhost:8000/api/users/login/', userCredentials)
+                    .then((response) => {
+                        if (response.data.status) {
+                            this.$router.push('/');
+                        } else {
+                            console.exception(response.data.message);
+                            this.$emit('serverResponse', response.data.message)
+                        }
+                    }).catch((error) => {
+                    console.error(error);
+                    this.$emit('serverResponse', error)
+                });
+            },
+            validEmail: function (email) {
+                const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(email);
+            },
+        },
     };
-  },
-  methods: {
-    login() {
-      const userCredentials = {
-        user_email: this.userEmail,
-        user_password: this.userPassword,
-      };
-
-      axios.post('http://localhost:8000/api/users/login/', userCredentials)
-        .then((response) => {
-          if (response.data.status) {
-            alert(`User exists. Full name: ${response.data.full_name}`);
-            this.$router.push('/');
-          } else {
-            alert(response.data.message);
-          }
-        }).catch((error) => {
-          alert(error);
-        });
-    },
-  },
-};
 </script>
 
-<style scoped>
- #login {
-   width: 500px;
-   border: 1px solid #CCCCCC;
-   background-color: #FFFFFF;
-   margin: auto;
-   margin-top: 130px;
-   padding: 20px;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
- }
+<style scoped lang="scss">
+  #login {
+    display: flex;
+    flex-direction: column;
+    height: 80%;
+  }
 
- input {
-   padding: 10px 15px;
-   margin-bottom: 10px;
-   width: 300px;
-   border: 1px solid #ccc;
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-   border-radius: 5px;
- }
+  #content {
+    height: 200px;
+    flex: 1 1 auto;
 
- input:focus {
-   outline: none;
- }
+    input {
+      background-color: transparent;
+      border: none;
+      border-bottom: 2px solid #ff8383;
+      font-size: 16px;
+      outline: none;
+      margin: 15px 0;
+      width: 100%;
+    }
 
- .btn-login {
-   margin-top: 5px;
-   background-color: #ffc107;
-   color: #fff;
-   border: none;
-   padding: 10px 25px;
-   text-transform: uppercase;
-   font-weight: 600;
-   font-family: "Liberation Sans", sans;
-   border-radius: 20px;
-   cursor: pointer;
- }
+    input:focus {
+      border-bottom: 2px solid #b71c1c;
+    }
+  }
 
- .btn-login:hover {
-   background-color: #ffa000;
- }
+  #btn-login {
+    width: 100%;
+    border: none;
+    padding: 10px 25px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: 'Liberation Sans', sans, sans-serif;
+    cursor: pointer;
+    background-color: #ffb6c1;
+  }
+
+  #btn-login:disabled {
+    background-color: #d3d3d3;
+  }
 </style>
