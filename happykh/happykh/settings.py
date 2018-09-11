@@ -175,6 +175,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_REGEX_WHITELIST = (
+    # For Client
     r'http://localhost*',
     r'http://127.0.0.1:*',
+    # For Testing Environment
+    r'null',
 )
