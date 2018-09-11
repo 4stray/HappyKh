@@ -5,9 +5,7 @@
            placeholder="Email" />
     <input type="password" name="userPassword" v-model="userPassword"
            placeholder="Password" />
-    <button class="btn-login" type="button" v-on:click="login()">
-      Login
-    </button>
+    <button class="btn-login" type="button" v-on:click="login()">Login</button>
   </form>
 </template>
 

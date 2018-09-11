@@ -18,6 +18,7 @@ class UserLogin(APIView):
     """
     List all users, or create a new snippet.
     """
+
     permission_classes = (AllowAny,)
 
     def post(self, request, format=None):

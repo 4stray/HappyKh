@@ -25,6 +25,7 @@ export default {
         if (Boolean(response.data.status) === false) {
           console.log(response.data.message);
         } else {
+          console.log('user accout has been activated')
           // get token for authorisation here
         }
       })
