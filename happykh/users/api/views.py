@@ -24,6 +24,7 @@ class UserLogin(APIView):
             return Response({'status': False, 'message': "Incorrect password."})
 
         full_name = user.get_full_name()
+        send_email_confirmation(user)
         return Response({'status': True, 'full_name': full_name})
 
 
@@ -43,12 +44,15 @@ def send_email_confirmation(user):
 
 
 class UserActivation(APIView):
-
     def get(self, request, user_id, token):
         try:
             user = User.objects.get(pk=user_id)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
-        if user is not None and account_activation_token.check_token(user, token):
-            return Response({'status': True})
+        if not user.is_active:
+            return Response({'status': False, 'message': "User is already activated"})
+        elif user is not None and account_activation_token.check_token(user, token):
+            return Response({'status': True })
+        else:
+            return Response({'status': False})
