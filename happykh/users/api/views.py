@@ -1,9 +1,9 @@
 """Views for app users"""
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from django.core.mail import send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.core.mail import send_mail
 from users.models import User
 from happykh.settings import EMAIL_HOST_USER
 from .tokens import account_activation_token
@@ -14,6 +14,12 @@ class UserLogin(APIView):
     List all users, or create a new snippet.
     """
     def post(self, request, format=None):
+        """
+        Processes post request from login page
+        :param request: http request
+        :param format:
+        :return: json - status, message or full_name
+        """
         email = request.data.get('user_email')
         password = request.data.get('user_password')
 
@@ -36,6 +42,9 @@ class UserLogin(APIView):
 
 
 def send_email_confirmation(user):
+    """
+    Make and send mail for user confirmation
+    """
     try:
         token = account_activation_token.make_token(user)
         user_id = user.pk
@@ -51,7 +60,17 @@ def send_email_confirmation(user):
 
 
 class UserActivation(APIView):
+    """
+    Check token from email and activate user
+    """
     def get(self, request, user_id, token):
+        """
+        Processes get request from user activation page
+        :param request: http request
+        :param user_id: user`s id
+        :param token: onetime email confirmation token
+        :return: json - status, message
+        """
         try:
             user = User.objects.get(pk=user_id)
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
@@ -60,6 +79,6 @@ class UserActivation(APIView):
         if not user.is_active:
             return Response({'status': False, 'message': "User is already activated"})
         elif user is not None and account_activation_token.check_token(user, token):
-            return Response({'status': True})
+            return Response({'status': True, 'message': "User successfully activated"})
         else:
-            return Response({'status': False})
+            return Response({'status': False, 'message': "Activation error"})
