@@ -170,7 +170,7 @@ USE_L10N = True
 USE_TZ = True
 
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-SENDGRID_API_KEY = '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'
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 EMAIL_HOST_USER = 'manager@happykh.com'
 

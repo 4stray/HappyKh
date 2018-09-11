@@ -2,6 +2,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.core.mail import send_mail
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.models import User
@@ -18,7 +19,7 @@ class UserLogin(APIView):
         Processes post request from login page
         :param request: http request
         :param format:
-        :return: json - status, message or full_name
+        :return: json - error message or user`s full_name
         """
         email = request.data.get('user_email')
         password = request.data.get('user_password')
@@ -26,19 +27,19 @@ class UserLogin(APIView):
         try:
             validate_email(email)
         except ValidationError:
-            return Response({'status': False, 'message': "Invalid email data."})
+            return Response({'message': "Invalid email data."}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({'status': False, 'message': "No user with such email."})
+            return Response({'message': "No user with such email."}, status=status.HTTP_404_NOT_FOUND)
 
         if not user.check_password(password):
-            return Response({'status': False, 'message': "Incorrect password."})
+            return Response({'message': "Incorrect password."}, status=status.HTTP_400_BAD_REQUEST)
 
         full_name = user.get_full_name()
         send_email_confirmation(user)
-        return Response({'status': True, 'full_name': full_name})
+        return Response({'full_name': full_name})
 
 
 def send_email_confirmation(user):
