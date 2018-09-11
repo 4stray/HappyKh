@@ -53,6 +53,6 @@ class UserActivation(APIView):
         if not user.is_active:
             return Response({'status': False, 'message': "User is already activated"})
         elif user is not None and account_activation_token.check_token(user, token):
-            return Response({'status': True })
+            return Response({'status': True})
         else:
             return Response({'status': False})
