@@ -1,7 +1,6 @@
 from rest_framework import exceptions
 from rest_framework import authentication
 from rest_framework.authtoken.models import Token
-# from .models import User
 from users.models import User
 
 
@@ -20,4 +19,10 @@ class UserAuthentication:
                                                 password=user_password,
                                                 is_active=False)
                 return user
+            return None
+
+    def get_user(self, user_id):
+        try:
+            return User.objects.get(pk=user_id)
+        except User.DoesNotExist:
             return None

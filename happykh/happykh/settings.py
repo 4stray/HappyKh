@@ -30,8 +30,8 @@ AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
     'users.backends.UserAuthentication',
-    'django.contrib.auth.backends.RemoteUserBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.RemoteUserBackend',
 )
 # Application definition
 
@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
 ]
+
+# Basic Django REST Token setup
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -93,21 +95,12 @@ WSGI_APPLICATION = 'happykh.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_AUTHENTICATION_CLASSES': (
-#         'rest_framework.authentication.TokenAuthentication',
-#     ),
-#     'DEFAULT_PERMISSION_CLASSES': (
-#         'rest_framework.permissions.IsAuthenticated', )
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'happykh',
         'USER': 'admin',
-        'PASSWORD': 'abc12345',
+        'PASSWORD': 'admin123',
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -124,7 +117,8 @@ LOGGING = {
             'format': '%(asctime)s ::: %(levelname)s ::: %(message)s'
         },
         'file': {
-            'format': '%(levelname)s ::: %(filename)s ::: %(lineno)d ::: %(message)s'
+            'format': '%(levelname)s ::: %(filename)s ::: %(lineno)d'
+                      ' ::: %(message)s'
         },
     },
     'handlers': {
@@ -193,11 +187,16 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_REGEX_WHITELIST = (
+    # For Client
     r'http://localhost*',
     r'http://127.0.0.1:*',
+    # For Testing Environment
+    r'null',
 )
 
+# Email API setup
+
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-SENDGRID_API_KEY = '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'
-EMAIL_BACKEND = 'sgbackend.SendGridBackend'
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 EMAIL_HOST_USER = 'manager@happykh.com'

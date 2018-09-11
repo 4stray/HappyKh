@@ -4,23 +4,14 @@ from django.core.validators import validate_email
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.core.mail import send_mail
-from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.utils import six
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
-
+from .tokens import account_activation_token
 from users.models import User
-from happykh.settings import EMAIL_HOST_USER, AUTHENTICATION_BACKENDS
-
-
-class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
-    def _make_hash_value(self, user, timestamp):
-        return six.text_type(user.pk) + six.text_type(timestamp)
-
-
-account_activation_token = AccountActivationTokenGenerator()
+from happykh.settings import EMAIL_HOST_USER
 
 
 class UserLogin(APIView):
@@ -30,23 +21,24 @@ class UserLogin(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
-        # + Перенаправления с мейла на фронт (ссылка должна генериться)
-        # + Login User with token
-        # Login User with credentials
-        # Permissions
-        # Write serializer for login
+        """
 
+        :param request: HttpRequest
+        :param format:
+        :return: Response({status, message})
+        """
         if 'user_token' in request.data:
             pass
         else:
+            print(request.user)
             email = request.data.get('user_email')
             password = request.data.get('user_password')
 
             try:
                 validate_email(email)
             except ValidationError:
-                return Response({'status': False,
-                                 'message': "Invalid user credentials."})
+                return Response(data={'status': False,
+                                      'message': 'Invalid user credentials.'})
 
             user = authenticate(request, user_email=email,
                                 user_password=password)
@@ -54,6 +46,9 @@ class UserLogin(APIView):
             if not user:
                 return Response({'status': False,
                                  'message': 'Invalid user credentials'})
+
+            login(request, user)
+
             return Response({'status': True})
 
 
@@ -61,6 +56,11 @@ class UserRegistration(APIView):
     permission_classes = (AllowAny, )
 
     def post(self, request, format=None):
+        """
+        Authenticates and logs the user in (login is not working)
+        :param request: http request
+        :return: Response({status, message})
+        """
         email = request.data['user_email']
         password = request.data['user_password']
 
@@ -81,6 +81,11 @@ class UserRegistration(APIView):
                                             ' due to connection reasons'})
 
     def send_email_confirmation(self, user):
+        """
+        Sends an email on user.email mailbox
+        :param user: User
+        :return: Boolean
+        """
         try:
             token = account_activation_token.make_token(user)
             user_id = user.pk
@@ -98,14 +103,26 @@ class UserRegistration(APIView):
 
 
 class UserActivation(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request, user_id, token):
+        """
+        Processes GET request from user activation page
+        :param request: HttpRequest
+        :param user_id: Integer
+        :param token: String
+        :return: Response({status, message})
+        """
+
         try:
             user = User.objects.get(pk=user_id)
             user_token, created = Token.objects.get_or_create(user=user)
 
-            if account_activation_token.check_token(user, token) and created:
+            if user.is_active:
+                return Response({'status': False,
+                                 'message': "User is already activated"})
+            elif account_activation_token.check_token(user, token) \
+                    and created:
                 user.is_active = True
                 user.save()
 
@@ -119,4 +136,5 @@ class UserActivation(APIView):
                                  'message': 'User already exists'})
         except (TypeError, ValueError, OverflowError,
                 User.DoesNotExist) as Error:
-            return Response({'status': False, 'message': str(Error)})
+            return Response({'status': False,
+                             'message': str(Error)})

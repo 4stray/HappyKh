@@ -1,5 +1,8 @@
 <template>
-  <p>You've just confirmed your mail</p>
+  <div>
+    <h2>Congratulations!!!</h2>
+    <h3>You've just activated your account</h3>
+  </div>
 </template>
 
 <script>
@@ -15,20 +18,19 @@ export default {
     const user_token = this.$route.params.token;
 
     axios.post(`http://localhost:8000/api/users/activate/${user_id}/${user_token}/`, {
-        user_id: user_id,
-        user_token: user_token
+      user_id,
+      user_token,
     })
       .then((response) => {
         if (Boolean(response.data.status) === false) {
           console.log(response.data.message);
         } else {
-          // get token here
+          // get token for authorisation here
         }
-
       })
       .catch((error) => {
         console.log(error);
-      })
+      });
   },
 };
 </script>

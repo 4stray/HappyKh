@@ -1,9 +1,13 @@
 <template>
   <form id="login">
     <h1>Sign up</h1>
-    <input type="email" name="username" v-model="userEmail" placeholder="Email" />
-    <input type="password" name="password" v-model="userPassword" placeholder="Password" />
-    <button class="btn-login" type="button" v-on:click="login()">Login</button>
+    <input type="email" name="userEmail" v-model="userEmail"
+           placeholder="Email" />
+    <input type="password" name="userPassword" v-model="userPassword"
+           placeholder="Password" />
+    <button class="btn-login" type="button" v-on:click="login()">
+      Login
+    </button>
   </form>
 </template>
 
@@ -25,13 +29,12 @@ export default {
         user_password: this.userPassword,
       };
 
-      axios.post('http://localhost:8000/api/users/registration/', userCredentials)
+      axios.post('http://localhost:8000/api/users/login/', userCredentials)
         .then((response) => {
           if (response.data.status) {
-            alert(`Mail has been sent`);
             this.$router.push('/');
           } else {
-            alert(response.data.message);
+            alert(response.data.massage);
           }
         }).catch((error) => {
           alert(error);
