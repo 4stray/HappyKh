@@ -46,9 +46,12 @@ function register(context, userCredentials, redirect) {
       }
     }).catch((error) => {
     context.response = {
-      message: error.data.message,
+      message: error.message,
       status: false,
     };
-    context.$cookie.removeItem('token'); // if the request fails, remove any possible user token if possible
+    console.log(context.$cookie);
+    if (context.$cookie) {
+      context.$cookie.delete('token'); // if the request fails, remove any possible user token if possible
+    }
   });
 }
