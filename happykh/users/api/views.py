@@ -77,9 +77,11 @@ class UserActivation(APIView):
         except (TypeError, ValueError, OverflowError, User.DoesNotExist):
             user = None
 
-        if not user.is_active:
-            return Response({'status': False, 'message': "User is already activated"})
+        if user.is_active:
+            return Response({'message': "User is already activated"})
         elif user is not None and account_activation_token.check_token(user, token):
-            return Response({'status': True, 'message': "User successfully activated"})
+            user.is_active = True
+            user.save()
+            return Response({'message': "User successfully activated"})
         else:
-            return Response({'status': False, 'message': "Activation error"})
+            return Response({'message': "Activation error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
