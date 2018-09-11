@@ -1,4 +1,6 @@
 """Views for app users"""
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.mail import send_mail
@@ -14,6 +16,11 @@ class UserLogin(APIView):
     def post(self, request, format=None):
         email = request.data.get('user_email')
         password = request.data.get('user_password')
+
+        try:
+            validate_email(email)
+        except ValidationError:
+            return Response({'status': False, 'message': "Invalid email data."})
 
         try:
             user = User.objects.get(email=email)

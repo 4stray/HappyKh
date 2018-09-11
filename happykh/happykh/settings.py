@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -30,10 +29,11 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
-        'django.contrib.auth.backends.RemoteUserBackend',
-        'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.RemoteUserBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 # Application definition
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -42,8 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'customlogger.apps.CustomloggerConfig',
     'users.apps.UsersConfig',
     'rest_framework',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +56,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'happykh.urls'
@@ -76,7 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'happykh.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -90,6 +93,49 @@ DATABASES = {
         'HOST': 'localhost',
         'PORT': '',
     }
+}
+
+# Logger settings
+# https://docs.djangoproject.com/en/2.1/topics/logging/
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s ::: %(levelname)s ::: %(message)s'
+        },
+        'file': {
+            'format': '%(levelname)s ::: %(filename)s ::: %(lineno)d ::: %(message)s'
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default'
+        },
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'maxBytes': 1024 * 1024 * 50,
+            'backupCount': 15,
+            'filename': 'logs/warnings.log',
+            'formatter': 'file'
+        },
+        'db': {
+            'level': 'CRITICAL',
+            'class': 'customlogger.dbhandler.DataBaseHandler',
+            'formatter': 'default'
+        },
+    },
+    'loggers': {
+        'happy_logger': {
+            'handlers': ['console', 'file', 'db'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
 }
 
 # Password validation
@@ -109,7 +155,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
@@ -133,3 +178,11 @@ EMAIL_HOST_USER = 'manager@happykh.com'
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+CORS_ORIGIN_REGEX_WHITELIST = (
+    # For Client
+    r'http://localhost*',
+    r'http://127.0.0.1:*',
+    # For Testing Environment
+    r'null',
+)
