@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
+    'users.backends.UserAuthentication',
     'django.contrib.auth.backends.RemoteUserBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
@@ -45,8 +46,17 @@ INSTALLED_APPS = [
     'customlogger.apps.CustomloggerConfig',
     'users.apps.UsersConfig',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated', )
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -84,12 +94,20 @@ WSGI_APPLICATION = 'happykh.wsgi.application'
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
 
+# REST_FRAMEWORK = {
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#         'rest_framework.authentication.TokenAuthentication',
+#     ),
+#     'DEFAULT_PERMISSION_CLASSES': (
+#         'rest_framework.permissions.IsAuthenticated', )
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'happykh',
         'USER': 'admin',
-        'PASSWORD': 'admin123',
+        'PASSWORD': 'abc12345',
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -178,3 +196,8 @@ CORS_ORIGIN_REGEX_WHITELIST = (
     r'http://localhost*',
     r'http://127.0.0.1:*',
 )
+
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+SENDGRID_API_KEY = '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'
+EMAIL_BACKEND = 'sgbackend.SendGridBackend'
+EMAIL_HOST_USER = 'manager@happykh.com'

@@ -25,10 +25,10 @@ export default {
         user_password: this.userPassword,
       };
 
-      axios.post('http://localhost:8000/api/users/login/', userCredentials)
+      axios.post('http://localhost:8000/api/users/registration/', userCredentials)
         .then((response) => {
           if (response.data.status) {
-            alert(`User exists. Full name: ${response.data.full_name}`);
+            alert(`Mail has been sent`);
             this.$router.push('/');
           } else {
             alert(response.data.message);

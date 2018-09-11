@@ -5,5 +5,10 @@ from users.api import views
 urlpatterns = [
     path('users/', include([
         path('login/', views.UserLogin.as_view()),
+        path('registration/', views.UserRegistration.as_view()),
+        # UserRegistration.put | UserRegistration.post
+        # 'login/' - login (post)
+        # '/' - registration (put)
+        path('activate/<int:user_id>/<slug:token>/', views.UserActivation.as_view()),
     ])),
 ]
