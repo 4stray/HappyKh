@@ -1,7 +1,6 @@
 """Views for app users"""
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from users.models import User
