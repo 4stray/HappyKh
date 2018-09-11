@@ -1,65 +1,66 @@
 <template>
-    <div>
-        <p id="message" v-if="response">{{ response.message }}</p>
-        <div id="panel">
-            <div class="tabs">
-                <a
-                        v-for="tab in tabs"
-                        v-bind:key="tab.name"
-                        v-bind:class="[{ active: currentTab.name === tab.name }]"
-                        v-on:click="currentTab = tab"
-                >{{ tab.name }}
-                </a>
-            </div>
-            <component v-bind:is="currentTab.component" @serverResponse="showResponse"></component>
-        </div>
+  <div>
+    <p id="message" v-if="response">{{ response }}</p>
+    <div id="panel">
+      <div class="tabs">
+        <a
+            v-for="tab in tabs"
+            v-bind:key="tab.name"
+            v-bind:class="[{ active: currentTab.name === tab.name }]"
+            v-on:click="currentTab = tab"
+        >{{ tab.name }}
+        </a>
+      </div>
+      <component v-bind:is="currentTab.component"
+                 @serverResponse="showResponse"></component>
     </div>
+  </div>
 </template>
-<script scoped>
-    import LoginComponent from '../components/LoginComponent.vue';
-    import RegistrationComponent from '../components/RegistrationComponent.vue';
+<script>
+import LoginComponent from '../components/LoginComponent.vue';
+import RegistrationComponent from '../components/RegistrationComponent.vue';
 
-    const tabs = [
-        {
-            name: 'Sign in',
-            component: LoginComponent
-        },
-        {
-            name: 'Sign up',
-            component: RegistrationComponent
-        },
-    ];
+const tabs = [
+  {
+    name: 'Sign in',
+    component: LoginComponent,
+  },
+  {
+    name: 'Sign up',
+    component: RegistrationComponent,
+  },
+];
 
-    export default {
-        name: 'Login',
-        data() {
-            return {
-                tabs: tabs,
-                currentTab: tabs[0],
-                response: '',
-            }
-        },
-        methods: {
-            showResponse(serverResponse) {
-                this.response = serverResponse || '';
-            },
-        },
-        components: {
-            LoginComponent,
-            RegistrationComponent,
-        },
+export default {
+  name: 'Login',
+  data() {
+    return {
+      tabs,
+      currentTab: tabs[0],
+      response: '',
     };
+  },
+  methods: {
+    showResponse(serverResponse) {
+      this.response = serverResponse || '';
+    },
+  },
+  components: {
+    LoginComponent,
+    RegistrationComponent,
+  },
+};
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   #panel {
-    background-color: #ffe4c4;
+    background-color: #f7dbb5;
     box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12), 0 3px 4px rgba(0, 0, 0, 0.24);
     -webkit-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12), 0 3px 4px rgba(0, 0, 0, 0.24);
     -moz-box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12), 0 3px 4px rgba(0, 0, 0, 0.24);
     height: 350px;
     width: 70%;
-    margin: 30px auto;
+    margin: 20px auto;
     padding: 30px 40px;
   }
 
@@ -96,13 +97,25 @@
     }
   }
 
-    #message {
-      width: 350px;
-      //background-color: #ff8383;
-     // padding: 5px 10px;
-     // border-bottom: 3px solid #dc143c;
-      font-size: 16px;
-      margin: 10px auto;
-    }
+  #message {
+    width: 350px;
+    background-color: #ffabae;
+    color: #800000;
+    padding: 15px 10px;
+    font-size: 16px;
+    margin: 0 auto;
+    animation: fadeOut 5s linear forwards;
+  }
 
+  /*@keyframes fadeOut {*/
+  /*0% {*/
+  /*opacity: 1;*/
+  /*}*/
+  /*90% {*/
+  /*opacity: 1;*/
+  /*}*/
+  /*100% {*/
+  /*opacity: 0;*/
+  /*}*/
+  /*}*/
 </style>
