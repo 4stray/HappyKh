@@ -35,9 +35,10 @@ function login(context, userCredentials) {
  * @param redirect - redirect-rout after successful registration
  */
 function register(context, userCredentials, redirect) {
+  console.log(userCredentials);
   axios.post('http://localhost:8000/api/users/registration/', userCredentials)
     .then((response) => {
-      context.$cookie.set('token', response.data.token);
+      context.$cookies.set('token', response.data.token, "1h");
       context.response = {
         message: response.data.message,
         status: response.data.status,
@@ -46,12 +47,13 @@ function register(context, userCredentials, redirect) {
         context.$router.push(redirect);
       }
     }).catch((error) => {
+      console.log('Error register');
       context.response = {
         message: error.message,
         status: false,
       };
-      if (context.$cookie) {
-        context.$cookie.delete('token'); // if the request fails, remove any possible user token if possible
+      if (context.$cookies) {
+        context.$cookies.remove('token'); // if the request fails, remove any possible user token if possible
       }
     });
 }
