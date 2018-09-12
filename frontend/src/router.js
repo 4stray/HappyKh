@@ -21,7 +21,7 @@ export default new Router({
       component: () => import('./views/Login.vue'),
     },
     {
-      path: '/confirm_registration/:user_id/:token',
+      path: '/confirm_registration/:userId/:emailToken',
       name: 'confirm_registration',
       component: ConfirmRegistration,
     },

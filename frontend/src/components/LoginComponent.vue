@@ -35,21 +35,6 @@ export default {
           console.log(error);
         });
     },
-    logout() {
-      const authConfig = {
-        headers: {
-          // Write the token of a user on the place of default one
-          Authorization: 'Token c177bdde5338300b34b1d5a9f7650a3cd797bc41',
-        },
-      };
-
-      axios.post('http://localhost:8000/api/users/logout/', '', authConfig)
-        .then((response) => {
-          console.log(response.data);
-        }).catch((error) => {
-          console.log(error);
-        });
-    },
   },
 };
 </script>
