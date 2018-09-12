@@ -1,8 +1,10 @@
 <template>
   <form id="login">
     <h1>Sign up</h1>
-    <input type="email" name="userEmail" v-model="userEmail" placeholder="Email" />
-    <input type="password" name="userPassword" v-model="userPassword" placeholder="Password" />
+    <input type="email" name="userEmail" v-model="userEmail"
+           placeholder="Email" />
+    <input type="password" name="userPassword" v-model="userPassword"
+           placeholder="Password" />
     <button class="btn-login" type="button" v-on:click="login()">Login</button>
   </form>
 </template>
@@ -28,10 +30,9 @@ export default {
       axios.post('http://localhost:8000/api/users/login/', userCredentials)
         .then((response) => {
           if (response.data.status) {
-            alert(`User exists. Full name: ${response.data.full_name}`);
             this.$router.push('/');
           } else {
-            alert(response.data.message);
+            alert(response.data.massage);
           }
         }).catch((error) => {
           alert(error);
