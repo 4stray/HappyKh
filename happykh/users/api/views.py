@@ -1,55 +1,50 @@
 """Views for app users"""
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_email
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
-from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from .tokens import account_activation_token
+from rest_framework import exceptions
 from users.models import User
 from happykh.settings import EMAIL_HOST_USER
+from users.serializers import LoginSerializer
+from .tokens import account_activation_token
 
 
-class UserLogin(APIView):
-    """
-    List all users, or create a new snippet.
-    """
-
+class LoginView(APIView):
     permission_classes = (AllowAny,)
 
-    def post(self, request, format=None):
+    def post(self, request):
         """
-
+        Logs User in
         :param request: HttpRequest
-        :param format:
-        :return: Response({status, message})
+        :return: token
         """
-        if 'user_token' in request.data:
-            pass
-        else:
-            email = request.data.get('user_email')
-            password = request.data.get('user_password')
+        serializer = LoginSerializer(data=request.data)
+        try:
+            serializer.is_valid(raise_exception=True)
+        except exceptions.ValidationError:
+            return Response({'message': 'Invalid User Credentials'},
+                            status=400)
 
-            try:
-                validate_email(email)
-            except ValidationError:
-                return Response(data={'status': False,
-                                      'message': 'Invalid user credentials.'})
+        user = serializer.validated_data['user']
+        login(request, user)
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key} , status=200)
 
-            user = authenticate(request, user_email=email,
-                                user_password=password)
+    def get(self, request):
+        return Response({'user': str(request.user)})
 
-            if not user:
-                return Response({'status': False,
-                                 'message': 'Invalid user credentials'})
 
-            login(request, user)
+class LogoutView(APIView):
+    authentication_classes = (TokenAuthentication, )
 
-            return Response({'status': True})
+    def post(self, request):
+        logout(request)
+        return Response(status=204)
 
 
 class UserRegistration(APIView):
@@ -57,7 +52,7 @@ class UserRegistration(APIView):
 
     def post(self, request, format=None):
         """
-        Authenticates and logs the user in (login is not working)
+        If user credentials are valid then creates deactivated User
         :param request: http request
         :return: Response({status, message})
         """
@@ -66,19 +61,19 @@ class UserRegistration(APIView):
 
         try:
             user = User.objects.get(email=email)
-            return Response({'status': False,
-                             'message': 'User with such an email'
-                                        'already exist'})
+            return Response({'message': 'User with such an email'
+                                        ' already exist'},
+                            status=400)
         except User.DoesNotExist:
             user = authenticate(request, user_email=email,
                                 user_password=password)
 
             if self.send_email_confirmation(user):
-                return Response({'status': True})
+                return Response(status=201)
             else:
-                return Response({'status': False,
-                                 'message': 'The mail has not been delivered'
-                                            ' due to connection reasons'})
+                return Response({'message': 'The mail has not been delivered'
+                                            ' due to connection reasons'},
+                                status=500)
 
     def send_email_confirmation(self, user):
         """
@@ -107,7 +102,7 @@ class UserActivation(APIView):
 
     def post(self, request, user_id, token):
         """
-        Processes GET request from user activation page
+        Processes POST request from user activation page
         :param request: HttpRequest
         :param user_id: Integer
         :param token: String
@@ -119,8 +114,8 @@ class UserActivation(APIView):
             user_token, created = Token.objects.get_or_create(user=user)
 
             if user.is_active:
-                return Response({'status': False,
-                                 'message': "User is already activated"})
+                return Response({'message': "User is already activated"},
+                                status=400)
             elif account_activation_token.check_token(user, token) \
                     and created:
                 user.is_active = True
@@ -129,12 +124,10 @@ class UserActivation(APIView):
                 login(request, user,
                       backend='users.backends.UserAuthentication')
 
-                return Response({'status': True,
-                                 'user_token': user_token.key})
+                return Response({'user_token': user_token.key}, status=201)
             else:
-                return Response({'status': False,
-                                 'message': 'User already exists'})
+                return Response({'message': 'User already exists'},
+                                status=400)
         except (TypeError, ValueError, OverflowError,
                 User.DoesNotExist) as Error:
-            return Response({'status': False,
-                             'message': str(Error)})
+            return Response({'message': str(Error)}, status=500)
