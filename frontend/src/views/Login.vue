@@ -17,18 +17,19 @@
         </button>
       </div>
       <form id="login" @submit.prevent="loginUser" @keypress.enter="loginUser"
-            v-if="!signUpVisible">
+            v-if="!signUpVisible" method="post">
         <div class="content">
           <input type="email" name="username" v-model.trim="userEmail"
                  placeholder="EMAIL"/>
           <input type="password" name="password" v-model="userPassword"
                  placeholder="PASSWORD"/>
         </div>
-        <input class="btn-submit" type="submit" :disabled="isDisabled"
+        <input class="btn-submit" type="submit" :disabled="isDisabledLogin"
                value="Login"/>
       </form>
       <form id="register" @submit.prevent="registerUser"
-            v-if="signUpVisible">
+            @keypress.enter="registerUser"
+            v-if="signUpVisible" method="post">
         <div class="content">
           <input type="email" v-model.trim="userEmail" placeholder="EMAIL"/>
           <p v-if="errors.email" class="error">{{errors.email}}</p>
@@ -43,94 +44,96 @@
           </ul>
         </div>
         <input class="btn-submit" type="submit"
-               :disabled="isDisabledRegistration"
+               :disabled="isDisabledLoginRegistration"
                value="SIGN UP"/>
       </form>
     </div>
   </div>
 </template>
 <script>
-  import {login, register} from '../components/authentication';
+import { login, register } from '../components/authentication';
 
-  export default {
-    name: 'Login',
-    data() {
-      return {
-        signUpVisible: false,
-        response: '',
-        userEmail: '',
-        userPassword: '',
-        confirmPassword: '',
-        errors: {
-          email: '',
-          password: [],
-        },
-        userCredentials: {
-          user_email: '',
-          user_password: '',
-        },
-      };
+export default {
+  name: 'Login',
+  data() {
+    return {
+      signUpVisible: false,
+      response: '',
+      userEmail: '',
+      userPassword: '',
+      confirmPassword: '',
+      errors: {
+        email: '',
+        password: [],
+      },
+    };
+  },
+  methods: {
+    loginUser() {
+      login(this, this.userCredentials);
     },
-    methods: {
-      registerUser() {
-        if (this.validate()) {
-          register(this, this.userCredentials);
-        }
-      },
-      loginUser() {
-        login(this, this.userCredentials);
-      },
-      /**
-       * @description Checks correctness of entered user's fields
-       * @returns {boolean}
-       */
-      validate() {
-        this.errors = {
-          email: '',
-          password: [],
-        };
-        if (!this.isEmailValid(this.userEmail)) {
-          this.errors.email = '* Please enter a valid email address.';
-        }
-        if (this.userPassword.length < 8) {
-          this.errors.password.push('* Your password must be at least 8 characters.');
-        }
-        const alphaNumeric = /^[0-9a-zA-Z]+$/;
-        if (!this.userPassword.match(alphaNumeric)) {
-          this.errors.password.push('* Your password must contain only numbers and alphabetical characters.');
-        }
-        if (this.userPassword !== this.confirmPassword) {
-          this.errors.password.push("* Your passwords don't match, please try again.");
-        }
-        return !this.errors.length;
-      },
-      /**
+    registerUser() {
+      if (this.isUserDataValid()) {
+        register(this, this.userCredentials);
+      }
+    },
+    /**
        * @description Checks correctness of  user's email
        * @param {string} email
        * @returns {*|boolean}
        */
-      isEmailValid(email) {
-        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        return re.test(email);
-      },
+    isEmailValid(email) {
+      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      return re.test(email);
     },
-    computed: {
-      /**
+    /**
+       * @description Checks correctness of entered user's fields
+       * @returns {boolean} Result of check
+       */
+    isUserDataValid() {
+      this.errors = {
+        email: '',
+        password: [],
+      };
+      if (!this.isEmailValid(this.userEmail)) {
+        this.errors.email = '* Please enter a valid email address.';
+      }
+      if (this.userPassword.length < 8) {
+        this.errors.password.push('* Your password must be at least 8 characters.');
+      }
+      const alphaNumeric = /^[0-9a-zA-Z]+$/;
+      if (!this.userPassword.match(alphaNumeric)) {
+        this.errors.password.push('* Your password must contain only numbers and alphabetical characters.');
+      }
+      if (this.userPassword !== this.confirmPassword) {
+        this.errors.password.push("* Your passwords don't match, please try again.");
+      }
+      return !this.errors.length;
+    },
+  },
+  computed: {
+    /**
        * @description Checks if user filled all fields
        * @returns {boolean}
        * */
-      isDisabledRegistration() {
-        return !(this.userEmail && this.userPassword && this.confirmPassword);
-      },
-      /**
+    isDisabledLoginRegistration() {
+      return !(this.userEmail && this.userPassword && this.confirmPassword);
+    },
+    /**
        * @description Checks if user filled all fields
        * @returns {boolean}
        * */
-      isDisabled() {
-        return !(this.isEmailValid(this.userEmail) && this.userPassword);
-      },
+    isDisabledLogin() {
+      return !(this.isEmailValid(this.userEmail) && this.userPassword);
     },
-  };
+    userCredentials() {
+      return {
+        user_email: this.userEmail,
+        user_password: this.userPassword,
+      };
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>

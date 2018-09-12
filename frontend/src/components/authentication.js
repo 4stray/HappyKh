@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-export {login, register};
+import querystring from 'querystring';
 
 /**
  * @description Send user's credentials for authentication
@@ -8,23 +7,25 @@ export {login, register};
  * @param {Object} userCredentials
  */
 function login(context, userCredentials) {
-  axios.post('http://localhost:8000/api/users/login/', userCredentials)
+  axios.post(
+    'http://localhost:8000/api/users/login/',
+    querystring.stringify(userCredentials),
+  )
     .then((response) => {
-        if (response.data.status) {
-          context.$router.push('/');
-        } else {
-          context.response = {
-            message: response.data.message,
-            status: response.data.status,
-          };
-        }
+      if (response.data.status) {
+        context.$router.push('/');
+      } else {
+        context.response = {
+          message: response.data.message,
+          status: response.data.status,
+        };
       }
-    ).catch((error) => {
-    context.response = {
-      message: error.message,
-      status: false,
-    };
-  });
+    }).catch((error) => {
+      context.response = {
+        message: error.message,
+        status: false,
+      };
+    });
 }
 
 /**
@@ -45,13 +46,14 @@ function register(context, userCredentials, redirect) {
         context.$router.push(redirect);
       }
     }).catch((error) => {
-    context.response = {
-      message: error.message,
-      status: false,
-    };
-    console.log(context.$cookie);
-    if (context.$cookie) {
-      context.$cookie.delete('token'); // if the request fails, remove any possible user token if possible
-    }
-  });
+      context.response = {
+        message: error.message,
+        status: false,
+      };
+      if (context.$cookie) {
+        context.$cookie.delete('token'); // if the request fails, remove any possible user token if possible
+      }
+    });
 }
+
+export { login, register };
