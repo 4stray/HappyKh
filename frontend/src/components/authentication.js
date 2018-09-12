@@ -38,7 +38,6 @@ function register(context, userCredentials, redirect) {
   console.log(userCredentials);
   axios.post('http://localhost:8000/api/users/registration/', userCredentials)
     .then((response) => {
-      context.$cookies.set('token', response.data.token, "1h");
       context.response = {
         message: response.data.message,
         status: response.data.status,
@@ -53,7 +52,8 @@ function register(context, userCredentials, redirect) {
         status: false,
       };
       if (context.$cookies) {
-        context.$cookies.remove('token'); // if the request fails, remove any possible user token if possible
+        context.$cookies.remove('token');
+        // if the request fails, remove any possible user token if possible
       }
     });
 }

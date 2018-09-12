@@ -16,7 +16,7 @@
         >Sign up
         </button>
       </div>
-      <form id="login" @submit.prevent="loginUser" @keypress.enter="loginUser"
+      <form id="login" @submit.prevent="loginUser"
             v-if="!signUpVisible" method="post">
         <div class="content">
           <input type="email" name="username" v-model.trim="userEmail"
@@ -28,7 +28,6 @@
                value="Login"/>
       </form>
       <form id="register" @submit.prevent="registerUser"
-            @keypress.enter="registerUser"
             v-if="signUpVisible" method="post">
         <div class="content">
           <input type="email" v-model.trim="userEmail" placeholder="EMAIL"/>

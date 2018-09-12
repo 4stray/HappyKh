@@ -130,7 +130,9 @@ class UserActivation(APIView):
                       backend='users.backends.UserAuthentication')
 
                 return Response({'status': True,
-                                 'user_token': user_token.key})
+                                 'token': user_token.key,
+                                 'user_id': user.id
+                                })
             else:
                 return Response({'status': False,
                                  'message': 'User already exists'})

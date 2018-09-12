@@ -26,7 +26,7 @@ export default {
           console.log(response.data.message);
         } else {
           console.log('user accout has been activated')
-          // get token for authorisation here
+          this.$cookies.set('token', response.data.token, "1h");
         }
       })
       .catch((error) => {
