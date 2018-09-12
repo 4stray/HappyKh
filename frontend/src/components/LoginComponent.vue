@@ -29,13 +29,25 @@ export default {
 
       axios.post('http://localhost:8000/api/users/login/', userCredentials)
         .then((response) => {
-          if (response.data.status) {
-            this.$router.push('/');
-          } else {
-            alert(response.data.massage);
-          }
+          console.log(response.status);
+          this.$router.push('/');
         }).catch((error) => {
-          alert(error);
+          console.log(error);
+        });
+    },
+    logout() {
+      const authConfig = {
+        headers: {
+          // Write the token of a user on the place of default one
+          Authorization: 'Token c177bdde5338300b34b1d5a9f7650a3cd797bc41',
+        },
+      };
+
+      axios.post('http://localhost:8000/api/users/logout/', '', authConfig)
+        .then((response) => {
+          console.log(response.data);
+        }).catch((error) => {
+          console.log(error);
         });
     },
   },
