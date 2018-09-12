@@ -31,7 +31,6 @@ class UserLogin(APIView):
         if 'user_token' in request.data:
             pass
         else:
-            print(request.user)
             email = request.data.get('user_email')
             password = request.data.get('user_password')
 
