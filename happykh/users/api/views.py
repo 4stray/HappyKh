@@ -52,7 +52,7 @@ class UserLogout(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        # Token.objects.get(key=request.data['user_token']).delete()
+        Token.objects.get(key=request.data['user_token']).delete()
         return Response({'message': 'User has been logged out'}, status=201)
 
 
