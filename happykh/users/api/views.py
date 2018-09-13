@@ -5,8 +5,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework import exceptions
 from users.models import User
@@ -45,6 +45,15 @@ class UserLogin(APIView):
             return Response({
                 'message': 'You have to register first'
             }, status=400)
+
+
+class UserLogout(APIView):
+    authentication_classes = (TokenAuthentication, )
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        # Token.objects.get(key=request.data['user_token']).delete()
+        return Response({'message': 'User has been logged out'}, status=201)
 
 
 class UserRegistration(APIView):
@@ -109,7 +118,7 @@ class UserRegistration(APIView):
 
 
 class UserActivation(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (AllowAny, )
 
     def post(self, request, user_id, token):
         """
@@ -121,7 +130,6 @@ class UserActivation(APIView):
         """
         try:
             user = User.objects.get(pk=user_id)
-            user_token, created = Token.objects.get_or_create(user=user)
 
             if user.is_active:
                 return Response({
