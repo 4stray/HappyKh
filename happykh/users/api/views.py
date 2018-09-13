@@ -1,7 +1,8 @@
 """Views for app users"""
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -27,9 +28,9 @@ class UserLogin(APIView):
         serializer = LoginSerializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
-        except exceptions.ValidationError:
+        except exceptions.ValidationError as error:
             return Response({
-                'message': 'Invalid User Credentials'
+                'message': str(error)
             }, status=400)
 
         user = serializer.validated_data['user']
@@ -55,17 +56,25 @@ class UserRegistration(APIView):
         :param request: http request
         :return: Response({status, message})
         """
-        email = request.data['user_email']
-        password = request.data['user_password']
+        user_email = request.data['user_email']
+        user_password = request.data['user_password']
 
         try:
-            user = User.objects.get(email=email)
+            validate_email(user_email)
+        except ValidationError:
+            return Response({
+                'message': 'Invalid email format'
+            }, status=400)
+
+        try:
+            user = User.objects.get(email=user_email)
             return Response({
                 'message': 'User with such an email already exists'
             }, status=400)
         except User.DoesNotExist:
-            user = authenticate(request, user_email=email,
-                                user_password=password)
+            user = User.objects.create_user(email=user_email,
+                                            password=user_password,
+                                            is_active=False)
 
             if self.send_email_confirmation(user):
                 return Response({

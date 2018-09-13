@@ -17,19 +17,13 @@ class UserAuthentication:
         :param user_token: String
         :return: User object or None
         """
-        if user_token:
-            pass
-        else:
-            try:
-                user = User.objects.get(email=user_email)
-                if user.check_password(user_password):
-                    return user
-            except User.DoesNotExist:
-                user = User.objects.create_user(email=user_email,
-                                                password=user_password,
-                                                is_active=False)
+        try:
+            user = User.objects.get(email=user_email)
+            if user.check_password(user_password):
                 return user
-            return None
+        except User.DoesNotExist:
+            pass
+        return None
 
     def get_user(self, user_id):
         try:
