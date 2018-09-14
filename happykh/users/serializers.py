@@ -2,8 +2,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from rest_framework import serializers
-from rest_framework import exceptions
+from rest_framework import serializers, exceptions
 
 
 class UserSerializer(serializers.ModelSerializer):
