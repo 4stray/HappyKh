@@ -1,12 +1,9 @@
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from rest_framework import serializers, exceptions
-from rest_framework.mixins import UpdateModelMixin
-from rest_framework.viewsets import ModelViewSet
-from django.contrib.auth.password_validation import validate_password
 from users.models import User
+
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -68,6 +65,3 @@ class PasswordSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
-
-

@@ -10,11 +10,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework import exceptions
 from users.models import User
+from users.serializers import LoginSerializer, UserSerializer, PasswordSerializer
 from happykh.settings import EMAIL_HOST_USER
-from users.serializers import LoginSerializer
 from .tokens import account_activation_token
-from users.serializers import UserSerializer
-from users.serializers import PasswordSerializer
 
 
 class UserLogin(APIView):
@@ -157,6 +155,8 @@ class UserProfile(APIView):
     """
     Get user's data, update data or change password.
     """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get_profile(self, pk):
         """
@@ -164,7 +164,6 @@ class UserProfile(APIView):
         :param pk: Integer
         :return: User
         """
-
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
@@ -194,7 +193,9 @@ class UserProfile(APIView):
         user = self.get_profile(id)
 
         if 'old_password' in self.request.data:
-            """Change password"""
+            """
+            Change password
+            """
             serializer = PasswordSerializer(data=request.data)
 
             if serializer.is_valid():
@@ -210,7 +211,9 @@ class UserProfile(APIView):
             return Response(serializer.errors, status=500)
 
         else:
-            """Update data"""
+            """
+            Update data
+            """
             serializer = UserSerializer(user, data=request.data, partial=True)
 
             if serializer.is_valid():
