@@ -1,0 +1,75 @@
+#message {
+  width: 350px;
+  padding: 15px 10px;
+  font-size: 16px;
+  margin: 0 auto;
+}
+
+.errorResult {
+  @extend #message;
+  background-color: #ffabae;
+  color: #800000;
+}
+
+.successResult {
+  @extend #message;
+  background-color: #93c54b;
+  color: #02570f;
+}
+
+#login {
+  display: flex;
+  flex-direction: column;
+  height: 80%;
+}
+
+.content {
+  height: 245px;
+  flex: 1 1 auto;
+
+  input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #ff8383;
+    font-size: 16px;
+    outline: none;
+    margin: 15px 0;
+    width: 100%;
+  }
+
+  input:focus {
+    border-bottom: 2px solid #b71c1c;
+  }
+}
+
+.btn-submit {
+  width: 100%;
+  border: none;
+  padding: 10px 25px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: 'Liberation Sans', sans, sans-serif;
+  cursor: pointer;
+  background-color: #ff8383;
+}
+
+.btn-submit:disabled {
+  background-color: #d3d3d3;
+}
+
+.error {
+  color: #dc143c;
+  font-size: 12px;
+  font-family: 'Liberation Sans', sans, sans-serif;
+  margin: 2px 0;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  list-style: none;
+}

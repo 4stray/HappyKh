@@ -2,6 +2,16 @@ import axios from 'axios';
 import querystring from 'querystring';
 
 /**
+ * @description Checks correctness of  user's email
+ * @param {string} email
+ * @returns {*|boolean}
+ */
+function isEmailValid(email) {
+  const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+  return re.test(email);
+}
+
+/**
  * @description Send user's credentials for authentication
  * @param {Component} context - Login Component
  * @param {Object} userCredentials
@@ -58,4 +68,4 @@ function register(context, userCredentials, redirect) {
     });
 }
 
-export { login, register };
+// export { login, register, isEmailValid };

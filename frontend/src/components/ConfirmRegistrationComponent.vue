@@ -17,18 +17,15 @@ export default {
     const user_id = this.$route.params.user_id;
     const user_token = this.$route.params.token;
 
-    axios.post(`http://localhost:8000/api/users/activate/${user_id}/${user_token}/`, {
-      user_id,
-      user_token,
+    axios.post(
+      `http://localhost:8000/api/users/activate/${user_id}/${user_token}/`,
+      {
+        user_id,
+        user_token,
+      },
+    ).then((response) => {
+      console.log(response.status);
     })
-      .then((response) => {
-        if (Boolean(response.data.status) === false) {
-          console.log(response.data.message);
-        } else {
-          console.log('user accout has been activated')
-          this.$cookies.set('token', response.data.token, "1h");
-        }
-      })
       .catch((error) => {
         console.log(error);
       });
