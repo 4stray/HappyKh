@@ -29,8 +29,9 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'users.User'
 
 AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.RemoteUserBackend',
+    'users.backends.UserAuthentication',
     'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.RemoteUserBackend',
 )
 # Application definition
 
@@ -45,8 +46,20 @@ INSTALLED_APPS = [
     'customlogger.apps.CustomloggerConfig',
     'users.apps.UsersConfig',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
 ]
+
+# Basic Django REST Token setup
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -83,7 +96,6 @@ WSGI_APPLICATION = 'happykh.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -106,7 +118,8 @@ LOGGING = {
             'format': '%(asctime)s ::: %(levelname)s ::: %(message)s'
         },
         'file': {
-            'format': '%(levelname)s ::: %(filename)s ::: %(lineno)d ::: %(message)s'
+            'format': '%(levelname)s ::: %(filename)s ::: %(lineno)d'
+                      ' ::: %(message)s'
         },
     },
     'handlers': {
@@ -169,11 +182,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-SENDGRID_SANDBOX_MODE_IN_DEBUG = False
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
-EMAIL_HOST_USER = 'manager@happykh.com'
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
@@ -186,3 +194,10 @@ CORS_ORIGIN_REGEX_WHITELIST = (
     # For Testing Environment
     r'null',
 )
+
+# Email API setup
+
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+EMAIL_HOST_USER = os.environ.get('manager@happykh.com')
