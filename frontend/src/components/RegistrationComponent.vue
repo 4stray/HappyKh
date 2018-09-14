@@ -82,7 +82,7 @@
           .then((response) => {
             this.$awn.success("Successful registration. Please check your mailbox for confirmation email.");
           }).catch((error) => {
-          this.$awn.warning("Some problems happend.");
+          this.$awn.warning(error.massage);
           console.log('Error register');
           if (context.$cookies) {
             context.$cookies.remove('token');
@@ -104,5 +104,5 @@
 </script>
 
 <style scoped lang="scss">
-  /*import 'authentication';*/
+
 </style>
