@@ -14,14 +14,14 @@ export default {
   components: {
   },
   created() {
-    const user_id = this.$route.params.user_id;
-    const user_token = this.$route.params.token;
+    const userId = this.$route.params.userId;
+    const emailToken = this.$route.params.emailToken;
 
     axios.post(
-      `http://localhost:8000/api/users/activate/${user_id}/${user_token}/`,
+      `http://localhost:8000/api/users/activate/${userId}/${emailToken}/`,
       {
-        user_id,
-        user_token,
+        userId,
+        emailToken,
       },
     ).then((response) => {
       console.log(response.status);

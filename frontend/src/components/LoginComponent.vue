@@ -71,4 +71,24 @@
 
 <style scoped lang="scss">
 
+ input:focus {
+   outline: none;
+ }
+
+ .btn-login {
+   margin-top: 5px;
+   background-color: #ffc107;
+   color: #fff;
+   border: none;
+   padding: 10px 25px;
+   text-transform: uppercase;
+   font-weight: 600;
+   font-family: "Liberation Sans", sans;
+   border-radius: 20px;
+   cursor: pointer;
+ }
+
+ .btn-login:hover {
+   background-color: #ffa000;
+ }
 </style>
