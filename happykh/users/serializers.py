@@ -1,8 +1,8 @@
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from rest_framework import serializers, exceptions
+from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -42,3 +42,26 @@ class LoginSerializer(serializers.Serializer):
             msg = 'Must provide user email and password'
             raise exceptions.ValidationError(msg)
         return data
+
+
+class PasswordSerializer(serializers.ModelSerializer):
+    """
+    Serializer for password change.
+    """
+    old_password = serializers.CharField(required=True)
+    new_password1 = serializers.CharField(required=True)
+    new_password2 = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('old_password', 'new_password1', 'new_password2')
+
+    def update(self, instance, validated_data):
+        password = validated_data.pop("new_password1")
+        instance.__dict__.update(validated_data)
+
+        if password:
+            instance.set_password(password)
+        instance.save()
+
+        return instance
