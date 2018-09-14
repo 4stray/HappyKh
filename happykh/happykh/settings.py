@@ -57,7 +57,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated', )
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
 MIDDLEWARE = [
@@ -199,4 +200,4 @@ CORS_ORIGIN_REGEX_WHITELIST = (
 SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
-EMAIL_HOST_USER = 'manager@happykh.com'
+EMAIL_HOST_USER = os.environ.get('manager@happykh.com')
