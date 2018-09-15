@@ -1,5 +1,6 @@
 <template>
-  <form id="register" @submit.prevent="register" method="post">
+  <form id="register" @submit.prevent="register" method="post"
+        novalidate>
     <div class="content">
       <input type="email" v-model.trim="userEmail" placeholder="EMAIL"/>
       <p v-if="errors.email" class="error">{{errors.email}}</p>
@@ -15,7 +16,7 @@
     </div>
     <input class="btn-submit" type="submit"
            :disabled="isDisabledButton"
-           value="SIGN UP"/>
+           value="REGISTER"/>
   </form>
 </template>
 
@@ -23,7 +24,7 @@
   import axios from 'axios';
 
   export default {
-    name: "RegistrationComponent",
+    name: 'RegistrationComponent',
     data() {
       return {
         userEmail: '',
@@ -33,7 +34,7 @@
           email: '',
           password: [],
         },
-      }
+      };
     },
     methods: {
       isEmailValid() {
@@ -44,7 +45,7 @@
        * @description Checks correctness of entered user's fields
        * @returns {boolean} Result of check
        */
-      isUserDataValid: function () {
+      isUserDataValid() {
         this.errors = {
           email: '',
           password: [],
@@ -61,34 +62,35 @@
         }
         if (this.userPassword !== this.confirmPassword) {
           this.errors.password.push("* Your passwords don't match, please try again.");
-        }
-        if (this.errors.length) {
           this.userPassword = '';
           this.confirmPassword = '';
         }
-        return !this.errors.length;
+        console.log(!!this.errors.length);
+        return Boolean(this.errors.length);
       },
       register() {
-        console.log("Register",);
-        if (!this.isUserDataValid()) {
-          this.$awn.warning("Please correct your mistakes.");
-          return;
+        if (this.isUserDataValid()) {
+          this.$awn.warning('Please correct your mistakes.');
+        } else {
+          const userCredentials = {
+            user_email: this.userEmail,
+            user_password: this.userPassword,
+          };
+          axios.post('http://localhost:8000/api/users/registration/', userCredentials)
+            .then((response) => {
+              this.$awn.alert(response);
+              if (response.message) {
+                this.$awn.success(response.message);
+              }
+              this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
+            }).catch((error) => {
+            this.$awn.warning(error.message);
+            if (this.$cookies) {
+              this.$cookies.remove('token');
+              // if the request fails, remove any possible user token if possible
+            }
+          });
         }
-        const userCredentials = {
-          user_email: this.userEmail,
-          user_password: this.userPassword,
-        };
-        axios.post('http://localhost:8000/api/users/registration/', userCredentials)
-          .then((response) => {
-            this.$awn.success("Successful registration. Please check your mailbox for confirmation email.");
-          }).catch((error) => {
-          this.$awn.warning(error.massage);
-          console.log('Error register');
-          if (context.$cookies) {
-            context.$cookies.remove('token');
-            // if the request fails, remove any possible user token if possible
-          }
-        });
       },
     },
     computed: {
@@ -99,10 +101,9 @@
       isDisabledButton() {
         return !(this.userEmail && this.userPassword && this.confirmPassword);
       },
-    }
-  }
+    },
+  };
 </script>
 
 <style scoped lang="scss">
-
 </style>

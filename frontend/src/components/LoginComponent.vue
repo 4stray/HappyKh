@@ -1,5 +1,5 @@
 <template>
-  <form id="login" method="post" @submit.prevent="login">
+  <form id="login" method="post" @submit.prevent="login" novalidate>
     <div class="content">
       <input type="email" name="username" v-model.trim="userEmail"
              placeholder="EMAIL"/>
@@ -12,83 +12,46 @@
 </template>
 
 <script>
-  import axios from 'axios';
-  // import {isEmailValid} from "./authentication";
+import axios from 'axios';
 
-  export default {
-    name: 'LoginComponent',
-    data() {
-      return {
-        userEmail: '',
-        userPassword: '',
-      }
-    },
-    methods: {
-      login() {
-        console.log('login');
-        const userCredentials = {
-          user_email: this.userEmail,
-          user_password: this.userPassword,
-        };
-        axios.post('http://localhost:8000/api/users/login/', userCredentials)
-          .then((response) => {
-            console.log(response.status);
-            this.$router.push('/');
-          }).catch((error) => {
-          console.log(error);
+export default {
+  name: 'LoginComponent',
+  data() {
+    return {
+      userEmail: '',
+      userPassword: '',
+    };
+  },
+  methods: {
+    login() {
+      const userCredentials = {
+        user_email: this.userEmail,
+        user_password: this.userPassword,
+      };
+      axios.post('http://localhost:8000/api/users/login/', userCredentials)
+        .then((response) => {
+          this.$router.push('/');
+        }).catch((error) => {
+        this.$awn.alert("Account with such an email does not exist");
+        this.userPassword='';
         });
-      },
-      logout() {
-        const authConfig = {
-          headers: {
-            // Write the token of a user on the place of default one
-            Authorization: 'Token c177bdde5338300b34b1d5a9f7650a3cd797bc41',
-          },
-        };
-        axios.post('http://localhost:8000/api/users/logout/', '', authConfig)
-          .then((response) => {
-            console.log(response.data);
-          }).catch((error) => {
-          console.log(error);
-        });
-      },
-      isEmailValid() {
-        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        return re.test(this.userEmail);
-      },
     },
-    computed: {
-      /**
+    isEmailValid() {
+      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      return re.test(this.userEmail);
+    },
+  },
+  computed: {
+    /**
        * @description Checks if user filled all fields
        * @returns {boolean}
        * */
-      isDisabledButton() {
-        return !(this.isEmailValid() && this.userPassword);
-      },
-    }
-  };
+    isDisabledButton() {
+      return !(this.isEmailValid() && this.userPassword);
+    },
+  },
+};
 </script>
 
 <style scoped lang="scss">
-
- input:focus {
-   outline: none;
- }
-
- .btn-login {
-   margin-top: 5px;
-   background-color: #ffc107;
-   color: #fff;
-   border: none;
-   padding: 10px 25px;
-   text-transform: uppercase;
-   font-weight: 600;
-   font-family: "Liberation Sans", sans;
-   border-radius: 20px;
-   cursor: pointer;
- }
-
- .btn-login:hover {
-   background-color: #ffa000;
- }
 </style>

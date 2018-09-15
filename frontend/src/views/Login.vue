@@ -1,18 +1,19 @@
 <template>
   <div>
-
     <div id="panel">
       <div class="tabs">
-        <a
-            v-for="tab in tabs"
-            v-bind:key="tab.name"
-            v-bind:class="[{ active: currentTab.name === tab.name }]"
-            v-on:click="currentTab = tab"
-        >{{ tab.name }}
-        </a>
+        <button
+            v-bind:class="[{ active: currentTab === tabs.signIn }]"
+            v-on:click="currentTab = tabs.signIn"
+        >SIGN IN
+        </button>
+        <button
+            v-bind:class="[{ active: currentTab === tabs.signUp }]"
+            v-on:click="currentTab = tabs.signUp"
+        >SIGN UP
+        </button>
       </div>
-      <component v-bind:is="currentTab.component"
-                 @serverResponse="showMessage"></component>
+      <component v-bind:is="currentTab.component"></component>
     </div>
   </div>
 </template>
@@ -20,32 +21,24 @@
   import LoginComponent from '../components/LoginComponent.vue';
   import RegistrationComponent from '../components/RegistrationComponent.vue';
 
-  const tabs = [
-    {
-      name: 'Sign in',
-      component: LoginComponent,
+  const tabs = {
+    signIn: {
+      component:
+      LoginComponent,
     },
-    {
-      name: 'Sign up',
-      component: RegistrationComponent,
+    signUp: {
+      component:
+      RegistrationComponent,
     },
-  ];
+  };
 
   export default {
     name: 'Login',
     data() {
       return {
         tabs,
-        currentTab: tabs[0],
+        currentTab: tabs.signIn,
       };
-    },
-    methods: {
-      showMessage(serverResponse) {
-        this.message = {
-          text: serverResponse.message,
-          type: serverResponse.status,
-        };
-      },
     },
     components: {
       LoginComponent,
@@ -54,12 +47,12 @@
   };
 </script>
 <style lang="scss">
-  @import "../components/authentication";
+  @import "../../dist/css/login";
 
   #panel {
-    box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.4);
-    -webkit-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.4);
-    -moz-box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
+    -moz-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     height: 350px;
     width: 70%;
     margin: 20px auto;
@@ -79,7 +72,7 @@
     margin-bottom: 15px;
     justify-content: space-evenly;
 
-    a {
+    button {
       display: block;
       list-style: none;
       padding: 10px;
@@ -93,12 +86,11 @@
       border-bottom: 3px solid #999;
       background-color: transparent;
       color: #999;
-    }
 
-    .active {
-      color: #ff8383;
-      border-bottom: 3px solid #ff8383;
+      &.active {
+        color: $primaryColor;
+        border-bottom: 3px solid $primaryColor;
+      }
     }
-
   }
 </style>

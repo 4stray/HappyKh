@@ -2,13 +2,14 @@ import Vue from 'vue';
 import VueCookies from 'vue-cookies';
 import App from './App.vue';
 import router from './router';
+
+import VueAWN from 'vue-awesome-notifications';
+
 Vue.use(VueCookies);
 Vue.config.productionTip = false;
-
-import VueAWN from "vue-awesome-notifications";
 const options = {
-  icons: {enabled: false},
-  position: 'top center',
+  icons: { enabled: false },
+  position: 'top',
 };
 Vue.use(VueAWN, options);
 new Vue({
