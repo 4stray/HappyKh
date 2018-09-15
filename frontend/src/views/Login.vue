@@ -18,33 +18,33 @@
   </div>
 </template>
 <script>
-  import LoginComponent from '../components/LoginComponent.vue';
-  import RegistrationComponent from '../components/RegistrationComponent.vue';
+import LoginComponent from '../components/LoginComponent.vue';
+import RegistrationComponent from '../components/RegistrationComponent.vue';
 
-  const tabs = {
-    signIn: {
-      component:
+const tabs = {
+  signIn: {
+    component:
       LoginComponent,
-    },
-    signUp: {
-      component:
+  },
+  signUp: {
+    component:
       RegistrationComponent,
-    },
-  };
+  },
+};
 
-  export default {
-    name: 'Login',
-    data() {
-      return {
-        tabs,
-        currentTab: tabs.signIn,
-      };
-    },
-    components: {
-      LoginComponent,
-      RegistrationComponent,
-    },
-  };
+export default {
+  name: 'Login',
+  data() {
+    return {
+      tabs,
+      currentTab: tabs.signIn,
+    };
+  },
+  components: {
+    LoginComponent,
+    RegistrationComponent,
+  },
+};
 </script>
 <style lang="scss">
   @import "../../dist/css/login";

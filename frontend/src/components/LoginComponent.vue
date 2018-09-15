@@ -32,8 +32,8 @@ export default {
         .then((response) => {
           this.$router.push('/');
         }).catch((error) => {
-        this.$awn.alert("Account with such an email does not exist");
-        this.userPassword='';
+          this.$awn.alert('Account with such an email does not exist');
+          this.userPassword = '';
         });
     },
     isEmailValid() {
