@@ -1,8 +1,11 @@
+import logging
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from rest_framework import serializers, exceptions
 from users.models import User
+
+logger = logging.getLogger('happy_logger')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,7 +25,8 @@ class LoginSerializer(serializers.Serializer):
 
         try:
             validate_email(user_email)
-        except ValidationError:
+        except ValidationError as error:
+            logger.error(f'Validation error {error}, invalid email format')
             raise exceptions.ValidationError('Invalid email format')
 
         if user_email and user_password:
@@ -34,12 +38,15 @@ class LoginSerializer(serializers.Serializer):
                 else:
                     msg = "Please, check you mailbox in order " \
                           "to activate your account"
+                    logger.warning('Validation warning, need to activate account')
                     raise exceptions.ValidationError(msg)
             else:
                 msg = 'Account with such an email does not exist'
+                logger.warning(f'Validation warning, {msg}')
                 raise exceptions.ValidationError(msg)
         else:
             msg = 'Must provide user email and password'
+            logger.warning(f'Validation warning, {msg}')
             raise exceptions.ValidationError(msg)
         return data
 
