@@ -77,13 +77,12 @@ export default {
         };
         axios.post('http://localhost:8000/api/users/registration/', userCredentials)
           .then((response) => {
-            this.$awn.alert(response);
-            if (response.message) {
-              this.$awn.success(response);
+            if (response.data.message) {
+              this.$awn.success(response.data.message);
             }
             this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
           }).catch((error) => {
-            this.$awn.warning(error.message);
+            this.$awn.warning('User with such an email already exists');
             if (this.$cookies) {
               this.$cookies.remove('token');
               // if the request fails, remove any possible user token if possible
