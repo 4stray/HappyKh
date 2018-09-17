@@ -21,10 +21,9 @@ class TestUserProfile(BaseTestCase, APITestCase):
 
     def setUp(self):
         """Create test user for testing"""
+        self.test_user = User.objects.create_user(**CORRECT_DATA)
         user_token = Token.objects.create(user=self.test_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
-        self.client.login(username=CORRECT_DATA['email'],
-                          password=CORRECT_DATA['password'])
 
         self.PASSWORDS = {
             'old_password': CORRECT_DATA['password'],
@@ -107,7 +106,6 @@ class TestUserProfile(BaseTestCase, APITestCase):
         response = self.client.patch(f'/api/users/profile/{self.test_user.pk}',
                                      **INVALID_PASSWORD)
         # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
         self.assertFalse(
             self.test_user.check_password(INVALID_PASSWORD['new_password1']))
 
