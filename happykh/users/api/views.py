@@ -32,7 +32,8 @@ class UserLogin(APIView):
         try:
             serializer.is_valid(raise_exception=True)
         except exceptions.ValidationError as error:
-            logger.error(f'ValidationError {error.detail["non_field_errors"]}')
+            logger.error(f'ValidationError {error.detail["non_field_errors"]}, '
+                         f'Email: {request.data["user_email"]}')
             return Response({
                 'message': error.detail["non_field_errors"]
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -78,14 +79,15 @@ class UserRegistration(APIView):
         try:
             validate_email(user_email)
         except ValidationError as error:
-            logger.error(f'Email validation error "{error.message}"')
+            logger.error(f'Email validation error "{error.message}", '
+                         f'Email: {request.data["user_email"]}')
             return Response({
                 'message': 'Invalid email format'
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            User.objects.get(email=user_email)
-            logger.warning('User with such an email already exists')
+            user = User.objects.get(email=user_email)
+            logger.warning(f'User with such an email already exists, user_id: {user.pk}')
             return Response({
                 'message': 'User with such an email already exists'
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -100,9 +102,9 @@ class UserRegistration(APIView):
                 }, status=status.HTTP_201_CREATED)
             else:
                 logger.error('Confirmation email has not delivered')
+                user.delete()
                 return Response({
-                    'message': 'The mail has not been delivered'
-                    ' due to connection reasons'
+                    'message': 'Try again'
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def send_email_confirmation(self, user):
@@ -124,8 +126,8 @@ class UserRegistration(APIView):
                       [user.email])
             logger.info('Confirmation mail has been sent')
             return True
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist) as error:
-            logger.error(f'Send email error {error}')
+        except:
+            logger.error(f'Error occurred while sending mail')
             return False
 
 
@@ -144,7 +146,7 @@ class UserActivation(APIView):
             user = User.objects.get(pk=user_id)
 
             if user.is_active:
-                logger.warning('Activate already activated user')
+                logger.warning(f'Activate already activated user, user_id: {user.pk}')
                 return Response({
                     'message': "User is already exists and activated"
                 }, status=status.HTTP_400_BAD_REQUEST)
@@ -156,7 +158,8 @@ class UserActivation(APIView):
                     'message': "User's account has been activated"
                 }, status=status.HTTP_201_CREATED)
             else:
-                logger.error('User activation with invalid token')
+                logger.error('User activation with invalid token,'
+                             f' user_email: {user.email}, token: {token}')
                 return Response({
                     'message': 'Invalid token'
                 }, status=status.HTTP_400_BAD_REQUEST)
@@ -182,7 +185,7 @@ class UserProfile(APIView):
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
-            logger.error('Can`t get user profile because of invalid id')
+            logger.error(f'Can`t get user profile because of invalid id, user_id: {user.pk}')
             return Response({'message': "No user with such id."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return user

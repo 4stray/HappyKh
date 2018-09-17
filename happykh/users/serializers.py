@@ -26,7 +26,7 @@ class LoginSerializer(serializers.Serializer):
         try:
             validate_email(user_email)
         except ValidationError as error:
-            logger.error(f'Validation error {error}, invalid email format')
+            logger.error(f'Validation error {error}, invalid email format, Email: {user_email}')
             raise exceptions.ValidationError('Invalid email format')
 
         if user_email and user_password:
@@ -42,7 +42,7 @@ class LoginSerializer(serializers.Serializer):
                     raise exceptions.ValidationError(msg)
             else:
                 msg = 'Account with such an email does not exists'
-                logger.warning(f'Validation warning, {msg}')
+                logger.warning(f'Validation warning, {msg}, user_email: {user_email}')
                 raise exceptions.ValidationError(msg)
         else:
             msg = 'Must provide user email and password'
