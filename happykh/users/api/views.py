@@ -38,7 +38,7 @@ class UserLogin(APIView):
         if user.is_active:
             user_token, created = Token.objects.get_or_create(user=user)
             return Response({
-                'user_token': user_token.key,
+                'token': user_token.key,
                 'user_id': user.id,
             }, status=200)
         else:
