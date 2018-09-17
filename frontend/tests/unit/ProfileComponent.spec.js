@@ -78,13 +78,25 @@ describe('ProfileComponent interactions', () => {
 });
 
 describe('Django Server /profile', () => {
-  it('has user response data', () => {
+  it('has 401 error in response to unauthorized request', () => {
     const request = new XMLHttpRequest();
 
-    request.open('GET', 'http://localhost:8000/api/users/profile/5', false, 'toronto@dav.com', 'admin');
+    request.open('GET', 'http://localhost:8000/api/users/profile/1', false);
 
     request.send();
 
     expect(request.status).to.be.equal(401);
+  });
+
+  it('has 200 status response to authorized user using token', () => {
+    const request = new XMLHttpRequest();
+
+    request.open('GET', 'http://localhost:8000/api/users/profile/5', false);
+
+    request.setRequestHeader("Authorization", 'Token 1a0ccc1ff0455016164ddac9366af9c7711fe9ef');
+
+    request.send();
+
+    expect(request.status).to.be.equal(200);
   });
 });
