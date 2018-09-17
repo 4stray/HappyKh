@@ -85,8 +85,10 @@
             }).catch((error) => {
             if (error.response.status === 400) {
               this.$awn.alert(error.response.data.message);
+            } else if (error.response.status === 500 && error.response.data.message){
+              this.$awn.info(error.response.data.message);
             } else {
-              console.log(error.response.data.message);
+              this.$awn.warning("Server error");
             }
             if (this.$cookies) {
               this.$cookies.remove('token');

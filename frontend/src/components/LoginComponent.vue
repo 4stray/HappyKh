@@ -32,7 +32,9 @@
           .then((response) => {
             this.$router.push('/');
           }).catch((error) => {
-          this.$awn.warning(error.response.data.message);
+          if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
           this.userPassword = '';
         });
       },
