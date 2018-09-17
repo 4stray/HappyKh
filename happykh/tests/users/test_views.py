@@ -4,6 +4,7 @@ from rest_framework import status
 from tests.utils import BaseTestCase
 from users.models import User
 
+
 CORRECT_DATA = {'user_email': 'test@mail.com',
                 'user_password': 'testpassword'}
 
