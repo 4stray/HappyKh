@@ -32,9 +32,9 @@ class UserLogin(APIView):
         try:
             serializer.is_valid(raise_exception=True)
         except exceptions.ValidationError as error:
-            logger.error(f'ValidationError {error} in login view')
+            logger.error(f'ValidationError {error.detail["non_field_errors"]}')
             return Response({
-                'message': str(error)
+                'message': error.detail["non_field_errors"]
             }, status=400)
 
         user = serializer.validated_data['user']
@@ -78,14 +78,14 @@ class UserRegistration(APIView):
         try:
             validate_email(user_email)
         except ValidationError as error:
-            logger.error(f'Email validation error {error} in register view')
+            logger.error(f'Email validation error "{error.message}"')
             return Response({
                 'message': 'Invalid email format'
             }, status=400)
 
         try:
             User.objects.get(email=user_email)
-            logger.warning('Registration user with an email exists in db')
+            logger.warning('User with such an email already exists')
             return Response({
                 'message': 'User with such an email already exists'
             }, status=400)

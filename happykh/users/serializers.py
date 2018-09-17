@@ -41,7 +41,7 @@ class LoginSerializer(serializers.Serializer):
                     logger.warning('Validation warning, need to activate account')
                     raise exceptions.ValidationError(msg)
             else:
-                msg = 'Account with such an email does not exist'
+                msg = 'Account with such an email does not exists'
                 logger.warning(f'Validation warning, {msg}')
                 raise exceptions.ValidationError(msg)
         else:
