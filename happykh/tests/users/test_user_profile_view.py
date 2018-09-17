@@ -1,6 +1,7 @@
 """Test users api views"""
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from tests.utils import BaseTestCase
 from users.models import User
 from users.serializers import UserSerializer
@@ -20,10 +21,13 @@ class TestUserProfile(BaseTestCase, APITestCase):
 
     def setUp(self):
         """Create test user for testing"""
-        self.test_user = User.objects.create_user(**CORRECT_DATA)
-        self.client.force_authenticate(user=self.test_user)
+        user_token = Token.objects.create(user=self.test_user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
+        self.client.login(username=CORRECT_DATA['email'],
+                          password=CORRECT_DATA['password'])
+
         self.PASSWORDS = {
-            'old_password': self.test_user.password,
+            'old_password': CORRECT_DATA['password'],
             'new_password1': 'password2',
             'new_password2': 'password2',
         }
@@ -32,8 +36,19 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test if user exists"""
         response = self.client.get(f'/api/users/profile/{self.test_user.pk}')
         serializer = UserSerializer(self.test_user)
-        self.assertEqual(response.data, serializer.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], serializer.data["id"])
+        self.assertEqual(response.data['email'], serializer.data['email'])
+        self.assertEqual(response.data['first_name'],
+                         serializer.data['first_name'])
+        self.assertEqual(response.data['last_name'],
+                         serializer.data['last_name'])
+        self.assertEqual(response.data['profile_image'],
+                         serializer.data['profile_image'])
+        self.assertEqual(response.data['is_active'],
+                         serializer.data['is_active'])
+        self.assertEqual(response.data['age'], serializer.data['age'])
+        self.assertEqual(response.data['gender'], serializer.data['gender'])
 
     def test_get_unauthorized_user(self):
         """test if user is unauthorized"""
@@ -70,10 +85,12 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer_edited_user = UserSerializer(edited_user)
-        self.assertNotEqual(response.data, serializer_edited_user.data)
+        self.assertEqual(int(response.data["age"]),
+                         serializer_edited_user.data["age"])
 
-        serializer = UserSerializer(self.test_user)
-        self.assertNotEqual(response.data, serializer.data)
+        response = self.client.get(f'/api/users/profile/{self.test_user.pk}')
+        self.assertNotEqual(response.data["age"],
+                            serializer_edited_user.data["age"])
 
         self.assertIsNot(edited_user, User.objects.get(pk=self.test_user.pk))
 
@@ -89,8 +106,10 @@ class TestUserProfile(BaseTestCase, APITestCase):
         INVALID_PASSWORD['old_password'] = '123userPassword'
         response = self.client.patch(f'/api/users/profile/{self.test_user.pk}',
                                      **INVALID_PASSWORD)
+        # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
         self.assertFalse(
-            self.test_user.check_password(INVALID_PASSWORD['old_password']))
+            self.test_user.check_password(INVALID_PASSWORD['new_password1']))
 
     def test_patch_different_new_passwords(self):
         """test update user's password with different new passwords"""
@@ -98,6 +117,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
         INVALID_PASSWORD['new_password1'] = '123userPassword'
         response = self.client.patch(f'/api/users/profile/{self.test_user.pk}',
                                      **INVALID_PASSWORD)
+        # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(
             self.test_user.check_password(INVALID_PASSWORD['new_password1']))
 
@@ -107,5 +127,6 @@ class TestUserProfile(BaseTestCase, APITestCase):
         INVALID_PASSWORD['new_password1'] = '123'
         response = self.client.patch(f'/api/users/profile/{self.test_user.pk}',
                                      **INVALID_PASSWORD)
+        # self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
         self.assertFalse(
             self.test_user.check_password(INVALID_PASSWORD['new_password1']))
