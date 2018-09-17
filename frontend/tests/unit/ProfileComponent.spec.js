@@ -76,3 +76,15 @@ describe('ProfileComponent interactions', () => {
     expect(btn.text()).to.be.equal('Disable editing');
   });
 });
+
+describe('Django Server /profile', () => {
+  it('has user response data', () => {
+    const request = new XMLHttpRequest();
+
+    request.open('GET', 'http://localhost:8000/api/users/profile/5', false, 'toronto@dav.com', 'admin');
+
+    request.send();
+
+    expect(request.status).to.be.equal(401);
+  });
+});
