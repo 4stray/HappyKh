@@ -1,100 +1,59 @@
 <template>
-  <form id="login">
-    <h1>Sign up</h1>
-    <input type="email" name="userEmail" v-model="userEmail"
-           placeholder="Email" />
-    <input type="password" name="userPassword" v-model="userPassword"
-           placeholder="Password" />
-    <button class="btn-login" type="button" v-on:click="login()">Login</button>
+  <form id="login" method="post" @submit.prevent="login" novalidate>
+    <div class="content">
+      <input type="email" name="username" v-model.trim="userEmail"
+             placeholder="EMAIL"/>
+      <input type="password" name="password" v-model="userPassword"
+             placeholder="PASSWORD"/>
+    </div>
+    <input class="btn-submit" type="submit" :disabled="isDisabledButton"
+           value="LOGIN"/>
   </form>
 </template>
 
 <script>
-import axios from 'axios';
+  import axios from 'axios';
 
-export default {
-  name: 'LoginComponent',
-  data() {
-    return {
-      userEmail: '',
-      userPassword: '',
-    };
-  },
-  methods: {
-    login() {
-      const userCredentials = {
-        user_email: this.userEmail,
-        user_password: this.userPassword,
+  export default {
+    name: 'LoginComponent',
+    data() {
+      return {
+        userEmail: '',
+        userPassword: '',
       };
-
-      axios.post('http://localhost:8000/api/users/login/', userCredentials)
-        .then((response) => {
-          console.log(response.status);
-          this.$router.push('/');
-        }).catch((error) => {
-          console.log(error);
-        });
     },
-    logout() {
-      const authConfig = {
-        headers: {
-          // Write the token of a user on the place of default one
-          Authorization: 'Token c177bdde5338300b34b1d5a9f7650a3cd797bc41',
-        },
-      };
-
-      axios.post('http://localhost:8000/api/users/logout/', '', authConfig)
-        .then((response) => {
-          console.log(response.data);
-        }).catch((error) => {
-          console.log(error);
+    methods: {
+      login() {
+        const userCredentials = {
+          user_email: this.userEmail,
+          user_password: this.userPassword,
+        };
+        axios.post('http://localhost:8000/api/users/login/', userCredentials)
+          .then((response) => {
+            this.$router.push('/');
+          }).catch((error) => {
+          if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
+          this.userPassword = '';
         });
+      },
+      isEmailValid() {
+        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        return re.test(this.userEmail);
+      },
     },
-  },
-};
+    computed: {
+      /**
+       * @description Checks if user filled all fields
+       * @returns {boolean}
+       * */
+      isDisabledButton() {
+        return !(this.isEmailValid() && this.userPassword);
+      },
+    },
+  };
 </script>
 
-<style scoped>
- #login {
-   width: 500px;
-   border: 1px solid #CCCCCC;
-   background-color: #FFFFFF;
-   margin: auto;
-   margin-top: 130px;
-   padding: 20px;
-   display: flex;
-   flex-direction: column;
-   align-items: center;
- }
-
- input {
-   padding: 10px 15px;
-   margin-bottom: 10px;
-   width: 300px;
-   border: 1px solid #ccc;
-   -webkit-border-radius: 5px;
-   -moz-border-radius: 5px;
-   border-radius: 5px;
- }
-
- input:focus {
-   outline: none;
- }
-
- .btn-login {
-   margin-top: 5px;
-   background-color: #ffc107;
-   color: #fff;
-   border: none;
-   padding: 10px 25px;
-   text-transform: uppercase;
-   font-weight: 600;
-   font-family: "Liberation Sans", sans;
-   border-radius: 20px;
-   cursor: pointer;
- }
-
- .btn-login:hover {
-   background-color: #ffa000;
- }
+<style scoped lang="scss">
 </style>

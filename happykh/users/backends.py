@@ -1,7 +1,7 @@
-from rest_framework import exceptions
-from rest_framework import authentication
-from rest_framework.authtoken.models import Token
+import logging
 from users.models import User
+
+logger = logging.getLogger('happy_logger')
 
 
 class UserAuthentication:
@@ -17,19 +17,14 @@ class UserAuthentication:
         :param user_token: String
         :return: User object or None
         """
-        if user_token:
-            pass
-        else:
-            try:
-                user = User.objects.get(email=user_email)
-                if user.check_password(user_password):
-                    return user
-            except User.DoesNotExist:
-                user = User.objects.create_user(email=user_email,
-                                                password=user_password,
-                                                is_active=False)
+        try:
+            user = User.objects.get(email=user_email)
+            if user.check_password(user_password):
+                logger.info('User authenticated')
                 return user
-            return None
+        except User.DoesNotExist:
+            logger.error('User does not exists while authentication')
+        return None
 
     def get_user(self, user_id):
         try:
