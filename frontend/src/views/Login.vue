@@ -47,7 +47,7 @@ export default {
 };
 </script>
 <style lang="scss">
-  @import "../../dist/css/login";
+  @import "../scss/login";
 
   #panel {
     box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);

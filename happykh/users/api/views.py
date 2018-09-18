@@ -30,7 +30,7 @@ class UserLogin(APIView):
             serializer.is_valid(raise_exception=True)
         except exceptions.ValidationError as error:
             return Response({
-                'message': str(error)
+                'message': 'Your email or password is not valid.'
             }, status=400)
 
         user = serializer.validated_data['user']
@@ -43,7 +43,7 @@ class UserLogin(APIView):
             }, status=200)
         else:
             return Response({
-                'message': 'You have to register first'
+                'message': "You can't login, you have to register first."
             }, status=400)
 
 
@@ -90,6 +90,7 @@ class UserRegistration(APIView):
                     'message': 'Mail has been sent'
                 }, status=201)
             else:
+                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
                     ' due to connection reasons'
@@ -113,7 +114,7 @@ class UserRegistration(APIView):
                       EMAIL_HOST_USER,
                       [user.email])
             return True
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except:
             return False
 
 
