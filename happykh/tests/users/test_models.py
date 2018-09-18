@@ -10,7 +10,6 @@ class UserTestCase(BaseTestCase):
     def setUp(self):
         """Create user objects"""
         User.objects.create_user(email='any@mail.com', password='password')
-        User.objects.create_user(email='no@pass.com', password='')
         User.objects.create_superuser(email='admin@mail.com', password='password')
 
     def test_user_creation(self):
@@ -42,11 +41,6 @@ class UserTestCase(BaseTestCase):
             User.objects.create_user(email='', password='password')
         self.assertEqual(type(ve.exception), ValueError)
 
-    def test_empty_password(self):  # Test failed, now empty password is allowed for use
-        """Test is usable empty password"""
-        user = User.objects.get(email='no@pass.com')
-        self.assertEqual(user.check_password(''), True)
-        self.assertEqual(user.has_usable_password(), False)
 
     def test_get_name_functions(self):
         """Test 'get_short_name' and 'get_full_name' functions"""

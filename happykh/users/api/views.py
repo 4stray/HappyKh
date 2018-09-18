@@ -2,15 +2,17 @@
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
+from django.core import exceptions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
-from rest_framework import exceptions
+from rest_framework.exceptions import (ValidationError, AuthenticationFailed,
+    NotFound, NotAuthenticated)
 from users.models import User
-from users.serializers import LoginSerializer, UserSerializer, PasswordSerializer
+from users.serializers import (LoginSerializer, UserSerializer,
+    PasswordSerializer)
 from happykh.settings import EMAIL_HOST_USER
 from .tokens import account_activation_token
 
@@ -28,10 +30,11 @@ class UserLogin(APIView):
         serializer = LoginSerializer(data=request.data)
         try:
             serializer.is_valid(raise_exception=True)
-        except exceptions.ValidationError as error:
+        except (ValidationError, NotFound,
+                NotAuthenticated, AuthenticationFailed) as error:
             return Response({
-                'message': str(error)
-            }, status=400)
+                'message': str(error.default_detail)
+            }, status=error.status_code)
 
         user = serializer.validated_data['user']
 
@@ -70,7 +73,7 @@ class UserRegistration(APIView):
 
         try:
             validate_email(user_email)
-        except ValidationError:
+        except exceptions.ValidationError:
             return Response({
                 'message': 'Invalid email format'
             }, status=400)
@@ -90,9 +93,10 @@ class UserRegistration(APIView):
                     'message': 'Mail has been sent'
                 }, status=201)
             else:
+                User.objects.get(email=user_email).delete()
                 return Response({
                     'message': 'The mail has not been delivered'
-                    ' due to connection reasons'
+                    '. Please, try again'
                 }, status=500)
 
     def send_email_confirmation(self, user):
@@ -104,16 +108,18 @@ class UserRegistration(APIView):
         try:
             email_token = account_activation_token.make_token(user)
             user_id = user.pk
-            send_mail(f'Confirm {user.email} on HappyKH',
-                      f'We just needed to verify that {user.email} '
-                      f'is your email address.' +
-                      f' Just click the link below \n' +
+            message_body = (f'We just needed to verify that {user.email} '
+                      f'is your email address.'
+                      f' Just click the link below \n'
                       f'http://127.0.0.1:8080/#/confirm_registration/'
-                      f'{user_id}/{email_token}/',
-                      EMAIL_HOST_USER,
-                      [user.email])
+                      f'{user_id}/{email_token}/'
+            )
+
+            send_mail(f'Confirm {user.email} on HappyKH', message_body,
+                      EMAIL_HOST_USER, [user.email])
+
             return True
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except:
             return False
 
 

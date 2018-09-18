@@ -1,12 +1,12 @@
 <template>
   <form id="login" method="post" @submit.prevent="login" novalidate>
     <div class="content">
-      <input type="email" name="username" v-model.trim="userEmail"
+      <input type="email" name="userEmail" v-model.trim="userEmail"
              placeholder="EMAIL"/>
-      <input type="password" name="password" v-model="userPassword"
+      <input type="password" name="userPassword" v-model="userPassword"
              placeholder="PASSWORD"/>
     </div>
-    <input class="btn-submit" type="submit" :disabled="isDisabledButton"
+    <input class="btn-login" type="submit" :disabled="isDisabledButton"
            value="LOGIN"/>
   </form>
 </template>
