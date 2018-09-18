@@ -208,9 +208,6 @@ class UserProfile(APIView):
                 if not user.check_password(serializer.data.get('old_password')):
                     return Response({'message': 'Wrong password.'}, status=400)
 
-                if not serializer.data.get('new_password1') == serializer.data.get('new_password2'):
-                    return Response({'message': "Passwords don't match."}, status=400)
-
                 serializer.update(user, serializer.data)
                 return Response({'message': 'Password was updated.'}, status=200)
 
