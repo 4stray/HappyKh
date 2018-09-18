@@ -46,7 +46,7 @@ class UserLogin(APIView):
             }, status=200)
         else:
             return Response({
-                'message': 'You have to register first'
+                'message': "You can't login, you have to register first."
             }, status=400)
 
 
@@ -93,7 +93,7 @@ class UserRegistration(APIView):
                     'message': 'Mail has been sent'
                 }, status=201)
             else:
-                User.objects.get(email=user_email).delete()
+                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
                     '. Please, try again'

@@ -12,45 +12,47 @@
 </template>
 
 <script>
-import axios from 'axios';
+  import axios from 'axios';
 
-export default {
-  name: 'LoginComponent',
-  data() {
-    return {
-      userEmail: '',
-      userPassword: '',
-    };
-  },
-  methods: {
-    login() {
-      const userCredentials = {
-        user_email: this.userEmail,
-        user_password: this.userPassword,
+  export default {
+    name: 'LoginComponent',
+    data() {
+      return {
+        userEmail: '',
+        userPassword: '',
       };
-      axios.post('http://localhost:8000/api/users/login/', userCredentials)
-        .then((response) => {
-          this.$router.push('/');
-        }).catch((error) => {
-          this.$awn.alert('Account with such an email does not exist');
+    },
+    methods: {
+      login() {
+        const userCredentials = {
+          user_email: this.userEmail,
+          user_password: this.userPassword,
+        };
+        axios.post('http://localhost:8000/api/users/login/', userCredentials)
+          .then((response) => {
+            this.$router.push('/');
+          }).catch((error) => {
+          if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
           this.userPassword = '';
         });
+      },
+      isEmailValid() {
+        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        return re.test(this.userEmail);
+      },
     },
-    isEmailValid() {
-      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-      return re.test(this.userEmail);
-    },
-  },
-  computed: {
-    /**
+    computed: {
+      /**
        * @description Checks if user filled all fields
        * @returns {boolean}
        * */
-    isDisabledButton() {
-      return !(this.isEmailValid() && this.userPassword);
+      isDisabledButton() {
+        return !(this.isEmailValid() && this.userPassword);
+      },
     },
-  },
-};
+  };
 </script>
 
 <style scoped lang="scss">
