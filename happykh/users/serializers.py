@@ -49,15 +49,14 @@ class PasswordSerializer(serializers.ModelSerializer):
     Serializer for password change.
     """
     old_password = serializers.CharField(required=True)
-    new_password1 = serializers.CharField(required=True)
-    new_password2 = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
 
     class Meta:
         model = User
-        fields = ('old_password', 'new_password1', 'new_password2')
+        fields = ('old_password', 'new_password')
 
     def update(self, instance, validated_data):
-        password = validated_data.pop("new_password1")
+        password = validated_data.pop("new_password")
         instance.__dict__.update(validated_data)
 
         if password:
