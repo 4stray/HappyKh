@@ -22,6 +22,7 @@
 
 <script>
   import axios from 'axios';
+  import Router from '../router';
 
   export default {
     name: 'RegistrationComponent',
@@ -78,10 +79,8 @@
           };
           axios.post('http://localhost:8000/api/users/registration/', userCredentials)
             .then((response) => {
-              if (response.data.message) {
-                this.$awn.success(response.data.message);
-              }
               this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
+              Router.router.push('/');
             }).catch((error) => {
             if (error.response.status === 400) {
               this.$awn.alert(error.response.data.message);
@@ -92,6 +91,7 @@
             }
             if (this.$cookies) {
               this.$cookies.remove('token');
+              this.$cookies.remove('user_id');
               // if the request fails, remove any possible user token if possible
             }
             this.userPassword = '';
