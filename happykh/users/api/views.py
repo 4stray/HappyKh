@@ -35,7 +35,7 @@ class UserLogin(APIView):
             logger.error(f'ValidationError {error.detail["non_field_errors"]}, '
                          f'Email: {request.data["user_email"]}')
             return Response({
-                'message': error.detail["non_field_errors"]
+                'message': 'Your email or password is not valid.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.validated_data['user']
@@ -50,7 +50,7 @@ class UserLogin(APIView):
         else:
             logger.warning(f'Login by unregistered user')
             return Response({
-                'message': 'You have to register first'
+                'message': 'You can`t login, you have to register first.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -222,10 +222,6 @@ class UserProfile(APIView):
                 if not user.check_password(serializer.data.get('old_password')):
                     logger.error('Received wrong old password while changing password')
                     return Response({'message': 'Wrong password.'}, status=status.HTTP_400_BAD_REQUEST)
-
-                if not serializer.data.get('new_password1') == serializer.data.get('new_password2'):
-                    logger.error('Passwords don`t match while changing password')
-                    return Response({'message': "Passwords don't match."}, status=status.HTTP_400_BAD_REQUEST)
 
                 serializer.update(user, serializer.data)
                 logger.info('Updated user password')
