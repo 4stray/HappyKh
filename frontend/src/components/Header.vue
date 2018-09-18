@@ -3,9 +3,10 @@
     <router-link :to="{ name: 'home'}">Home</router-link>
     |
       <router-link v-if="!isAuthenticated" :to="{ name: 'login'}">Login</router-link>
-      <button v-if="isAuthenticated"
-                   v-on:click="signOut()"
-                   :to="{ name: 'logout'}">Sign out</button>
+      <router-link v-if="isAuthenticated"
+                   v-on:click.native="signOut()"
+                   to="{ name: 'login'}"
+                   replace>Sign out</router-link>
     <div v-if="isAuthenticated">
       |
       <router-link v-if="isAuthenticated" :to="{ name: 'profile'}">Profile</router-link>
