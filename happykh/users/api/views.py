@@ -1,4 +1,5 @@
 """Views for app users"""
+import logging
 from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.core.validators import validate_email
@@ -8,11 +9,13 @@ from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
-from rest_framework import exceptions
+from rest_framework import exceptions, status
 from users.models import User
 from users.serializers import LoginSerializer, UserSerializer, PasswordSerializer
 from happykh.settings import EMAIL_HOST_USER
 from .tokens import account_activation_token
+
+logger = logging.getLogger('happy_logger')
 
 
 class UserLogin(APIView):
@@ -29,22 +32,26 @@ class UserLogin(APIView):
         try:
             serializer.is_valid(raise_exception=True)
         except exceptions.ValidationError as error:
+            logger.error(f'ValidationError {error.detail["non_field_errors"]}, '
+                         f'Email: {request.data["user_email"]}')
             return Response({
                 'message': 'Your email or password is not valid.'
-            }, status=400)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.validated_data['user']
 
         if user.is_active:
             user_token, created = Token.objects.get_or_create(user=user)
+            logger.info('User has been logged in')
             return Response({
                 'user_token': user_token.key,
                 'user_id': user.id,
-            }, status=200)
+            }, status=status.HTTP_200_OK)
         else:
+            logger.warning(f'Login by unregistered user')
             return Response({
-                'message': "You can't login, you have to register first."
-            }, status=400)
+                'message': 'You can`t login, you have to register first.'
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogout(APIView):
@@ -53,13 +60,14 @@ class UserLogout(APIView):
 
     def post(self, request):
         Token.objects.get(key=request.data['user_token']).delete()
-        return Response({'message': 'User has been logged out'}, status=201)
+        logger.info('User has been logged out')
+        return Response({'message': 'User has been logged out'}, status=status.HTTP_201_CREATED)
 
 
 class UserRegistration(APIView):
     permission_classes = (AllowAny, )
 
-    def post(self, request, format=None):
+    def post(self, request):
         """
         If user credentials are valid then creates deactivated User
         :param request: http request
@@ -70,16 +78,19 @@ class UserRegistration(APIView):
 
         try:
             validate_email(user_email)
-        except ValidationError:
+        except ValidationError as error:
+            logger.error(f'Email validation error "{error.message}", '
+                         f'Email: {request.data["user_email"]}')
             return Response({
                 'message': 'Invalid email format'
-            }, status=400)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=user_email)
+            logger.warning(f'User with such an email already exists, user_id: {user.pk}')
             return Response({
                 'message': 'User with such an email already exists'
-            }, status=400)
+            }, status=status.HTTP_400_BAD_REQUEST)
         except User.DoesNotExist:
             user = User.objects.create_user(email=user_email,
                                             password=user_password,
@@ -88,13 +99,13 @@ class UserRegistration(APIView):
             if self.send_email_confirmation(user):
                 return Response({
                     'message': 'Mail has been sent'
-                }, status=201)
+                }, status=status.HTTP_201_CREATED)
             else:
+                logger.error('Confirmation email has not delivered')
                 user.delete()
                 return Response({
-                    'message': 'The mail has not been delivered'
-                    ' due to connection reasons'
-                }, status=500)
+                    'message': 'Try again'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def send_email_confirmation(self, user):
         """
@@ -113,8 +124,10 @@ class UserRegistration(APIView):
                       f'{user_id}/{email_token}/',
                       EMAIL_HOST_USER,
                       [user.email])
+            logger.info('Confirmation mail has been sent')
             return True
         except:
+            logger.error(f'Error occurred while sending mail')
             return False
 
 
@@ -133,23 +146,27 @@ class UserActivation(APIView):
             user = User.objects.get(pk=user_id)
 
             if user.is_active:
+                logger.warning(f'Activate already activated user, user_id: {user.pk}')
                 return Response({
-                    'message': "User is already activated"
-                }, status=400)
+                    'message': "User is already exists and activated"
+                }, status=status.HTTP_400_BAD_REQUEST)
             elif account_activation_token.check_token(user, token):
                 user.is_active = True
                 user.save()
-
+                logger.info('User`s account has been activated')
                 return Response({
                     'message': "User's account has been activated"
-                }, status=201)
+                }, status=status.HTTP_201_CREATED)
             else:
+                logger.error('User activation with invalid token,'
+                             f' user_email: {user.email}, token: {token}')
                 return Response({
-                    'message': 'User already exists'
-                }, status=400)
+                    'message': 'Invalid token'
+                }, status=status.HTTP_400_BAD_REQUEST)
         except (TypeError, ValueError, OverflowError,
-                User.DoesNotExist) as Error:
-            return Response({'message': str(Error)}, status=500)
+                User.DoesNotExist) as error:
+            logger.error(f'Error {error} while user activation')
+            return Response({'message': str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserProfile(APIView):
@@ -168,11 +185,12 @@ class UserProfile(APIView):
         try:
             user = User.objects.get(pk=pk)
         except User.DoesNotExist:
-            return Response({'message': "No user with such id."}, status=500)
+            logger.error(f'Can`t get user profile because of invalid id, user_id: {user.pk}')
+            return Response({'message': "No user with such id."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return user
 
-    def get(self, request, id, format=None):
+    def get(self, request, id):
         """
         Return user's data.
         :param request: HTTP request
@@ -182,9 +200,10 @@ class UserProfile(APIView):
         user = self.get_profile(id)
         serializer = UserSerializer(user)
 
-        return Response(serializer.data, status=200)
+        logger.info('Return user profile')
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def patch(self, request, id, format=None):
+    def patch(self, request, id):
         """
         Update user's data
         :param request: HTTP request
@@ -201,12 +220,15 @@ class UserProfile(APIView):
 
             if serializer.is_valid():
                 if not user.check_password(serializer.data.get('old_password')):
-                    return Response({'message': 'Wrong password.'}, status=400)
+                    logger.error('Received wrong old password while changing password')
+                    return Response({'message': 'Wrong password.'}, status=status.HTTP_400_BAD_REQUEST)
 
                 serializer.update(user, serializer.data)
-                return Response({'message': 'Password was updated.'}, status=200)
+                logger.info('Updated user password')
+                return Response({'message': 'Password was updated.'}, status=status.HTTP_200_OK)
 
-            return Response(serializer.errors, status=500)
+            logger.critical(f'Serializer error {serializer.errors} while changing password')
+            return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
             """
@@ -217,4 +239,5 @@ class UserProfile(APIView):
             if serializer.is_valid():
                 serializer.save(id=id, **serializer.validated_data)
 
-            return Response(serializer.data, status=200)
+            logger.info('User data updated')
+            return Response(serializer.data, status=status.HTTP_200_OK)
