@@ -2,8 +2,8 @@
   <div id="PasswordComponent">
     <h1>Change your password:</h1>
     <input type="password" name="password" v-model="oldPassword" placeholder="Old password"/>
-    <input type="password" name="password" v-model="newPassword1" placeholder="New password"/>
-    <input type="password" name="password" v-model="newPassword2" placeholder="Confirm new password"/>
+    <input type="password" name="password" v-model="newPassword" placeholder="New password"/>
+    <input type="password" name="password" v-model="confirmationPassword" placeholder="Confirm new password"/>
     <button class="btn-save-password" type="button" v-on:click="saveNewPassword()">Save password</button>
   </div>
 </template>
@@ -19,40 +19,55 @@
     data() {
       return {
         oldPassword: '',
-        newPassword1: '',
-        newPassword2: '',
+        newPassword: '',
+        confirmationPassword: '',
+        passwordErrors: [],
       };
     },
     methods: {
+      isPasswordValid() {
+        this.passwordErrors = [];
+        if (this.newPassword.length < 8) {
+          this.passwordErrors.push('Your password must be at least 8 characters.');
+        }
+        const alphaNumeric = /^[0-9a-zA-Z]+$/;
+        if (!this.newPassword.match(alphaNumeric)) {
+          this.passwordErrors.push('Your password must contain only numbers and alphabetical characters.');
+        }
+        if (this.newPassword !== this.confirmationPassword) {
+          this.passwordErrors.push("Your passwords don't match, please try again.");
+        }
+        if (this.newPassword != this.confirmationPassword) {
+          this.passwordErrors.push("Confirmation password is incorrect");
+        }
+        return this.passwordErrors.length < 1;
+      },
       saveNewPassword() {
-        if (this.newPassword1 == this.newPassword2) {
+        if (this.isPasswordValid()) {
           const userCredentials = {
             old_password: this.oldPassword,
-            new_password1: this.newPassword1,
-            new_password2: this.newPassword2,
+            new_password: this.newPassword,
           };
           axios.patch(UserAPI + this.$cookies.get('user_id'), userCredentials,
               {
                 headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
               })
             .then((response) => {
-              if (response.data.status) {
-                alert('Password successfully changed.');
-              } else {
-                alert(response.data.message);
-              }
+              this.$awn.success('Password successfully changed.');
             }).catch((error) => {
               if(error.response.data.message){
                 this.$awn.warning(error.response.data.message);
               }
-              this.newPassword1 = '';
-              this.newPassword2 = '';
-              this.oldPassword = '';
             });
         } else
         {
-          this.$awn.warning('Confirmation password is incorrect');
+          for (const index in this.passwordErrors){
+            this.$awn.warning(this.passwordErrors[index]);
+          }
         }
+        this.newPassword = '';
+        this.confirmationPassword = '';
+        this.oldPassword = '';
       },
     },
   };

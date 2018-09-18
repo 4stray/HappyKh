@@ -5,13 +5,13 @@
            v-model="userFirstName" placeholder="First name"/>
     <input type="text" :disabled="isDisabled" id="last_name"
            v-model="userLastName" placeholder="Last name"/>
-    <input type="number" :disabled="isDisabled" id="age" v-model="userAge" placeholder="Age"/>
+    <input type="number" :disabled="isDisabled" id="age" v-model="userAge" min="0" max="140" step="1"/>
     <select :disabled="isDisabled" v-model="userGender">
       <option disabled value="">Choose your gender</option>
       <option>Man</option>
       <option>Woman</option>
     </select>
-    <img v-bind:src=userImage id='image' alt="внедренная иконка папки"/>
+    <img v-bind:src=userImage id='image' alt="No profile image"/>
     <input type="file" id="imageInput" :disabled="isDisabled" v-on:change="changeImage()" accept="image/*"/>
     <button class="btn-change" v-on:click=edit()>{{ enableText }}</button>
     <button class="btn-save" type="button" v-on:click="save()">Save changes</button>
@@ -31,7 +31,7 @@ export default {
     return {
       userFirstName: '',
       userLastName: '',
-      userAge: '',
+      userAge: 0,
       userGender: 'Male',
       userImage: '',
       isDisabled: true,
@@ -52,38 +52,45 @@ export default {
               this.userLastName = response.data['last_name'];
               this.userAge = response.data['age'];
               this.userGender = GENDER_CHOISES[response.data['gender']];
-              this.userImage = response.data['image'];
+              this.userImage = response.data['profile_image'];
           }).catch((error) => {
             Authentication.signout(this);
-            alert(error);
+            this.$awn.warning(this.error.message);
           });
     },
     save() {
-      const userCredentials = {
-        first_name: this.userFirstName,
-        last_name: this.userLastName,
-        age: this.userAge,
-        gender: this.userGender.charAt(0),
-        image: this.userImage,
-      };
+      console.log(this.userImage);
+      if(Number.isInteger(Number(this.userAge))) {
+        const userCredentials = {
+          first_name: this.userFirstName,
+          last_name: this.userLastName,
+          age: this.userAge,
+          gender: this.userGender.charAt(0),
+          profile_image: this.userImage,
+        };
 
-      axios.patch(UserAPI+this.$cookies.get('user_id'), userCredentials,
-          {
-            headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
-          })
-          .then((response) => {
+        axios.patch(UserAPI + this.$cookies.get('user_id'), userCredentials,
+            {
+              headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
+            })
+            .then((response) => {
               this.isDisabled = true;
               this.enableText = 'Enable editing';
               this.userFirstName = response.data['first_name'];
               this.userLastName = response.data['last_name'];
               this.userAge = response.data['age'];
               this.userGender = GENDER_CHOISES[response.data['gender']];
-              this.userImage = response.data['image'];
-              alert('Your profile was successfully updated.');
-          }).catch((error) => {
-            Authentication.signout(this);
-            alert(error);
-          });
+              this.userImage = response.data['profile_image'];
+              this.$awn.success('Your profile was successfully updated.');
+            }).catch((error) => {
+              Authentication.signout(this);
+              this.$awn.warning(this.error.message);
+            });
+      } else
+      {
+        this.userAge = 0;
+        this.$awn.warning('Enter valid age.');
+      }
     },
     edit() {
       this.isDisabled = !this.isDisabled;

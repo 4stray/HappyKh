@@ -216,5 +216,6 @@ class UserProfile(APIView):
 
             if serializer.is_valid():
                 serializer.save(id=id, **serializer.validated_data)
-
-            return Response(serializer.data, status=200)
+                print(serializer.validated_data)
+                return Response(serializer.data, status=200)
+            return Response(serializer.errors, status=500)

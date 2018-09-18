@@ -45,7 +45,7 @@
        * @description Checks correctness of entered user's fields
        * @returns {boolean} Result of check
        */
-      isUserDataValid() {
+      isPasswordValid() {
         this.errors = {
           email: '',
           password: [],
@@ -69,7 +69,7 @@
         return Boolean(this.errors.email || this.errors.password.length);
       },
       register() {
-        if (this.isUserDataValid()) {
+        if (this.isPasswordValid()) {
           this.$awn.warning('Please correct your mistakes.');
         } else {
           const userCredentials = {
