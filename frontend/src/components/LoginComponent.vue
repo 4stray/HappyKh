@@ -30,7 +30,7 @@ import Auth from './Authentication/auth'
           user_email: this.userEmail,
           user_password: this.userPassword,
         };
-        Auth.authenticate(this, userCredentials, '/');
+        Auth.authenticate(this, userCredentials, { name: 'home' });
         this.userEmail = '';
         this.userPassword = '';
       },

@@ -22,7 +22,6 @@
 
 <script>
   import axios from 'axios';
-  import Router from '../router';
 
   export default {
     name: 'RegistrationComponent',
@@ -80,22 +79,22 @@
           axios.post('http://localhost:8000/api/users/registration/', userCredentials)
             .then((response) => {
               this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
-              Router.router.push('/');
+              this.$router.push({ name: 'home' });
             }).catch((error) => {
-            if (error.response.status === 400) {
-              this.$awn.alert(error.response.data.message);
-            } else if (error.response.status === 500 && error.response.data.message){
-              this.$awn.info(error.response.data.message);
-            } else {
-              this.$awn.warning("Server error");
-            }
-            if (this.$cookies) {
-              this.$cookies.remove('token');
-              this.$cookies.remove('user_id');
-              // if the request fails, remove any possible user token if possible
-            }
-            this.userPassword = '';
-            this.confirmPassword = '';
+              if (error.response.status === 400) {
+                this.$awn.alert(error.response.data.message);
+              } else if (error.response.status === 500 && error.response.data.message){
+                this.$awn.info(error.response.data.message);
+              } else {
+                this.$awn.warning("Server error");
+              }
+              if (this.$cookies) {
+                this.$cookies.remove('token');
+                this.$cookies.remove('user_id');
+                // if the request fails, remove any possible user token if possible
+              }
+              this.userPassword = '';
+              this.confirmPassword = '';
           });
         }
       },

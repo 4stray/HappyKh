@@ -30,7 +30,7 @@ export default {
     this.user.authenticated = false;
 
     if (redirect) router.push(redirect);
-    router.push('/');
+    router.push({ name: 'home' });
   },
 
   checkAuthentication() {

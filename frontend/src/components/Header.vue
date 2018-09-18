@@ -2,15 +2,13 @@
   <div id="nav">
     <router-link :to="{ name: 'home'}">Home</router-link>
     |
-      <router-link v-if="!isAuthenticated" :to="{ name: 'login'}">Login</router-link>
-      <router-link v-if="isAuthenticated"
-                   v-on:click.native="signOut()"
-                   to="{ name: 'login'}"
-                   replace>Sign out</router-link>
-    <div v-if="isAuthenticated">
-      |
-      <router-link v-if="isAuthenticated" :to="{ name: 'profile'}">Profile</router-link>
-    </div>
+    <router-link v-if="!isAuthenticated" :to="{ name: 'login'}">Login</router-link>
+    <router-link v-if="isAuthenticated"
+                 v-on:click.native="signOut()"
+                 to="{ name: 'login'}"
+                 replace>Sign out</router-link>
+    <p v-if="isAuthenticated"> | </p>
+    <router-link v-if="isAuthenticated" :to="{ name: 'profile'}">Profile</router-link>
   </div>
 </template>
 
@@ -26,7 +24,7 @@
     },
     methods: {
       signOut(){
-        Auth.signout(this, '/');
+        Auth.signout(this);
         if(document.location.pathname == '/') {
           document.location.reload(true);
         }
@@ -41,9 +39,6 @@
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: #2c3e50;
-  }
-
-  #nav {
     padding: 30px;
   }
 
@@ -54,5 +49,9 @@
 
   #nav a.router-link-exact-active {
     color: #42b983;
+  }
+
+  #nav p {
+    display: inline;
   }
 </style>
