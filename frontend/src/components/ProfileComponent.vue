@@ -11,7 +11,6 @@
       <option>Male</option>
       <option>Woman</option>
     </select>
-    <input type="text" :disabled="isDisabled" id="email" v-model="userEmail" placeholder="Email"/>
     <img v-bind:src=userImage id='image' alt="внедренная иконка папки"/>
     <input type="file" id="imageInput" :disabled="isDisabled" v-on:change="changeImage()" accept="image/*"/>
     <button class="btn-change" v-on:click=edit()>{{ enableText }}</button>
@@ -23,6 +22,8 @@
 import axios from 'axios';
 import Authentication from '../components/Authentication/auth';
 
+const UserAPI = 'http://127.0.0.1:8000/api/users/';
+
 export default {
   name: 'ProfileComponent',
   data() {
@@ -31,7 +32,6 @@ export default {
       userLastName: '',
       userAge: '',
       userGender: 'Male',
-      userEmail: '',
       userImage: '',
       isDisabled: true,
       enableText: 'Enable editing',
@@ -42,8 +42,7 @@ export default {
   },
   methods: {
     fetchUserCredentials() {
-      console.log(this.$cookies.get('token'));
-      axios.get('http://localhost:8000/api/users/'+this.$cookies.get('user_id'),
+      axios.get(UserAPI+this.$cookies.get('user_id'),
           {
             headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
           })
@@ -52,11 +51,11 @@ export default {
               this.userLastName = response.data['last_name'];
               this.userAge = response.data['age'];
               this.userGender = response.data['gender'];
-              this.userEmail = response.data['email'];
               this.userImage = response.data['image'];
           }).catch((error) => {
-        alert(error);
-      });
+            Authentication.signout(this);
+            alert(error);
+          });
     },
     save() {
       const userCredentials = {
@@ -64,11 +63,10 @@ export default {
         last_name: this.userLastName,
         age: this.userAge,
         gender: this.userGender,
-        email: this.userEmail,
         image: this.userImage,
       };
 
-      axios.patch('http://localhost:8000/api/users/'+this.$cookies.get('user_id'), userCredentials,
+      axios.patch(UserAPI+this.$cookies.get('user_id'), userCredentials,
           {
             headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
           })
@@ -79,12 +77,12 @@ export default {
               this.userLastName = response.data['last_name'];
               this.userAge = response.data['age'];
               this.userGender = response.data['gender'];
-              this.userEmail = response.data['email'];
               this.userImage = response.data['image'];
               alert('Your profile was successfully updated.');
           }).catch((error) => {
-        alert(error);
-      });
+            Authentication.signout(this);
+            alert(error);
+          });
     },
     edit() {
       this.isDisabled = !this.isDisabled;

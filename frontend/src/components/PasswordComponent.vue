@@ -11,6 +11,8 @@
 <script>
   import axios from 'axios';
 
+  const UserAPI = 'http://127.0.0.1:8000/api/users/';
+
   export default {
     name: 'PasswordComponent',
     data() {
@@ -27,7 +29,7 @@
           new_password1: this.newPassword1,
           new_password2: this.newPassword2,
         };
-        axios.patch('http://localhost:8000/api/users/id', userCredentials)
+        axios.patch(UserAPI + this.$cookies.get('user_id'), userCredentials)
             .then((response) => {
               if (response.data.status) {
                 alert('Password successfully changed.');

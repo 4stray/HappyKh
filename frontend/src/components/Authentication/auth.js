@@ -10,13 +10,13 @@ export default {
     Axios.post(`${UserAPI}/login/`, credentials)
         .then((response) => {
             context.$cookies.set('token', response.data['token']);
-            console.log(response.data['token']);
             context.$cookies.set('user_id', response.data['user_id']);
 
             this.user.authenticated = true;
 
             if (redirect) router.push(redirect);
         }).catch((error) => {
+          this.signout(this);
           alert(error);
         })  ;
   },
@@ -33,11 +33,13 @@ export default {
   // },
 
   signout(context, redirect) {
-    context.$cookies.delete('token');
-    context.$cookies.delete('user_id');
+    context.$cookies.remove('token');
+    context.$cookies.remove('user_id');
     this.user.authenticated = false;
+    console.log(context.$cookies);
 
     if (redirect) router.push(redirect);
+    router.push('/');
   },
 
   checkAuthentication() {

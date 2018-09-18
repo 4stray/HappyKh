@@ -3,7 +3,9 @@
     <router-link :to="{ name: 'home'}">Home</router-link>
     |
       <router-link v-if="!isAuthenticated" :to="{ name: 'login'}">Login</router-link>
-      <a v-if="isAuthenticated" v-on:click="signOut()">Sign out</a>
+      <button v-if="isAuthenticated"
+                   v-on:click="signOut()"
+                   :to="{ name: 'logout'}">Sign out</button>
     <div v-if="isAuthenticated">
       |
       <router-link v-if="isAuthenticated" :to="{ name: 'profile'}">Profile</router-link>
@@ -23,7 +25,7 @@
     },
     methods: {
       signOut(){
-        Auth.signout(this, '/login');
+        Auth.signout(this, '/');
       },
     },
   };
