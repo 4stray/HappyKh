@@ -24,7 +24,7 @@ describe('LoginComonent', () => {
   });
 
   it('contains button for submitting user credentials', () => {
-    expect(wrapper.contains('[class="btn-login"]')).to.be.equal(true);
+    expect(wrapper.contains('[class="btn-submit"]')).to.be.equal(true);
   });
 });
 

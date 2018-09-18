@@ -6,7 +6,7 @@
       <input type="password" name="userPassword" v-model="userPassword"
              placeholder="PASSWORD"/>
     </div>
-    <input class="btn-login" type="submit" :disabled="isDisabledButton"
+    <input class="btn-submit" type="submit" :disabled="isDisabledButton"
            value="LOGIN"/>
   </form>
 </template>
