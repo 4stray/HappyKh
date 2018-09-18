@@ -13,7 +13,7 @@ from rest_framework import exceptions, status
 from smtplib import SMTPException
 from users.models import User
 from users.serializers import LoginSerializer, UserSerializer, PasswordSerializer
-from happykh.settings import EMAIL_HOST_USER, SENDGRID_API_KEY
+from happykh.settings import EMAIL_HOST_USER
 from .tokens import account_activation_token
 
 logger = logging.getLogger('happy_logger')

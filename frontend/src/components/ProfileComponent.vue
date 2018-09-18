@@ -59,7 +59,6 @@ export default {
           });
     },
     save() {
-      console.log(this.userImage);
       if(Number.isInteger(Number(this.userAge))) {
         const userCredentials = {
           first_name: this.userFirstName,

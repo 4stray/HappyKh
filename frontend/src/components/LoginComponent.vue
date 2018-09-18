@@ -31,13 +31,6 @@ import Auth from './Authentication/auth'
           user_password: this.userPassword,
         };
         Auth.authenticate(this, userCredentials, '/');
-      // axios.post('http://localhost:8000/api/users/login/', userCredentials)
-      //   .then((response) => {
-      //     this.$router.push('/');
-      //   }).catch((error) => {
-      //     this.$awn.alert('Account with such an email does not exist');
-      //     this.userPassword = '';
-      //   });
         this.userEmail = '';
         this.userPassword = '';
       },

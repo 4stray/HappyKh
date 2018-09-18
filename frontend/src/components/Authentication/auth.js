@@ -9,38 +9,25 @@ export default {
   authenticate(context, credentials, redirect) {
     Axios.post(`${UserAPI}/login/`, credentials)
         .then((response) => {
-            context.$cookies.set('token', response.data['token']);
-            context.$cookies.set('user_id', response.data['user_id']);
+          context.$cookies.set('token', response.data['token']);
+          context.$cookies.set('user_id', response.data['user_id']);
 
-            this.user.authenticated = true;
+          this.user.authenticated = true;
 
-            if (redirect) router.push(redirect);
+          if (redirect) router.push(redirect);
         }).catch((error) => {
-          if(error.response.data.message){
+          if (error.response.data.message) {
             context.$awn.warning(error.response.data.message);
           }
-
           this.signout(this);
-          alert(error);
-        })  ;
+          context.$awn.warning(context.error.message);
+        });
   },
-
-  // signup(context, credentials, redirect) {
-  //   Axios.post(`${UserAPI}/v1/signup`, credentials)
-  //       .then(() => {
-  //         context.validSignUp = true;
-  //
-  //         this.authenticate(context, credentials, redirect);
-  //       }).catch((error) => {
-  //         alert(error);
-  //       });
-  // },
 
   signout(context, redirect) {
     context.$cookies.remove('token');
     context.$cookies.remove('user_id');
     this.user.authenticated = false;
-    console.log(context.$cookies);
 
     if (redirect) router.push(redirect);
     router.push('/');
