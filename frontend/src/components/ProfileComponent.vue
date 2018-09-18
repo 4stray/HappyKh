@@ -8,7 +8,7 @@
     <input type="number" :disabled="isDisabled" id="age" v-model="userAge" placeholder="Age"/>
     <select :disabled="isDisabled" v-model="userGender">
       <option disabled value="">Choose your gender</option>
-      <option>Male</option>
+      <option>Man</option>
       <option>Woman</option>
     </select>
     <img v-bind:src=userImage id='image' alt="внедренная иконка папки"/>
@@ -23,6 +23,7 @@ import axios from 'axios';
 import Authentication from '../components/Authentication/auth';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
+const GENDER_CHOISES = {'M': 'Man', 'W': 'Woman'};
 
 export default {
   name: 'ProfileComponent',
@@ -50,7 +51,7 @@ export default {
               this.userFirstName = response.data['first_name'];
               this.userLastName = response.data['last_name'];
               this.userAge = response.data['age'];
-              this.userGender = response.data['gender'];
+              this.userGender = GENDER_CHOISES[response.data['gender']];
               this.userImage = response.data['image'];
           }).catch((error) => {
             Authentication.signout(this);
@@ -62,7 +63,7 @@ export default {
         first_name: this.userFirstName,
         last_name: this.userLastName,
         age: this.userAge,
-        gender: this.userGender,
+        gender: this.userGender.charAt(0),
         image: this.userImage,
       };
 
@@ -76,7 +77,7 @@ export default {
               this.userFirstName = response.data['first_name'];
               this.userLastName = response.data['last_name'];
               this.userAge = response.data['age'];
-              this.userGender = response.data['gender'];
+              this.userGender = GENDER_CHOISES[response.data['gender']];
               this.userImage = response.data['image'];
               alert('Your profile was successfully updated.');
           }).catch((error) => {

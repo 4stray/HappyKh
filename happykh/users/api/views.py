@@ -30,7 +30,7 @@ class UserLogin(APIView):
             serializer.is_valid(raise_exception=True)
         except exceptions.ValidationError as error:
             return Response({
-                'message': str(error)
+                'message': 'Your email or password is not valid.'
             }, status=400)
 
         user = serializer.validated_data['user']
@@ -43,13 +43,13 @@ class UserLogin(APIView):
             }, status=200)
         else:
             return Response({
-                'message': 'You have to register first'
+                'message': "You can't login, you have to register first."
             }, status=400)
 
 
 class UserLogout(APIView):
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated, )
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         Token.objects.get(key=request.data['user_token']).delete()
@@ -57,7 +57,7 @@ class UserLogout(APIView):
 
 
 class UserRegistration(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
         """
@@ -90,9 +90,10 @@ class UserRegistration(APIView):
                     'message': 'Mail has been sent'
                 }, status=201)
             else:
+                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
-                    ' due to connection reasons'
+                               ' due to connection reasons'
                 }, status=500)
 
     def send_email_confirmation(self, user):
@@ -113,12 +114,12 @@ class UserRegistration(APIView):
                       EMAIL_HOST_USER,
                       [user.email])
             return True
-        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        except:
             return False
 
 
 class UserActivation(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request, user_id, token):
         """

@@ -10,6 +10,7 @@
 
 <script>
   import axios from 'axios';
+  import Authentication from './Authentication/auth';
 
   const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
@@ -24,12 +25,16 @@
     },
     methods: {
       saveNewPassword() {
-        const userCredentials = {
-          old_password: this.oldPassword,
-          new_password1: this.newPassword1,
-          new_password2: this.newPassword2,
-        };
-        axios.patch(UserAPI + this.$cookies.get('user_id'), userCredentials)
+        if (this.newPassword1 == this.newPassword2) {
+          const userCredentials = {
+            old_password: this.oldPassword,
+            new_password1: this.newPassword1,
+            new_password2: this.newPassword2,
+          };
+          axios.patch(UserAPI + this.$cookies.get('user_id'), userCredentials,
+              {
+                headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
+              })
             .then((response) => {
               if (response.data.status) {
                 alert('Password successfully changed.');
@@ -37,8 +42,17 @@
                 alert(response.data.message);
               }
             }).catch((error) => {
-          alert(error);
-        });
+              if(error.response.data.message){
+                this.$awn.warning(error.response.data.message);
+              }
+              this.newPassword1 = '';
+              this.newPassword2 = '';
+              this.oldPassword = '';
+            });
+        } else
+        {
+          this.$awn.warning('Confirmation password is incorrect');
+        }
       },
     },
   };

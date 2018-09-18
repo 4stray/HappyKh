@@ -26,7 +26,10 @@
     methods: {
       signOut(){
         Auth.signout(this, '/');
-      },
+        if(document.location.pathname == '/') {
+          document.location.reload(true);
+        }
+      }
     },
   };
 </script>

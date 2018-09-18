@@ -49,7 +49,8 @@
 </script>
 
 <style lang="scss">
-  $primaryColor: #0ca086;
+  @import "../scss/login";
+  
   #panel {
     box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     -webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);

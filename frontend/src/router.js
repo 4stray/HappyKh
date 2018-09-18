@@ -6,8 +6,6 @@ import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import Profile from './views/Profile';
 import Auth from './components/Authentication/auth';
 
-Vue.use(Router);
-
 const router = new Router({
   routes: [
     {
@@ -38,5 +36,8 @@ router.beforeEach((to, from, next) => {
   Auth.checkAuthentication();
   next();
 });
+
+Vue.use(Router);
+
 
 export default router;

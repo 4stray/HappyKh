@@ -16,6 +16,10 @@ export default {
 
             if (redirect) router.push(redirect);
         }).catch((error) => {
+          if(error.response.data.message){
+            context.$awn.warning(error.response.data.message);
+          }
+
           this.signout(this);
           alert(error);
         })  ;
