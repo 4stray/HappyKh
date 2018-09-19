@@ -45,7 +45,7 @@
        * @description Checks correctness of entered user's fields
        * @returns {boolean} Result of check
        */
-      isUserDataValid() {
+      isPasswordValid() {
         this.errors = {
           email: '',
           password: [],
@@ -69,7 +69,7 @@
         return Boolean(this.errors.email || this.errors.password.length);
       },
       register() {
-        if (this.isUserDataValid()) {
+        if (this.isPasswordValid()) {
           this.$awn.warning('Please correct your mistakes.');
         } else {
           const userCredentials = {
@@ -78,24 +78,23 @@
           };
           axios.post('http://localhost:8000/api/users/registration/', userCredentials)
             .then((response) => {
-              if (response.data.message) {
-                this.$awn.success(response.data.message);
-              }
               this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
+              this.$router.push({ name: 'home' });
             }).catch((error) => {
-            if (error.response.status === 400) {
-              this.$awn.alert(error.response.data.message);
-            } else if (error.response.status === 500 && error.response.data.message){
-              this.$awn.info(error.response.data.message);
-            } else {
-              this.$awn.warning("Server error");
-            }
-            if (this.$cookies) {
-              this.$cookies.remove('token');
-              // if the request fails, remove any possible user token if possible
-            }
-            this.userPassword = '';
-            this.confirmPassword = '';
+              if (error.response.status === 400) {
+                this.$awn.alert(error.response.data.message);
+              } else if (error.response.status === 500 && error.response.data.message){
+                this.$awn.info(error.response.data.message);
+              } else {
+                this.$awn.warning("Server error");
+              }
+              if (this.$cookies) {
+                this.$cookies.remove('token');
+                this.$cookies.remove('user_id');
+                // if the request fails, remove any possible user token if possible
+              }
+              this.userPassword = '';
+              this.confirmPassword = '';
           });
         }
       },

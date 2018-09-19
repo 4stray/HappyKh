@@ -10,6 +10,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework import exceptions, status
+from smtplib import SMTPException
 from users.models import User
 from users.serializers import LoginSerializer, UserSerializer, PasswordSerializer
 from happykh.settings import EMAIL_HOST_USER
@@ -44,7 +45,7 @@ class UserLogin(APIView):
             user_token, created = Token.objects.get_or_create(user=user)
             logger.info('User has been logged in')
             return Response({
-                'user_token': user_token.key,
+                'token': user_token.key,
                 'user_id': user.id,
             }, status=status.HTTP_200_OK)
         else:
@@ -55,8 +56,8 @@ class UserLogin(APIView):
 
 
 class UserLogout(APIView):
-    authentication_classes = (TokenAuthentication, )
-    permission_classes = (IsAuthenticated, )
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def post(self, request):
         Token.objects.get(key=request.data['user_token']).delete()
@@ -65,7 +66,7 @@ class UserLogout(APIView):
 
 
 class UserRegistration(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request):
         """
@@ -95,16 +96,14 @@ class UserRegistration(APIView):
             user = User.objects.create_user(email=user_email,
                                             password=user_password,
                                             is_active=False)
-
             if self.send_email_confirmation(user):
-                return Response({
-                    'message': 'Mail has been sent'
-                }, status=status.HTTP_201_CREATED)
+                return Response(status=status.HTTP_201_CREATED)
             else:
                 logger.error('Confirmation email has not delivered')
                 user.delete()
                 return Response({
-                    'message': 'Try again'
+                    'message': 'The mail has not been delivered'
+                               ' due to connection reasons'
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def send_email_confirmation(self, user):
@@ -118,21 +117,21 @@ class UserRegistration(APIView):
             user_id = user.pk
             send_mail(f'Confirm {user.email} on HappyKH',
                       f'We just needed to verify that {user.email} '
-                      f'is your email address.' +
-                      f' Just click the link below \n' +
+                      f'is your email address.'
+                      f' Just click the link below \n'
                       f'http://127.0.0.1:8080/#/confirm_registration/'
                       f'{user_id}/{email_token}/',
                       EMAIL_HOST_USER,
                       [user.email])
             logger.info('Confirmation mail has been sent')
             return True
-        except:
+        except SMTPException:
             logger.error(f'Error occurred while sending mail')
-            return False
+        return False
 
 
 class UserActivation(APIView):
-    permission_classes = (AllowAny, )
+    permission_classes = (AllowAny,)
 
     def post(self, request, user_id, token):
         """
@@ -238,6 +237,6 @@ class UserProfile(APIView):
 
             if serializer.is_valid():
                 serializer.save(id=id, **serializer.validated_data)
-
-            logger.info('User data updated')
-            return Response(serializer.data, status=status.HTTP_200_OK)
+                logger.info('User data updated')
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
