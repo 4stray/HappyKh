@@ -106,8 +106,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         INVALID_PASSWORD = self.PASSWORDS.copy()
         INVALID_PASSWORD['old_password'] = '123userPassword'
         response = self.client.patch(f'/api/users/profile/{self.test_user.pk}',
-                                     **INVALID_PASSWORD)
-        # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                                     INVALID_PASSWORD)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(
             self.test_user.check_password(INVALID_PASSWORD['new_password1']))
 
@@ -116,8 +116,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         INVALID_PASSWORD = self.PASSWORDS.copy()
         INVALID_PASSWORD['new_password1'] = '123userPassword'
         response = self.client.patch(f'/api/users/profile/{self.test_user.pk}',
-                                     **INVALID_PASSWORD)
-        # self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+                                     INVALID_PASSWORD)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(
             self.test_user.check_password(INVALID_PASSWORD['new_password1']))
 
@@ -126,7 +126,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
         INVALID_PASSWORD = self.PASSWORDS.copy()
         INVALID_PASSWORD['new_password1'] = '123'
         response = self.client.patch(f'/api/users/profile/{self.test_user.pk}',
-                                     **INVALID_PASSWORD)
-        # self.assertEqual(response.status_code, HTTP_400_BAD_REQUEST)
+                                     INVALID_PASSWORD)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertFalse(
             self.test_user.check_password(INVALID_PASSWORD['new_password1']))
