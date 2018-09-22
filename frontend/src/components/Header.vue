@@ -13,24 +13,24 @@
 </template>
 
 <script>
-  import Auth from '../components/Authentication/auth'
+import Auth from '../components/Authentication/auth';
 
-  export default {
-    name: 'Header',
-    data() {
-      return {
-        isAuthenticated: Auth.user.authenticated,
-      };
-    },
-    methods: {
-      signOut(){
-        Auth.signout(this);
-        if(document.location.pathname == '/') {
-          document.location.reload(true);
-        }
+export default {
+  name: 'Header',
+  data() {
+    return {
+      isAuthenticated: Auth.user.authenticated,
+    };
+  },
+  methods: {
+    signOut() {
+      Auth.signout(this);
+      if (document.location.pathname == '/') {
+        document.location.reload(true);
       }
     },
-  };
+  },
+};
 </script>
 <style>
   #nav {
