@@ -12,7 +12,7 @@ class UserAdmin(BaseUserAdmin):
     # that reference specific fields on auth.User.
     list_display = ('email', 'is_superuser')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('email', 'password', 'is_active')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'age', 'gender')}),
         ('Avatar', {'fields': ('profile_image',)}),
         ('Permissions', {'fields': ('is_superuser',)}),

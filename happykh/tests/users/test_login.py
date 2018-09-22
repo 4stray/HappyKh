@@ -20,8 +20,9 @@ class LoginViewTestCase(BaseTestCase, APITestCase):
         data = CORRECT_DATA.copy()
         data['user_email'] = 'invalidmail.com'
         response = self.client.post('/api/users/login/', data)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-        self.assertEqual(response.data['message'], 'Incorrect authentication credentials.')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'],
+                         'Invalid user email format.')
 
     def test_nonexisting_email(self):
         """Test view response for nonexisting email"""
@@ -29,7 +30,8 @@ class LoginViewTestCase(BaseTestCase, APITestCase):
         data['user_email'] = 'fake@mail.com'
         response = self.client.post('/api/users/login/', data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data['message'], 'Not found.')
+        self.assertEqual(response.data['message'],
+                         'User with such credentials was not found.')
 
     def test_wrong_password(self):
         """Test view response for incorrect password"""
@@ -37,7 +39,8 @@ class LoginViewTestCase(BaseTestCase, APITestCase):
         data['user_password'] = 'wrongpassword'
         response = self.client.post('/api/users/login/', data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data['message'], 'Not found.')
+        self.assertEqual(response.data['message'],
+                         'User with such credentials was not found.')
 
     def test_successful_response(self):
         """Test view response for correct data"""

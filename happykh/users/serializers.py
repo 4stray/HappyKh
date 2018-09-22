@@ -1,10 +1,13 @@
+import logging
 from django.contrib.auth import authenticate
 from django.core import exceptions
 from django.core.validators import validate_email
 from rest_framework import serializers
 from rest_framework.exceptions import (AuthenticationFailed, ValidationError,
-    NotAuthenticated, NotFound)
+    NotFound, PermissionDenied)
 from users.models import User
+
+logger = logging.getLogger('happy_logger')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,28 +27,50 @@ class LoginSerializer(serializers.Serializer):
 
         try:
             validate_email(user_email)
-        except exceptions.ValidationError:
-            raise AuthenticationFailed()
+        except exceptions.ValidationError as error:
+            logger.error(f'Validation error {error}, invalid email format,'
+                         f' Email: {user_email}')
 
-        if user_email and user_password:
+            email_format_error = ValidationError
+            email_format_error.default_detail = 'Invalid user email format.'
+
+            raise email_format_error
+
+        if not user_email is None and not user_password is None:
             user = authenticate(user_email=user_email,
                                 user_password=user_password)
-            if user:
+            if not user is None:
                 if user.is_active:
                     data['user'] = user
                 else:
-                    deactivated_user_error = ValidationError()
+                    logger.warning('Validation warning, need to activate '
+                                   'account')
 
-                    deactivated_user_error.default_detail = (
-                        "Please, check you mailbox in order "
-                        "to activate your account",
-                    )
+                    activation_required_error = PermissionDenied
+                    activation_required_error.default_detail = \
+                        'Please, click the link in the mail we sent you' \
+                        'in order to activate your account'
 
-                    raise deactivated_user_error
+                    raise activation_required_error
             else:
-                raise NotFound()
+                account_exists_error = NotFound
+                account_exists_error.default_detail = \
+                    'User with such credentials was not found.'
+
+                logger.warning(f'Validation warning, '
+                               f'{account_exists_error.default_detail},'
+                               f' user_email: {user_email}')
+
+                raise account_exists_error
         else:
-            raise NotAuthenticated()
+            authorization_error = AuthenticationFailed
+            authorization_error.default_detail = 'Must provide user ' \
+                                                 'email and password'
+
+            logger.warning(f'Validation warning, '
+                           f'{authorization_error.default_detail}')
+            raise authorization_error
+
         return data
 
 

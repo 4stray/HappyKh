@@ -12,7 +12,9 @@
 </template>
 
 <script>
+
 import axios from 'axios';
+import Auth from './Authentication/auth'
 
 export default {
   name: 'LoginComponent',
@@ -28,15 +30,21 @@ export default {
         user_email: this.userEmail,
         user_password: this.userPassword,
       };
-      axios.post('http://localhost:8000/api/users/login/', userCredentials)
-        .then((response) => {
-          this.$router.push('/');
-        }).catch((error) => {
-          if (error.response.data.message) {
-            this.$awn.warning(error.response.data.message);
-          }
-          this.userPassword = '';
-        });
+    },
+    methods: {
+      login() {
+        const userCredentials = {
+          user_email: this.userEmail,
+          user_password: this.userPassword,
+        };
+        Auth.authenticate(this, userCredentials, { name: 'home' });
+        this.userEmail = '';
+        this.userPassword = '';
+      },
+      isEmailValid() {
+        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        return re.test(this.userEmail);
+      },
     },
     isEmailValid() {
       const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
