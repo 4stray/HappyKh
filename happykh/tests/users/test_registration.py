@@ -25,7 +25,7 @@ class RegistrationViewTestCase(BaseTestCase, APITestCase):
         response = self.register_deactivated_user(data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-    def test_sending_email_with(self):
+    def test_sending_email(self):
         user = User.objects.create_user(TEST_USER_DATA['user_email'],
                                         TEST_USER_DATA['user_password'],
                                         is_active=False)
