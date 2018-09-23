@@ -5,6 +5,7 @@ from django.utils import six
 
 class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
     """ Email confirmation token """
+
     def _make_hash_value(self, user, timestamp):
         """
         Make hash for token

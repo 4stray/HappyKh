@@ -1,21 +1,27 @@
+"""Custom serializers for users app"""
 import logging
+
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from rest_framework import serializers, exceptions
-from users.models import User
+from rest_framework import exceptions
+from rest_framework import serializers
 
-logger = logging.getLogger('happy_logger')
+from happykh.users.models import User
+
+LOGGER = logging.getLogger('happy_logger')
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = '__all__'
 
 
 class LoginSerializer(serializers.Serializer):
+    """
+    Serializer for user credentials
+    """
     user_email = serializers.EmailField()
     user_password = serializers.CharField()
 
@@ -26,8 +32,10 @@ class LoginSerializer(serializers.Serializer):
         try:
             validate_email(user_email)
         except ValidationError as error:
-            logger.error(f'Validation error {error}, invalid email format, Email: {user_email}')
-            raise exceptions.ValidationError('Invalid email format')
+            LOGGER.error(
+                "Serializer: Validation error %s"
+                "invalid email format, Email: %s" % (error, user_email))
+            raise exceptions.ValidationError("Invalid email format")
 
         if user_email and user_password:
             user = authenticate(user_email=user_email,
@@ -38,15 +46,19 @@ class LoginSerializer(serializers.Serializer):
                 else:
                     msg = "Please, check you mailbox in order " \
                           "to activate your account"
-                    logger.warning('Validation warning, need to activate account')
+                    LOGGER.warning(
+                        "Serializer: Validation warning,"
+                        " need to activate account")
                     raise exceptions.ValidationError(msg)
             else:
-                msg = 'Account with such an email does not exists'
-                logger.warning(f'Validation warning, {msg}, user_email: {user_email}')
+                msg = "Account with such an email does not exists"
+                LOGGER.warning(
+                    "Serializer: Validation warning, %s, user_email: %s" % (
+                        msg, user_email))
                 raise exceptions.ValidationError(msg)
         else:
-            msg = 'Must provide user email and password'
-            logger.warning(f'Validation warning, {msg}')
+            msg = "Must provide user email and password"
+            LOGGER.warning("Serializer:  Validation warning, %s", msg)
             raise exceptions.ValidationError(msg)
         return data
 
