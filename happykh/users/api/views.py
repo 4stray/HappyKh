@@ -110,16 +110,20 @@ class UserRegistration(APIView):
 
             mail_message = self.form_mail_message(user)
 
-            if mail_message is not None:
+            try:
                 send_mail(mail_message['header'], mail_message['body'],
                           EMAIL_HOST_USER, (user.email,))
+
+                logger.info('Confirmation mail has been sent')
+
                 return Response(status=status.HTTP_201_CREATED)
-            else:
-                logger.error('Confirmation email has not been delivered')
+            except (SMTPException, exceptions.ImproperlyConfigured):
+                logger.error(f'Error occurred while sending mail')
+
                 user.delete()
+
                 return Response({
-                    'message': 'The mail has not been delivered'
-                               ' due to connection reasons'
+                    'message': 'The mail has not been delivered.'
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def form_mail_message(self, user):
@@ -128,24 +132,18 @@ class UserRegistration(APIView):
         :param user: User
         :return: Boolean
         """
-        try:
-            email_token = account_activation_token.make_token(user)
-            user_id = user.pk
-            mail_message = {
-                'header': f'Confirm {user.email} on HappyKH',
-                'body': f'We just needed to verify that {user.email} '
-                        f'is your email address.'
-                        f' Just click the link below \n'
-                        f'http://127.0.0.1:8080/#/confirm_registration/'
-                        f'{user_id}/{email_token}/'
-            }
+        email_token = account_activation_token.make_token(user)
+        user_id = user.pk
+        mail_message = {
+            'header': f'Confirm {user.email} on HappyKH',
+            'body': f'We just needed to verify that {user.email} '
+                    f'is your email address.'
+                    f' Just click the link below \n'
+                    f'http://127.0.0.1:8080/#/confirm_registration/'
+                    f'{user_id}/{email_token}/'
+        }
 
-            logger.info('Confirmation mail has been sent')
-
-            return mail_message
-        except SMTPException:
-            logger.error(f'Error occurred while sending mail')
-        return None
+        return mail_message
 
 
 class UserActivation(APIView):
