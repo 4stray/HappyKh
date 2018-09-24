@@ -22,7 +22,7 @@ class LoginSerializer(serializers.Serializer):
     """
     Serializer for user credentials
     """
-    user_email = serializers.EmailField()
+    user_email = serializers.CharField()
     user_password = serializers.CharField()
 
     def validate(self, data):
@@ -31,11 +31,14 @@ class LoginSerializer(serializers.Serializer):
 
         try:
             validate_email(user_email)
-        except ValidationError as error:
+        except ValidationError:
+            email_format_error = exceptions.ValidationError
+            email_format_error.default_detail = 'Invalid user email format.'
             LOGGER.error(
-                "Serializer: Validation error %s"
-                "invalid email format, Email: %s" % (error, user_email))
-            raise exceptions.ValidationError("Invalid email format")
+                f'Serializer:'
+                f' Validation error {email_format_error.default_detail}'
+                f'invalid email format, Email: {user_email}')
+            raise email_format_error
 
         if user_email and user_password:
             user = authenticate(user_email=user_email,
@@ -44,22 +47,30 @@ class LoginSerializer(serializers.Serializer):
                 if user.is_active:
                     data['user'] = user
                 else:
-                    msg = "Please, check you mailbox in order " \
-                          "to activate your account"
+                    activation_error = exceptions.PermissionDenied
+                    activation_error.default_detail = \
+                        'Please, check you mailbox in order ' \
+                        'to activate your account'
                     LOGGER.warning(
-                        "Serializer: Validation warning,"
-                        " need to activate account")
-                    raise exceptions.ValidationError(msg)
+                        'Serializer: Validation warning,'
+                        ' need to activate account')
+                    raise activation_error
             else:
-                msg = "Account with such an email does not exists"
+                not_found_error = exceptions.NotFound
+                not_found_error.default_detail = \
+                    'Account with such credentials does not exists'
                 LOGGER.warning(
-                    "Serializer: Validation warning, %s, user_email: %s" % (
-                        msg, user_email))
-                raise exceptions.ValidationError(msg)
+                    f'Serializer: Validation warning,'
+                    f' {not_found_error.default_detail},'
+                    f' user_email: {user_email}')
+                raise not_found_error
         else:
-            msg = "Must provide user email and password"
-            LOGGER.warning("Serializer:  Validation warning, %s", msg)
-            raise exceptions.ValidationError(msg)
+            credentials_error = exceptions.AuthenticationFailed
+            credentials_error.default_detail = \
+                'Must provide user email and password'
+            LOGGER.warning(f'Serializer:  Validation warning,'
+                           f' {credentials_error.default_detail}')
+            raise credentials_error
         return data
 
 
