@@ -253,7 +253,7 @@ class UserProfile(APIView):
                 f'Serializer error {serializer.errors} while changing password'
             )
             return Response(serializer.errors,
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
 
         else:
             # Update data

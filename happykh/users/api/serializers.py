@@ -6,7 +6,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from rest_framework import exceptions
 from rest_framework import serializers
-from rest_framework import status
 
 from ..models import User
 
@@ -33,12 +32,15 @@ class LoginSerializer(serializers.Serializer):
         try:
             validate_email(user_email)
         except ValidationError:
-            error_message = 'Invalid user email format.'
+            email_validation_error = exceptions.ValidationError
+
+            email_validation_error.default_detail = \
+                'Invalid user email format.'
             LOGGER.error(
-                f'Serializer:Validation error {error_message}'
+                f'Serializer:Validation error '
+                f'{email_validation_error.default_detail}'
                 f'invalid email format, Email: {user_email}')
-            raise exceptions.ValidationError(error_message,
-                                             code=status.HTTP_400_BAD_REQUEST)
+            raise email_validation_error
 
         if user_email and user_password:
             user = authenticate(user_email=user_email,
@@ -47,26 +49,32 @@ class LoginSerializer(serializers.Serializer):
                 if user.is_active:
                     data['user'] = user
                 else:
-                    error_message = 'Please, check you mailbox in order ' \
+                    account_activation_error = exceptions.ValidationError
+                    account_activation_error.default_detail = \
+                        'Please, check you mailbox in order ' \
                                     'to activate your account'
                     LOGGER.warning(
                         'Serializer: Validation warning,'
                         ' need to activate account')
-                    raise exceptions.ValidationError(
-                        error_message,
-                        code=status.HTTP_400_BAD_REQUEST)
+                    raise account_activation_error
             else:
-                error_message = 'Account with such credentials does not exist'
+                account_exists_error = exceptions.ValidationError
+                account_exists_error.default_detail = \
+                    'Account with such credentials does not exist'
+
                 LOGGER.warning(
-                    f'Serializer: Validation warning, {error_message},'
+                    f'Serializer: Validation warning, '
+                    f'{account_exists_error.default_detail},'
                     f' user_email: {user_email}')
-            raise exceptions.ValidationError(error_message,
-                                             code=status.HTTP_400_BAD_REQUEST)
+                raise account_exists_error
         else:
-            error_message = 'Must provide user email and password'
-            LOGGER.warning(f'Serializer: Validation warning, {error_message}')
-            raise exceptions.ValidationError(error_message,
-                                             code=status.HTTP_400_BAD_REQUEST)
+            authorization_error = exceptions.ValidationError
+            authorization_error.default_detail = \
+                'Must provide user email and password'
+            LOGGER.warning(f'Serializer: Validation warning, '
+                           f'{authorization_error.default_detail}')
+            raise authorization_error
+        return data
 
 
 class PasswordSerializer(serializers.ModelSerializer):
