@@ -1,7 +1,7 @@
 """ Support class for user authentication """
 import logging
 
-from happykh.users.models import User
+from users.models import User
 
 LOGGER = logging.getLogger('happy_logger')
 

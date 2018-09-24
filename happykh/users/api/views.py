@@ -5,6 +5,7 @@ from smtplib import SMTPException
 from django.core.exceptions import ValidationError
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from happykh.settings import EMAIL_HOST_USER
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -14,7 +15,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from happykh.settings import EMAIL_HOST_USER
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
@@ -44,7 +44,7 @@ class UserLogin(APIView):
             LOGGER.error(
                 'ValidationError %s, '
                 'Email: %s' % (
-                    error.detail['non_field_errors'],
+                    error.detail['user_email'],
                     request.data['user_email']))
             return Response({
                 'message': 'Your email or password is not valid.'
