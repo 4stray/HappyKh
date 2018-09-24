@@ -7,7 +7,7 @@ from django.core.validators import validate_email
 from rest_framework import exceptions
 from rest_framework import serializers
 
-from happykh.users.models import User
+from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
 
