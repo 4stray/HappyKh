@@ -14,6 +14,7 @@ CORRECT_DATA = {'user_email': correct_email,
 
 class LoginViewTestCase(BaseTestCase, APITestCase):
     """Test user api login view /api/users/login/"""
+
     def setUp(self):
         """Create user objects"""
         self.test_user = User.objects.create_user(email=correct_email,

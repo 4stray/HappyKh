@@ -7,6 +7,7 @@ from users.models import User
 @pytest.mark.django_db
 class UserTestCase(BaseTestCase):
     """Tests for user model"""
+
     def setUp(self):
         """Create user objects"""
         self.regular_user = User.objects.create_user(email='any@mail.com', password='password')
