@@ -33,7 +33,7 @@ class UserLogin(APIView):
         try:
             serializer.is_valid(raise_exception=True)
         except exceptions.ValidationError as error:
-            logger.error(f'ValidationError {error.detail["non_field_errors"]}, '
+            logger.error(f'ValidationError {str(error)}, '
                          f'Email: {request.data["user_email"]}')
             return Response({
                 'message': 'Your email or password is not valid.'
