@@ -4,13 +4,32 @@ import RegistrationComponent from '@/components/RegistrationComponent.vue';
 const expect = require('chai').expect;
 const should = require('chai').should();
 
+describe('RegistrationComponent data', () => {
+  it('has default userEmail', () => {
+    expect(RegistrationComponent.data()).to.have.property('userEmail', '');
+  });
+
+  it('has default userPassword', () => {
+    expect(RegistrationComponent.data()).to.have.property('userPassword', '');
+  });
+
+  it('has default confirmPassword', () => {
+    expect(RegistrationComponent.data()).to.have.property('confirmPassword', '');
+  });
+
+  it('has defalut errors', () => {
+    expect(RegistrationComponent.data()).to.have.deep.property('errors', { email: '', password: [] });
+  });
+});
+
+
 describe('RegistrationComponent', () => {
   const wrapper = shallowMount(RegistrationComponent);
 
   it('is a vue instance', () => {
-    expect(wrapper.isVueInstance()).to.be.equal(true)
+    expect(wrapper.isVueInstance()).to.be.equal(true);
   });
-  
+
   it('has default userEmail', () => {
     expect(RegistrationComponent.data()).to.have.property('userEmail');
   });
@@ -38,6 +57,6 @@ describe('RegistrationComponent', () => {
     expect(wrapper.contains('[class="btn-submit"]')).to.be.equal(true);
     expect(wrapper.contains('[type="submit"]')).to.be.equal(true);
     expect(wrapper.contains('[value="REGISTER"]')).to.be.equal(true);
-
+    // expect(wrapper.find('#value')).attributes('REGISTER')
   });
 });
