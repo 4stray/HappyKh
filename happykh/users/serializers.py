@@ -20,8 +20,8 @@ class LoginSerializer(serializers.Serializer):
     user_password = serializers.CharField()
 
     def validate(self, data):
-        user_email = data.get('user_email', '')
-        user_password = data.get('user_password', '')
+        user_email = data.get('user_email')
+        user_password = data.get('user_password')
 
         try:
             validate_email(user_email)

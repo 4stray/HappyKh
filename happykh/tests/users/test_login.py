@@ -34,7 +34,7 @@ class LoginViewTestCase(BaseTestCase, APITestCase):
         data['user_email'] = 'fake@mail.com'
         response = self.client.post(login_url, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-        self.assertEqual('Account with such an email does not exist.',
+        self.assertEqual('Your email or password is not valid.',
                          response.data['message'])
 
     def test_incorrect_password(self):
@@ -46,9 +46,22 @@ class LoginViewTestCase(BaseTestCase, APITestCase):
         self.assertEqual('Your email or password is not valid.',
                          response.data['message'])
 
+    def test_inactive_logging(self):
+        """Test view response for inactive user"""
+        data = CORRECT_DATA.copy()
+        response = self.client.post(login_url, data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual('Your email or password is not valid.',
+                         response.data['message'])
+
     def test_successful_response(self):
         """Test view response for correct data"""
-        self.test_user.is_active = True
-        response = self.client.post(login_url, CORRECT_DATA)
-        print(response.data['message'])
+        activated_email = 'active@gmail.com'
+        activated_password = 'activePassword'
+        User.objects.create_user(email=activated_email,
+                                 password=activated_password,
+                                 is_active=True)
+        active_data = {'user_email': activated_email,
+                       'user_password': activated_password}
+        response = self.client.post(login_url, active_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
