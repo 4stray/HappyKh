@@ -14,7 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-import happykh.happykh.settings as settings
+from happykh.settings import EMAIL_HOST_USER
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
@@ -121,7 +121,7 @@ class UserRegistration(APIView):
             if self.send_email_confirmation(user):
                 return Response(status=status.HTTP_201_CREATED)
             else:
-                LOGGER.error('Confirmation email has not delivered')
+                LOGGER.error('Confirmation email has not been delivered')
                 user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
@@ -143,7 +143,7 @@ class UserRegistration(APIView):
                       f' Just click the link below \n'
                       f'http://127.0.0.1:8080/#/confirm_registration/'
                       f'{user_id}/{email_token}/',
-                      settings.EMAIL_HOST_USER,
+                      EMAIL_HOST_USER,
                       [user.email])
             LOGGER.info('Confirmation mail has been sent')
         except SMTPException:
