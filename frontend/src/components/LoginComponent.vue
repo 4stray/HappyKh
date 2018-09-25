@@ -1,9 +1,9 @@
 <template>
   <form id="login" method="post" @submit.prevent="login" novalidate>
     <div class="content">
-      <input type="email" name="username" v-model.trim="userEmail"
+      <input type="email" name="userEmail" v-model.trim="userEmail"
              placeholder="EMAIL"/>
-      <input type="password" name="password" v-model="userPassword"
+      <input type="password" name="userPassword" v-model="userPassword"
              placeholder="PASSWORD"/>
     </div>
     <input class="btn-submit" type="submit" :disabled="isDisabledButton"
@@ -12,45 +12,43 @@
 </template>
 
 <script>
-import axios from 'axios';
 
-export default {
-  name: 'LoginComponent',
-  data() {
-    return {
-      userEmail: '',
-      userPassword: '',
-    };
-  },
-  methods: {
-    login() {
-      const userCredentials = {
-        user_email: this.userEmail,
-        user_password: this.userPassword,
+import axios from 'axios';
+import Auth from './Authentication/auth'
+
+  export default {
+    name: 'LoginComponent',
+    data() {
+      return {
+        userEmail: '',
+        userPassword: '',
       };
-      axios.post('http://localhost:8000/api/users/login/', userCredentials)
-        .then((response) => {
-          this.$router.push('/');
-        }).catch((error) => {
-          this.$awn.alert('Account with such an email does not exist');
-          this.userPassword = '';
-        });
     },
-    isEmailValid() {
-      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-      return re.test(this.userEmail);
+    methods: {
+      login() {
+        const userCredentials = {
+          user_email: this.userEmail,
+          user_password: this.userPassword,
+        };
+        Auth.authenticate(this, userCredentials, { name: 'home' });
+        this.userEmail = '';
+        this.userPassword = '';
+      },
+      isEmailValid() {
+        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+        return re.test(this.userEmail);
+      },
     },
-  },
-  computed: {
-    /**
+    computed: {
+      /**
        * @description Checks if user filled all fields
        * @returns {boolean}
        * */
-    isDisabledButton() {
-      return !(this.isEmailValid() && this.userPassword);
+      isDisabledButton() {
+        return !(this.isEmailValid() && this.userPassword);
+      },
     },
-  },
-};
+  };
 </script>
 
 <style scoped lang="scss">

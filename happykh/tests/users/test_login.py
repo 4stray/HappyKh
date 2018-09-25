@@ -1,6 +1,7 @@
 """Test users api views"""
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
+
 from tests.utils import BaseTestCase
 from users.models import User
 
@@ -11,9 +12,11 @@ CORRECT_DATA = {'user_email': 'test@mail.com',
 
 class LoginViewTestCase(BaseTestCase, APITestCase):
     """Test user api login view /api/users/login/"""
+
     def setUp(self):
         """Create user objects"""
-        User.objects.create_user(email='test@mail.com', password='testpassword')
+        User.objects.create_user(email='test@mail.com',
+                                 password='testpassword')
 
     def test_invalid_email(self):
         """Test view response for invalid email"""

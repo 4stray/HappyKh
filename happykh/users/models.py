@@ -1,6 +1,8 @@
 """ Custom models for user """
+from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
 from django.db import models
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 
 
 class UserManager(BaseUserManager):
@@ -27,7 +29,8 @@ class UserManager(BaseUserManager):
 
     def create_user(self, email, password, **extra_fields):
         """
-        Creates and saves a User with the given email and password and sets is_staff and is_superuser as False.
+        Creates and saves a User with the given email and password and sets
+        is_staff and is_superuser as False.
         :param email: str - user's email
         :param password: str - user's password
         :param extra_fields: class User fields except of 'email', 'password'
@@ -39,10 +42,12 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password, **extra_fields):
         """
-        Creates and saves a User with the given email and password and sets is_staff and is_superuser as True.
+        Creates and saves a User with the given email and password and sets
+        is_staff and is_superuser as True.
         :param email: str - user's email
         :param password: str - user's password
-        :param extra_fields: class User fields except of email, password, is_staff, is_superuser
+        :param extra_fields: class User fields except of email, password,
+        is_staff, is_superuser
         :return: User object
         """
         extra_fields.setdefault('is_staff', True)
@@ -63,8 +68,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     age = models.PositiveSmallIntegerField(blank=True, null=True, )
-    gender = models.CharField(choices=GENDER_CHOICES, max_length=2, default=woman)
-    profile_image = models.ImageField(null=True, blank=True)
+    gender = models.CharField(choices=GENDER_CHOICES, max_length=2,
+                              default=woman)
+    profile_image = models.TextField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
@@ -73,14 +79,14 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
 
     def get_full_name(self):
-        '''
+        """
         Returns the first_name plus the last_name, with a space in between.
-        '''
+        """
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
 
     def get_short_name(self):
-        '''
+        """
         Returns the short name for the user. (only first_name)
-        '''
+        """
         return self.first_name
