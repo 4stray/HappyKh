@@ -10,8 +10,10 @@ class UserTestCase(BaseTestCase):
 
     def setUp(self):
         """Create user objects"""
-        self.regular_user = User.objects.create_user(email='any@mail.com', password='password')
-        self.admin_user = User.objects.create_superuser(email='admin@mail.com', password='password')
+        self.regular_user = User.objects.create_user(email='any@mail.com',
+                                                     password='password')
+        self.admin_user = User.objects.create_superuser(email='admin@mail.com',
+                                                        password='password')
 
     def test_user_creation(self):
         """Testing default user attributes"""
@@ -42,12 +44,13 @@ class UserTestCase(BaseTestCase):
             User.objects.create_user(email='', password='password')
         self.assertEqual(ValueError, type(ve.exception))
 
-    def test_empty_password(self):  # Test failed, now empty password is allowed for use
+    def test_empty_password(self):
         """Test is usable empty password"""
         with self.assertRaises(ValueError) as ve:
             User.objects.create_user(email='no@pass.com', password='')
         self.assertEqual(type(ve.exception), ValueError)
-        self.assertEqual('Users must have an non-empty password', str(ve.exception))
+        self.assertEqual('Users must have an non-empty password',
+                         str(ve.exception))
 
     def test_get_short_name_function(self):
         """Test 'get_short_name' function"""
@@ -57,7 +60,8 @@ class UserTestCase(BaseTestCase):
     def test_get_full_name_function(self):
         """Test 'get_full_name' function"""
         user = self.regular_user
-        self.assertEqual(f'{user.first_name} {user.last_name}'.strip(), user.get_full_name())
+        self.assertEqual(f'{user.first_name} {user.last_name}'.strip(),
+                         user.get_full_name())
         user.first_name = 'First name'
         user.last_name = 'Last name'
         self.assertEqual('First name Last name', user.get_full_name())

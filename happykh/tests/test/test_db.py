@@ -12,4 +12,5 @@ class DbConnectionTestCase(BaseTestCase):
     def test_db_name(self):
         """Created own database for tests"""
         from django.db import connections
-        self.assertEqual(connections.databases['default']['NAME'], 'test_happykh')
+        self.assertEqual(connections.databases['default']['NAME'],
+                         'test_happykh')
