@@ -71,7 +71,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(choices=GENDER_CHOICES, max_length=2,
                               default=woman)
     profile_image = models.TextField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 
     objects = UserManager()
