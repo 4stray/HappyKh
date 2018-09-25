@@ -39,7 +39,8 @@ class LoginSerializer(serializers.Serializer):
             LOGGER.error(
                 f'Serializer:Validation error '
                 f'{email_validation_error.default_detail}'
-                f'invalid email format, Email: {user_email}')
+                f'invalid email format, Email: {user_email}'
+            )
             raise email_validation_error
 
         if user_email and user_password:
@@ -55,7 +56,8 @@ class LoginSerializer(serializers.Serializer):
                                     'to activate your account'
                     LOGGER.warning(
                         'Serializer: Validation warning,'
-                        ' need to activate account')
+                        ' need to activate account'
+                    )
                     raise account_activation_error
             else:
                 account_exists_error = exceptions.ValidationError
@@ -65,14 +67,16 @@ class LoginSerializer(serializers.Serializer):
                 LOGGER.warning(
                     f'Serializer: Validation warning, '
                     f'{account_exists_error.default_detail},'
-                    f' user_email: {user_email}')
+                    f' user_email: {user_email}'
+                )
                 raise account_exists_error
         else:
             authorization_error = exceptions.ValidationError
             authorization_error.default_detail = \
                 'Must provide user email and password'
             LOGGER.warning(f'Serializer: Validation warning, '
-                           f'{authorization_error.default_detail}')
+                           f'{authorization_error.default_detail}'
+           )
             raise authorization_error
         return data
 
