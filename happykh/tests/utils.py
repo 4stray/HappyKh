@@ -7,5 +7,3 @@ class BaseTestCase(TestCase):
 
     def tearDown(self):
         super(BaseTestCase, self).tearDown()
-
-

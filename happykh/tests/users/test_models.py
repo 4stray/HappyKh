@@ -4,7 +4,7 @@ from tests.utils import BaseTestCase
 from users.models import User
 
 
-@pytest.mark.django_db
+@pytest.mark.usefixtures("django_test_db_setup")
 class UserTestCase(BaseTestCase):
     """Tests for user model"""
 

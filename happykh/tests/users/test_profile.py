@@ -6,18 +6,20 @@ from rest_framework.test import APITestCase
 
 from users.api.serializers import UserSerializer
 from users.models import User
+
 from ..utils import BaseTestCase
 
 USERS_PROFILE_URL = '/api/users/%d'
 
-CORRECT_DATA = {'email': 'test@mail.com',
-                'password': 'testpassword1',
-                'age': 20,
-                'gender': 'M',
-                'first_name': 'firstName',
-                'last_name': 'lastName',
-                'is_active': True
-                }
+CORRECT_DATA = {
+    'email': 'test@mail.com',
+    'password': 'testpassword1',
+    'age': 20,
+    'gender': 'M',
+    'first_name': 'firstName',
+    'last_name': 'lastName',
+    'is_active': True
+}
 
 
 class TestUserProfile(BaseTestCase, APITestCase):
@@ -77,7 +79,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
             {'age': edited_user.age})
         serializer_edited_user = UserSerializer(edited_user)
         expected = serializer_edited_user.data["age"]
-        self.assertEqual(status.HTTP_500_INTERNAL_SERVER_ERROR,
+        self.assertEqual(status.HTTP_400_BAD_REQUEST,
                          response.status_code)
         self.assertRaises(ValueError)
 
@@ -89,18 +91,16 @@ class TestUserProfile(BaseTestCase, APITestCase):
 
     def test_patch_update_password(self):
         """test update user's password"""
-        response = self.client.patch(
-            USERS_PROFILE_URL % self.test_user.pk,
-            self.PASSWORDS)
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     self.PASSWORDS)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_patch_invalid_update_password(self):
         """test update user's password with wrong old password"""
         INVALID_PASSWORD = self.PASSWORDS.copy()
         INVALID_PASSWORD['old_password'] = '123userPassword'
-        response = self.client.patch(
-            USERS_PROFILE_URL % self.test_user.pk,
-            INVALID_PASSWORD)
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     INVALID_PASSWORD)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
             self.test_user.check_password(INVALID_PASSWORD['new_password']))
@@ -114,4 +114,5 @@ class TestUserProfile(BaseTestCase, APITestCase):
             INVALID_PASSWORD)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
-            self.test_user.check_password(INVALID_PASSWORD['new_password']))
+            self.test_user.check_password(INVALID_PASSWORD['new_password'])
+        )

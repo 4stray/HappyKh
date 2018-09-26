@@ -127,7 +127,7 @@ class UserRegistration(APIView):
                 return Response({
                     'message': 'The mail has not been delivered'
                                ' due to connection reasons'
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                }, status=status.HTTP_400_BAD_REQUEST)
 
     def send_email_confirmation(self, user):
         """
@@ -196,7 +196,7 @@ class UserActivation(APIView):
                 User.DoesNotExist) as error:
             LOGGER.error(f'Error {error} while user activation')
             return Response({'message': str(error)},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfile(APIView):
@@ -224,7 +224,7 @@ class UserProfile(APIView):
                 f' user_id: {id}'
             )
             return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
         """
@@ -242,7 +242,7 @@ class UserProfile(APIView):
                 ' user_id: {user.pk}'
             )
             return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
 
         if 'old_password' in self.request.data:
             # Change password
@@ -279,4 +279,4 @@ class UserProfile(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             return Response(serializer.errors,
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
