@@ -1,79 +1,113 @@
-"""Test user profile"""
+"""Test users api views"""
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
-from tests.utils import BaseTestCase
+from users.api.serializers import UserSerializer
 from users.models import User
 
+from ..utils import BaseTestCase
 
-class ProfileViewTestCase(BaseTestCase, APITestCase):
-    """
-    Test user profile api
+USERS_PROFILE_URL = '/api/users/%d'
 
-    """
+CORRECT_DATA = {
+    'email': 'test@mail.com',
+    'password': 'testpassword1',
+    'age': 20,
+    'gender': 'M',
+    'first_name': 'firstName',
+    'last_name': 'lastName',
+    'is_active': True
+}
+
+
+class TestUserProfile(BaseTestCase, APITestCase):
+    """Test user profile view"""
 
     def setUp(self):
-        """Create user instance for tests"""
-        User.objects.create_user(email='test@mail.com', password='testpassword')
+        """Create test user for testing"""
+        self.test_user = User.objects.create_user(**CORRECT_DATA)
+        user_token = Token.objects.create(user=self.test_user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
+        self.PASSWORDS = {
+            'old_password': CORRECT_DATA['password'],
+            'new_password': 'password2',
+        }
 
-    def tearDown(self):
-        """Delete user instance for tests"""
-        User.objects.filter(email='test@mail.com').delete()
+    def test_get(self):
+        """test if user exists"""
 
-    def test_save_correct_password(self):
-        """Test view response for new password saving"""
-        pass
+        response = self.client.get(USERS_PROFILE_URL % self.test_user.pk)
+        serializer = UserSerializer(self.test_user)
+        expected = serializer.data
 
-    def test_save_invalid_password(self):
-        """Test view response for saving invalid password"""
-        pass
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertDictEqual(expected, response.data)
 
-    def test_save_empty_password(self):
-        """Test view response for empty password before saving"""
-        pass
+    def test_get_unauthorized_user(self):
+        """test if user is unauthorized"""
+        new_test_user = User.objects.create_user(email="second@test.com",
+                                                 password="password2")
+        new_client = APIClient()
+        response = new_client.get(USERS_PROFILE_URL % new_test_user.pk)
+        self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
 
-    def test_save_correct_email(self):
-        """Test view response for new password saving"""
-        pass
+    def test_patch_update_data(self):
+        """test update user's age"""
+        edited_user = User.objects.get(pk=self.test_user.pk)
+        edited_user.age = 41
+        response = self.client.patch(USERS_PROFILE_URL % edited_user.pk,
+                                     {'age': edited_user.age})
 
-    def test_save_invalid_email(self):
-        """Test view response for saving invalid password"""
-        pass
+        serializer_edited_user = UserSerializer(edited_user)
+        expected = serializer_edited_user.data
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected, response.data)
 
-    def test_save_empty_email(self):
-        """Test view response for empty password before saving"""
-        pass
+        serializer = UserSerializer(self.test_user)
+        self.assertNotEqual(serializer.data, response.data)
+        self.assertIn(edited_user, User.objects.all())
 
-    def test_save_first_name(self):
-        """Test view response for new first name saving"""
-        pass
+    def test_patch_invalid_update(self):
+        """test update user's age with invalid value"""
+        edited_user = User.objects.get(pk=self.test_user.pk)
+        edited_user.age = -41
+        response = self.client.patch(USERS_PROFILE_URL % edited_user.pk,
+                                     {'age': edited_user.age})
+        serializer_edited_user = UserSerializer(edited_user)
+        expected = serializer_edited_user.data["age"]
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertRaises(ValueError)
 
-    def test_save_empty_first_name(self):
-        """Test view response for empty first name saving"""
-        pass
+        response = self.client.get(USERS_PROFILE_URL % self.test_user.pk)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertNotEqual(expected, response.data["age"])
+        self.assertIsNot(edited_user, User.objects.get(pk=self.test_user.pk))
 
-    def test_save_last_name(self):
-        """Test view response for new last name saving"""
-        pass
+    def test_patch_update_password(self):
+        """test update user's password"""
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     self.PASSWORDS)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    def test_save_empty_last_name(self):
-        """Test view response for empty last name saving"""
-        pass
+    def test_patch_invalid_update_password(self):
+        """test update user's password with wrong old password"""
+        INVALID_PASSWORD = self.PASSWORDS.copy()
+        INVALID_PASSWORD['old_password'] = '123userPassword'
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     INVALID_PASSWORD)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertFalse(
+            self.test_user.check_password(INVALID_PASSWORD['new_password'])
+        )
 
-    def test_save_correct_age(self):
-        """Test view response for new age value before saving"""
-        pass
-
-    def test_save_invalid_age(self):
-        """Test view response for invalid age value before saving"""
-        pass
-
-    def test_save_empty_age(self):
-        """Test view response for empty age value before saving"""
-        pass
-
-    def test_gender_edit(self):
-        """Test change gender"""
-        pass
-
-    def test_load_new_profile_image(self):
-        """Test change profile_image"""
-        pass
+    def test_patch_invalid_new_password(self):
+        """test update user's password with invalid new password"""
+        INVALID_PASSWORD = self.PASSWORDS.copy()
+        INVALID_PASSWORD['new_password'] = ''
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     INVALID_PASSWORD)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertFalse(
+            self.test_user.check_password(INVALID_PASSWORD['new_password'])
+        )

@@ -3,13 +3,13 @@
     <div id="panel">
       <div class="tabs">
         <button
-            v-bind:class="[{ active: currentTab === tabs.signIn }]"
-            v-on:click="currentTab = tabs.signIn"
+                v-bind:class="[{ active: currentTab === tabs.signIn }]"
+                v-on:click="currentTab = tabs.signIn"
         >SIGN IN
         </button>
         <button
-            v-bind:class="[{ active: currentTab === tabs.signUp }]"
-            v-on:click="currentTab = tabs.signUp"
+                v-bind:class="[{ active: currentTab === tabs.signUp }]"
+                v-on:click="currentTab = tabs.signUp"
         >SIGN UP
         </button>
       </div>
@@ -17,6 +17,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import LoginComponent from '../components/LoginComponent.vue';
 import RegistrationComponent from '../components/RegistrationComponent.vue';
@@ -46,6 +47,7 @@ export default {
   },
 };
 </script>
+
 <style lang="scss">
   @import "../scss/login";
 
