@@ -1,10 +1,8 @@
 """Test users api views"""
-from django.core.mail import send_mail
 from rest_framework.test import APITestCase
 from rest_framework import status
 from tests.utils import BaseTestCase
 from users.models import User
-from happykh.settings import EMAIL_HOST_USER
 from users.api.tokens import account_activation_token
 
 
