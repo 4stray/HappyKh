@@ -1,19 +1,14 @@
 """Test users api views"""
-import django
-
-django.setup()
-
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
 from rest_framework.test import APIClient
+from rest_framework.test import APITestCase
 
-from tests.utils import BaseTestCase
-
+from users.api.serializers import UserSerializer
 from users.models import User
-from users.serializers import UserSerializer
+from ..utils import BaseTestCase
 
-USERS_PROFILE_URL = '/api/users/profile/%d'
+USERS_PROFILE_URL = '/api/users/%d'
 
 CORRECT_DATA = {'email': 'test@mail.com',
                 'password': 'testpassword1',
@@ -36,12 +31,12 @@ class TestUserProfile(BaseTestCase, APITestCase):
 
         self.PASSWORDS = {
             'old_password': CORRECT_DATA['password'],
-            'new_password1': 'password2',
-            'new_password2': 'password2',
+            'new_password': 'password2',
         }
 
     def test_get(self):
         """test if user exists"""
+
         response = self.client.get(USERS_PROFILE_URL % self.test_user.pk)
         serializer = UserSerializer(self.test_user)
         expected = serializer.data
@@ -82,8 +77,9 @@ class TestUserProfile(BaseTestCase, APITestCase):
             {'age': edited_user.age})
         serializer_edited_user = UserSerializer(edited_user)
         expected = serializer_edited_user.data["age"]
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(expected, int(response.data["age"]))
+        self.assertEqual(status.HTTP_500_INTERNAL_SERVER_ERROR,
+                         response.status_code)
+        self.assertRaises(ValueError)
 
         response = self.client.get(
             USERS_PROFILE_URL % self.test_user.pk)
@@ -107,26 +103,15 @@ class TestUserProfile(BaseTestCase, APITestCase):
             INVALID_PASSWORD)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
-            self.test_user.check_password(INVALID_PASSWORD['new_password1']))
-
-    def test_patch_different_new_passwords(self):
-        """test update user's password with different new passwords"""
-        INVALID_PASSWORD = self.PASSWORDS.copy()
-        INVALID_PASSWORD['new_password1'] = '123userPassword'
-        response = self.client.patch(
-            USERS_PROFILE_URL % self.test_user.pk,
-            INVALID_PASSWORD)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-        self.assertFalse(
-            self.test_user.check_password(INVALID_PASSWORD['new_password1']))
+            self.test_user.check_password(INVALID_PASSWORD['new_password']))
 
     def test_patch_invalid_new_password(self):
         """test update user's password with invalid new password"""
         INVALID_PASSWORD = self.PASSWORDS.copy()
-        INVALID_PASSWORD['new_password1'] = '123'
+        INVALID_PASSWORD['new_password'] = ''
         response = self.client.patch(
             USERS_PROFILE_URL % self.test_user.pk,
             INVALID_PASSWORD)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
-            self.test_user.check_password(INVALID_PASSWORD['new_password1']))
+            self.test_user.check_password(INVALID_PASSWORD['new_password']))
