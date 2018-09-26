@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
-
 from users.api.serializers import UserSerializer
 from users.models import User
 
@@ -30,7 +29,6 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.test_user = User.objects.create_user(**CORRECT_DATA)
         user_token = Token.objects.create(user=self.test_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
-
         self.PASSWORDS = {
             'old_password': CORRECT_DATA['password'],
             'new_password': 'password2',
@@ -74,17 +72,14 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's age with invalid value"""
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = -41
-        response = self.client.patch(
-            USERS_PROFILE_URL % edited_user.pk,
-            {'age': edited_user.age})
+        response = self.client.patch(USERS_PROFILE_URL % edited_user.pk,
+                                     {'age': edited_user.age})
         serializer_edited_user = UserSerializer(edited_user)
         expected = serializer_edited_user.data["age"]
-        self.assertEqual(status.HTTP_400_BAD_REQUEST,
-                         response.status_code)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertRaises(ValueError)
 
-        response = self.client.get(
-            USERS_PROFILE_URL % self.test_user.pk)
+        response = self.client.get(USERS_PROFILE_URL % self.test_user.pk)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertNotEqual(expected, response.data["age"])
         self.assertIsNot(edited_user, User.objects.get(pk=self.test_user.pk))
@@ -103,15 +98,15 @@ class TestUserProfile(BaseTestCase, APITestCase):
                                      INVALID_PASSWORD)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
-            self.test_user.check_password(INVALID_PASSWORD['new_password']))
+            self.test_user.check_password(INVALID_PASSWORD['new_password'])
+        )
 
     def test_patch_invalid_new_password(self):
         """test update user's password with invalid new password"""
         INVALID_PASSWORD = self.PASSWORDS.copy()
         INVALID_PASSWORD['new_password'] = ''
-        response = self.client.patch(
-            USERS_PROFILE_URL % self.test_user.pk,
-            INVALID_PASSWORD)
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     INVALID_PASSWORD)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
             self.test_user.check_password(INVALID_PASSWORD['new_password'])
