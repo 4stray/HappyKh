@@ -4,6 +4,7 @@ from smtplib import SMTPException
 
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from happykh.settings import EMAIL_HOST_USER
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -13,7 +14,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from happykh.settings import EMAIL_HOST_USER
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
@@ -127,7 +127,7 @@ class UserRegistration(APIView):
                 return Response({
                     'message': 'The mail has not been delivered'
                                ' due to connection reasons'
-                }, status=status.HTTP_400_BAD_REQUEST)
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def send_email_confirmation(self, user):
         """
