@@ -5,6 +5,7 @@ from smtplib import SMTPException
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
+from happykh.settings import EMAIL_HOST_USER
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -14,7 +15,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from happykh.settings import EMAIL_HOST_USER
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
@@ -197,7 +197,7 @@ class UserActivation(APIView):
                 User.DoesNotExist) as error:
             LOGGER.error(f'Error {error} while user activation')
             return Response({'message': str(error)},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserProfile(APIView):
@@ -225,7 +225,7 @@ class UserProfile(APIView):
                 f' user_id: {id}'
             )
             return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
 
     def patch(self, request, id):
         """
@@ -243,7 +243,7 @@ class UserProfile(APIView):
                 ' user_id: {user.pk}'
             )
             return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
 
         if 'old_password' in self.request.data:
             # Change password
@@ -280,4 +280,4 @@ class UserProfile(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             return Response(serializer.errors,
-                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                            status=status.HTTP_400_BAD_REQUEST)
