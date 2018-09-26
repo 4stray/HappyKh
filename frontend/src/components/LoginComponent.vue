@@ -14,6 +14,7 @@
 <script>
 import axios from 'axios';
 
+
 export default {
   name: 'LoginComponent',
   data() {
@@ -44,7 +45,6 @@ export default {
           this.$cookies.remove('token');
           this.$cookies.remove('user_id');
         });
-
       this.userEmail = '';
       this.userPassword = '';
     },
