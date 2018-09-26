@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Header/>
     <div id="panel">
       <div class="tabs">
         <button
@@ -19,6 +20,7 @@
 </template>
 
 <script>
+  import Header from '@/components/Header.vue';
   import LoginComponent from '../components/LoginComponent.vue';
   import RegistrationComponent from '../components/RegistrationComponent.vue';
 
@@ -42,6 +44,7 @@
       };
     },
     components: {
+      Header,
       LoginComponent,
       RegistrationComponent,
     },

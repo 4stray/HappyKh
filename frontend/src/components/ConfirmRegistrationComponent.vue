@@ -22,13 +22,11 @@ export default {
       {
         userId,
         emailToken,
-      },
-    ).then((response) => {
-      console.log(response.status);
-    })
-      .catch((error) => {
+      }).then((response) => {
+        console.log(response.status);
+      }).catch((error) => {
         console.log(error);
-      });
+    });
   },
 };
 </script>

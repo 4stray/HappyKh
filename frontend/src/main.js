@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueCookies from 'vue-cookies';
 import App from './App.vue';
 import router from './router';
+import store from './store'
 
 import VueAWN from 'vue-awesome-notifications';
 
@@ -14,5 +15,6 @@ const options = {
 Vue.use(VueAWN, options);
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount('#app');

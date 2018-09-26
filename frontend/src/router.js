@@ -33,7 +33,6 @@ const router = new Router({
 
 
 router.beforeEach((to, from, next) => {
-  Auth.checkAuthentication();
   next();
 });
 

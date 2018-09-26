@@ -15,6 +15,7 @@
 
 import axios from 'axios';
 import Auth from './Authentication/auth'
+import router from "../router";
 
   export default {
     name: 'LoginComponent',
@@ -26,11 +27,28 @@ import Auth from './Authentication/auth'
     },
     methods: {
       login() {
+        const UserAPI = 'http://127.0.0.1:8000/api/users';
         const userCredentials = {
           user_email: this.userEmail,
           user_password: this.userPassword,
         };
-        Auth.authenticate(this, userCredentials, { name: 'home' });
+
+        axios.post(`${UserAPI}/login/`, userCredentials)
+            .then((response) => {
+                this.$cookies.set('token', response.data['token']);
+                this.$cookies.set('user_id', response.data['user_id']);
+
+                this.$store.commit('setAuthenticated', true);
+
+                this.$router.push({ name: 'home'});
+            }).catch((error) => {
+                if (error.response.data.message) {
+                this.$awn.warning(error.response.data.message);
+                }
+                this.$cookies.remove('token');
+                this.$cookies.remove('user_id');
+        });
+
         this.userEmail = '';
         this.userPassword = '';
       },

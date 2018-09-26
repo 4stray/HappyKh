@@ -155,7 +155,7 @@ export default {
     padding: 10px 15px;
     margin-bottom: 10px;
     width: 332px;
-    height: 35px;
+    height: 40px;
     border: 1px solid #ccc;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
