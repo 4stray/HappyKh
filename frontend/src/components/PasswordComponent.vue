@@ -9,68 +9,69 @@
 </template>
 
 <script>
-  import axios from 'axios';
-  import Authentication from './Authentication/auth';
+import axios from 'axios';
+import Authentication from './Authentication/auth';
 
-  const UserAPI = 'http://127.0.0.1:8000/api/users/';
+const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
-  export default {
-    name: 'PasswordComponent',
-    data() {
-      return {
-        oldPassword: '',
-        newPassword: '',
-        confirmationPassword: '',
-        passwordErrors: [],
-      };
+export default {
+  name: 'PasswordComponent',
+  data() {
+    return {
+      oldPassword: '',
+      newPassword: '',
+      confirmationPassword: '',
+      passwordErrors: [],
+    };
+  },
+  methods: {
+    isPasswordValid() {
+      this.passwordErrors = [];
+      if (this.newPassword.length < 8) {
+        this.passwordErrors.push('Your password must be at least 8 characters.');
+      }
+      const alphaNumeric = /^[0-9a-zA-Z]+$/;
+      if (!this.newPassword.match(alphaNumeric)) {
+        this.passwordErrors.push('Your password must contain only numbers and alphabetical characters.');
+      }
+      if (this.newPassword !== this.confirmationPassword) {
+        this.passwordErrors.push("Your passwords don't match, please try again.");
+      }
+      if (this.newPassword != this.confirmationPassword) {
+        this.passwordErrors.push('Confirmation password is incorrect');
+      }
+      return this.passwordErrors.length < 1;
     },
-    methods: {
-      isPasswordValid() {
-        this.passwordErrors = [];
-        if (this.newPassword.length < 8) {
-          this.passwordErrors.push('Your password must be at least 8 characters.');
+    saveNewPassword() {
+      if (this.isPasswordValid()) {
+        const userCredentials = {
+          old_password: this.oldPassword,
+          new_password: this.newPassword,
+        };
+        axios.patch(
+          UserAPI + this.$cookies.get('user_id'), userCredentials,
+          {
+            headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+          },
+        )
+          .then((response) => {
+            this.$awn.success('Password successfully changed.');
+          }).catch((error) => {
+            if (error.response.data.message) {
+              this.$awn.warning(error.response.data.message);
+            }
+          });
+      } else {
+        for (const index in this.passwordErrors) {
+          this.$awn.warning(this.passwordErrors[index]);
         }
-        const alphaNumeric = /^[0-9a-zA-Z]+$/;
-        if (!this.newPassword.match(alphaNumeric)) {
-          this.passwordErrors.push('Your password must contain only numbers and alphabetical characters.');
-        }
-        if (this.newPassword !== this.confirmationPassword) {
-          this.passwordErrors.push("Your passwords don't match, please try again.");
-        }
-        if (this.newPassword != this.confirmationPassword) {
-          this.passwordErrors.push("Confirmation password is incorrect");
-        }
-        return this.passwordErrors.length < 1;
-      },
-      saveNewPassword() {
-        if (this.isPasswordValid()) {
-          const userCredentials = {
-            old_password: this.oldPassword,
-            new_password: this.newPassword,
-          };
-          axios.patch(UserAPI + this.$cookies.get('user_id'), userCredentials,
-              {
-                headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
-              })
-            .then((response) => {
-              this.$awn.success('Password successfully changed.');
-            }).catch((error) => {
-              if(error.response.data.message){
-                this.$awn.warning(error.response.data.message);
-              }
-            });
-        } else
-        {
-          for (const index in this.passwordErrors){
-            this.$awn.warning(this.passwordErrors[index]);
-          }
-        }
-        this.newPassword = '';
-        this.confirmationPassword = '';
-        this.oldPassword = '';
-      },
+      }
+      this.newPassword = '';
+      this.confirmationPassword = '';
+      this.oldPassword = '';
     },
-  };
+  },
+};
 </script>
 
 <style scoped>

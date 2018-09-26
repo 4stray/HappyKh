@@ -3,6 +3,7 @@ import logging
 from smtplib import SMTPException
 
 from django.core.mail import send_mail
+from django.core.validators import ValidationError
 from django.core.validators import validate_email
 from happykh.settings import EMAIL_HOST_USER
 from rest_framework import exceptions
@@ -98,14 +99,14 @@ class UserRegistration(APIView):
 
         try:
             validate_email(user_email)
-        except exceptions.ValidationError as error:
+        except ValidationError as error:
             LOGGER.error(
-                f"Email validation error {error.default_detail}, "
+                f"Email validation error {error}, "
                 f"Email: {request.data['user_email']}"
             )
             return Response({
                 'message': 'Invalid email format'
-            }, status=error.status_code)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=user_email)

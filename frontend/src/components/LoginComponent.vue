@@ -13,42 +13,41 @@
 
 <script>
 
-import axios from 'axios';
-import Auth from './Authentication/auth'
+import Auth from './Authentication/auth';
 
-  export default {
-    name: 'LoginComponent',
-    data() {
-      return {
-        userEmail: '',
-        userPassword: '',
+export default {
+  name: 'LoginComponent',
+  data() {
+    return {
+      userEmail: '',
+      userPassword: '',
+    };
+  },
+  methods: {
+    login() {
+      const userCredentials = {
+        user_email: this.userEmail,
+        user_password: this.userPassword,
       };
+      Auth.authenticate(this, userCredentials, { name: 'home' });
+      this.userEmail = '';
+      this.userPassword = '';
     },
-    methods: {
-      login() {
-        const userCredentials = {
-          user_email: this.userEmail,
-          user_password: this.userPassword,
-        };
-        Auth.authenticate(this, userCredentials, { name: 'home' });
-        this.userEmail = '';
-        this.userPassword = '';
-      },
-      isEmailValid() {
-        const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-        return re.test(this.userEmail);
-      },
+    isEmailValid() {
+      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+      return re.test(this.userEmail);
     },
-    computed: {
-      /**
+  },
+  computed: {
+    /**
        * @description Checks if user filled all fields
        * @returns {boolean}
        * */
-      isDisabledButton() {
-        return !(this.isEmailValid() && this.userPassword);
-      },
+    isDisabledButton() {
+      return !(this.isEmailValid() && this.userPassword);
     },
-  };
+  },
+};
 </script>
 
 <style scoped lang="scss">
