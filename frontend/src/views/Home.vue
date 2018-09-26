@@ -11,11 +11,11 @@
 import HomeComponent from '@/components/HomeComponent.vue';
 import Header from '@/components/Header.vue';
 
-  export default {
-    name: 'home',
-    components: {
-      Header,
-      HomeComponent,
-    },
+export default {
+  name: 'home',
+  components: {
+    Header,
+    HomeComponent,
+  },
 };
 </script>

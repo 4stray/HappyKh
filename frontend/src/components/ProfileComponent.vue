@@ -5,14 +5,17 @@
            v-model="userFirstName" placeholder="First name"/>
     <input type="text" :disabled="isDisabled" id="last_name"
            v-model="userLastName" placeholder="Last name"/>
-    <input type="number" :disabled="isDisabled" id="age" v-model="userAge" min="0" max="140" step="1"/>
+    <input type="number" :disabled="isDisabled" id="age" v-model="userAge"
+           min="0" max="140" step="1"/>
     <select :disabled="isDisabled" v-model="userGender">
       <option disabled value="">Choose your gender</option>
       <option>Man</option>
       <option>Woman</option>
     </select>
     <img v-bind:src=userImage id='image' alt="No profile image"/>
-    <input type="file" id="imageInput" :disabled="isDisabled" v-on:change="changeImage()" accept="image/*"/>
+    <input type="file" id="imageInput" :disabled="isDisabled"
+           v-on:change="changeImage()"
+           accept="image/*"/>
     <button class="btn-change" v-on:click=edit()>{{ enableText }}</button>
     <button class="btn-save" type="button" v-on:click="save()">Save changes</button>
   </div>
@@ -23,7 +26,7 @@ import axios from 'axios';
 import Authentication from '../components/Authentication/auth';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
-const GENDER_CHOISES = {'M': 'Man', 'W': 'Woman'};
+const GENDER_CHOISES = { M: 'Man', W: 'Woman' };
 
 export default {
   name: 'ProfileComponent',
@@ -43,23 +46,25 @@ export default {
   },
   methods: {
     fetchUserCredentials() {
-      axios.get(UserAPI+this.$cookies.get('user_id'),
-          {
-            headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
-          })
-          .then((response) => {
-              this.userFirstName = response.data['first_name'];
-              this.userLastName = response.data['last_name'];
-              this.userAge = response.data['age'];
-              this.userGender = GENDER_CHOISES[response.data['gender']];
-              this.userImage = response.data['profile_image'];
-          }).catch((error) => {
-            Authentication.signout(this);
-            this.$awn.warning(this.error.message);
-          });
+      axios.get(
+        UserAPI + this.$cookies.get('user_id'),
+        {
+          headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+        },
+      )
+        .then((response) => {
+          this.userFirstName = response.data.first_name;
+          this.userLastName = response.data.last_name;
+          this.userAge = response.data.age;
+          this.userGender = GENDER_CHOISES[response.data.gender];
+          this.userImage = response.data.profile_image;
+        }).catch((error) => {
+          Authentication.signout(this);
+          this.$awn.warning(this.error.message);
+        });
     },
     save() {
-      if(Number.isInteger(Number(this.userAge))) {
+      if (Number.isInteger(Number(this.userAge))) {
         const userCredentials = {
           first_name: this.userFirstName,
           last_name: this.userLastName,
@@ -68,25 +73,26 @@ export default {
           profile_image: this.userImage,
         };
 
-        axios.patch(UserAPI + this.$cookies.get('user_id'), userCredentials,
-            {
-              headers: {'Authorization': Authentication.getAuthenticationHeader(this)},
-            })
-            .then((response) => {
-              this.isDisabled = true;
-              this.enableText = 'Enable editing';
-              this.userFirstName = response.data['first_name'];
-              this.userLastName = response.data['last_name'];
-              this.userAge = response.data['age'];
-              this.userGender = GENDER_CHOISES[response.data['gender']];
-              this.userImage = response.data['profile_image'];
-              this.$awn.success('Your profile was successfully updated.');
-            }).catch((error) => {
-              Authentication.signout(this);
-              this.$awn.warning(this.error.message);
-            });
-      } else
-      {
+        axios.patch(
+          UserAPI + this.$cookies.get('user_id'), userCredentials,
+          {
+            headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+          },
+        )
+          .then((response) => {
+            this.isDisabled = true;
+            this.enableText = 'Enable editing';
+            this.userFirstName = response.data.first_name;
+            this.userLastName = response.data.last_name;
+            this.userAge = response.data.age;
+            this.userGender = GENDER_CHOISES[response.data.gender];
+            this.userImage = response.data.profile_image;
+            this.$awn.success('Your profile was successfully updated.');
+          }).catch((error) => {
+            Authentication.signout(this);
+            this.$awn.warning(this.error.message);
+          });
+      } else {
         this.userAge = 0;
         this.$awn.warning('Enter valid age.');
       }
@@ -100,11 +106,11 @@ export default {
       }
     },
     changeImage() {
-      var file = document.getElementById('imageInput').files[0];
-      var reader = new FileReader();
+      const file = document.getElementById('imageInput').files[0];
+      const reader = new FileReader();
 
-      var self = this;
-      reader.addEventListener("load", function () {
+      const self = this;
+      reader.addEventListener('load', () => {
         self.userImage = reader.result;
       }, false);
 

@@ -4,32 +4,27 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 const state = {
-    Authenticated: false,
-    User: {
-
-    },
+  Authenticated: false,
 };
 
 const getters = {
-    getAuthenticated: state => {
-        return state.Authenticated;
-    },
+  getAuthenticated: state => state.Authenticated,
 };
+
 const actions = {
 
 };
 
 const mutations = {
-    setAuthenticated(state, isAuthenticated) {
-        state.Authenticated = isAuthenticated;
-    },
-
+  setAuthenticated(state, isAuthenticated) {
+    state.Authenticated = isAuthenticated;
+  },
 };
 
 
 export default new Vuex.Store({
-    getters,
-    actions,
-    mutations,
-    state
-})
+  getters,
+  actions,
+  mutations,
+  state,
+});

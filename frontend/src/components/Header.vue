@@ -7,33 +7,35 @@
     <router-link v-if="!isAuthenticated" :to="{ name: 'login'}">Login</router-link>
     <router-link v-if="isAuthenticated"
                  v-on:click.native="signOut()"
-                 to="{ name: 'login'}"
+                 to="{name: login}"
                  replace>Sign out</router-link>
   </div>
 </template>
 
 <script>
-  import {mapGetters} from 'vuex';
+import { mapGetters } from 'vuex';
 
-  export default {
-    name: 'Header',
-    computed: {
-        ...mapGetters({
-            isAuthenticated: 'getAuthenticated'
-        })
-    },
-    methods: {
-      signOut() {
-        this.$cookies.remove('token');
-        this.$cookies.remove('user_id');
-        this.$store.commit('setAuthenticated', false);
-        this.$router.push({ name: 'home' });
-        if(document.location.pathname == '/') {
-          document.location.reload(true);
-        }
+export default {
+  name: 'Header',
+  computed: {
+    //get data from the store
+    ...mapGetters({
+      isAuthenticated: 'getAuthenticated',
+    }),
+  },
+  methods: {
+    //logout user and clear cookies
+    signOut() {
+      this.$cookies.remove('token');
+      this.$cookies.remove('user_id');
+      this.$store.commit('setAuthenticated', false);
+      this.$router.push({ name: 'home' });
+      if (document.location.pathname === '/') {
+        document.location.reload(true);
       }
     },
-  };
+  },
+};
 </script>
 <style>
   #nav {

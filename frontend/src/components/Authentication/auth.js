@@ -2,7 +2,6 @@ import router from '../../router';
 
 
 export default {
-
   signout(context, redirect) {
     context.$cookies.remove('token');
     context.$cookies.remove('user_id');
@@ -12,6 +11,6 @@ export default {
   },
 
   getAuthenticationHeader(context) {
-    return 'Token ' + context.$cookies.get('token');
+    return `Token ${context.$cookies.get('token')}`;
   },
 };
