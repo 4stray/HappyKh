@@ -1,4 +1,4 @@
-import {shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import LoginComponent from '../../src/components/LoginComponent.vue';
 
 const expect = require('chai').expect;

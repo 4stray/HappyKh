@@ -9,9 +9,9 @@ import store from './store';
 const ifAuthenticated = (to, from, next) => {
   if (store.getters.getAuthenticated) {
     next();
-    return
+    return;
   }
-  next('/login')
+  next('/login');
 };
 
 const router = new Router({
@@ -39,7 +39,6 @@ const router = new Router({
     },
   ],
 });
-
 
 
 Vue.use(Router);
