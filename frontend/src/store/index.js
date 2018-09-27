@@ -4,11 +4,11 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 const state = {
-  Authenticated: false,
+  Authenticated: window.$cookies.get('token'),
 };
 
 const getters = {
-  getAuthenticated: state => state.Authenticated,
+  getAuthenticated: state => !!state.Authenticated,
 };
 
 const actions = {

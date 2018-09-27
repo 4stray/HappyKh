@@ -33,10 +33,8 @@ export default {
       axios.post(`${UserAPI}/login/`, userCredentials)
         .then((response) => {
           this.$cookies.set('token', response.data.token);
+          this.$store.commit('setAuthenticated', response.data.token);
           this.$cookies.set('user_id', response.data.user_id);
-
-          this.$store.commit('setAuthenticated', true);
-
           this.$router.push({ name: 'home' });
         }).catch((error) => {
           if (error.response.data.message) {

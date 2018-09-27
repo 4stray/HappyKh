@@ -26,7 +26,6 @@ export default {
     signOut() {
       this.$cookies.remove('token');
       this.$cookies.remove('user_id');
-      this.$store.commit('setAuthenticated', false);
       this.$router.push({ name: 'home' });
       if (document.location.pathname === '/') {
         document.location.reload(true);
