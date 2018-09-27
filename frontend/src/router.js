@@ -4,6 +4,15 @@ import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import Profile from './views/Profile.vue';
+import store from './store';
+
+const ifAuthenticated = (to, from, next) => {
+  if (store.getters.getAuthenticated) {
+    next();
+    return
+  }
+  next('/login')
+};
 
 const router = new Router({
   routes: [
@@ -26,14 +35,12 @@ const router = new Router({
       path: '/profile',
       name: 'profile',
       component: Profile,
+      beforeEnter: ifAuthenticated,
     },
   ],
 });
 
 
-router.beforeEach((to, from, next) => {
-  next();
-});
 
 Vue.use(Router);
 

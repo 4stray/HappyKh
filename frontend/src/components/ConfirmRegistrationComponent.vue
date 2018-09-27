@@ -1,6 +1,5 @@
 <template>
   <div>
-    <Header/>
     <h1>Congratulations!</h1>
     <p>You've just activated your account</p>
   </div>

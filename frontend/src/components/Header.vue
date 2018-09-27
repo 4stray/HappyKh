@@ -18,13 +18,11 @@ import { mapGetters } from 'vuex';
 export default {
   name: 'Header',
   computed: {
-    //get data from the store
     ...mapGetters({
       isAuthenticated: 'getAuthenticated',
     }),
   },
   methods: {
-    //logout user and clear cookies
     signOut() {
       this.$cookies.remove('token');
       this.$cookies.remove('user_id');
