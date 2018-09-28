@@ -1,11 +1,11 @@
 <template>
   <div>
     <div id="panel">
-      <div class="tabs">
+      <div v-if="currentTab !== tabs.sendEmail" class="tabs">
         <button
                 v-bind:class="[{ active: currentTab === tabs.signIn }]"
-                v-on:click="currentTab = tabs.signIn"
-        >SIGN IN
+                v-on:click="currentTab = tabs.signIn">
+          SIGN IN
         </button>
         <button
                 v-bind:class="[{ active: currentTab === tabs.signUp }]"
@@ -13,7 +13,19 @@
         >SIGN UP
         </button>
       </div>
+      <div v-else class="tabs">
+        <button v-bind:class="[{ active: currentTab === tabs.sendEmail }]"
+                v-on:click="currentTab = tabs.signIn">
+          Back
+        </button>
+      </div>
       <component v-bind:is="currentTab.component"></component>
+      <button
+        v-if="currentTab!==tabs.sendEmail"
+        v-bind:class="[{ active: currentTab === tabs.sendEmail }]"
+        v-on:click="currentTab = tabs.sendEmail" id="sendEmail">
+        Resend Confirmation Email
+      </button>
     </div>
   </div>
 </template>
@@ -21,6 +33,8 @@
 <script>
 import LoginComponent from '../components/LoginComponent.vue';
 import RegistrationComponent from '../components/RegistrationComponent.vue';
+import ConfirmationEmailComponent from '../components/ConfirmationEmailComponent.vue';
+
 
 const tabs = {
   signIn: {
@@ -31,6 +45,10 @@ const tabs = {
     component:
       RegistrationComponent,
   },
+  sendEmail: {
+    component:
+      ConfirmationEmailComponent,
+  }
 };
 
 export default {
@@ -44,6 +62,7 @@ export default {
   components: {
     LoginComponent,
     RegistrationComponent,
+    ConfirmationEmailComponent,
   },
 };
 </script>
@@ -66,6 +85,21 @@ export default {
     #panel {
       width: 300px;
     }
+  }
+
+  #sendEmail {
+    display: block;
+    list-style: none;
+    margin: 10px;
+    padding: 10px;
+    width: 100%;
+    font-size: 12px;
+    font-weight: 300;
+    text-align: center;
+    text-decoration: none;
+    border: none;
+    background-color: transparent;
+    color: #999;
   }
 
   .tabs {

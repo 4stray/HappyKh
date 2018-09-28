@@ -136,47 +136,41 @@ class UserActivation(APIView):
 
     def post(self, request):
         """
-        If user credentials are valid send new confirmation
+        Check user credentials and send new confirmation email
         :param request: http request
         :return: Response({status, message})
         """
-        user_email = request.data['user_email']
-        user_password = request.data['user_password']
-
+        user_email = request.data["user_email"]
         try:
             validate_email(user_email)
         except ValidationError as error:
             LOGGER.error(
-                f"Email validation error {error}, "
-                f"Email: {request.data['user_email']}"
-            )
-            return Response({
-                'message': 'Invalid email format'
-            }, status=status.HTTP_400_BAD_REQUEST)
+                f'ValidationError {error}, '
+                f'Email: {user_email}')
+            return Response({'message': 'Invalid email'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         try:
             user = User.objects.get(email=user_email)
-            if user.is_active:
-                msg = 'User already activated'
-            else:
-                self.send_email_confirmation(user)
         except User.DoesNotExist:
-            user = User.objects.create_user(email=user_email,
-                                            password=user_password,
-                                            is_active=False)
-            if self.send_email_confirmation(user):
-                return Response(status=status.HTTP_201_CREATED)
-            else:
-                LOGGER.error('Confirmation email has not been delivered')
-                user.delete()
-                return Response({
-                    'message': 'The mail has not been delivered'
-                               ' due to connection reasons'
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': 'There is no user with such email'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        msg = 'The mail has not been delivered due to connection reasons'
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        if user.is_active:
+            msg = 'User already activated'
+            status_code = status.HTTP_400_BAD_REQUEST
+        elif self.send_email_confirmation(user):
+            msg = 'Confirmation email has been sent'
+            status_code = status.HTTP_200_OK
+
+        return Response({'message': msg}, status=status_code)
 
     def get(self, request, user_id, token):
         """
-        Processes POST request from user activation page
+        Processes GET request from user activation page
         :param request: HttpRequest
         :param user_id: Integer
         :param token: String
