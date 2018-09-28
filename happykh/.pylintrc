@@ -7,7 +7,10 @@ extension-pkg-whitelist=
 
 # Add files or directories to the blacklist. They should be base names, not
 # paths.
-ignore=CVS
+ignore=CVS,
+        migrations,
+        logs,
+
 
 # Add files or directories matching the regex patterns to the blacklist. The
 # regex matches against base names, not paths.
@@ -207,7 +210,8 @@ bad-names=foo,
           baz,
           toto,
           tutu,
-          tata
+          tata,
+          temp
 
 # Naming style matching correct class attribute names.
 class-attribute-naming-style=any
@@ -247,7 +251,8 @@ good-names=i,
            k,
            ex,
            Run,
-           _
+           _,
+           PASSWORD
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
@@ -515,7 +520,7 @@ max-returns=6
 max-statements=50
 
 # Minimum number of public methods for a class (see R0903).
-min-public-methods=2
+min-public-methods=1
 
 
 [IMPORTS]

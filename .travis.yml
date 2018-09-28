@@ -1,0 +1,41 @@
+include:
+-language: python
+python:
+- "3.6"
+before_install: cd happykh
+install:
+- pip install -r requirements.txt
+sudo: true
+services:
+- postgresql
+addons:
+  postgresql: '9.5'
+dist: trusty
+before_script:
+- psql -U postgres -c "CREATE DATABASE happykh;"
+- psql -c "CREATE USER admin WITH PASSWORD 'admin123';" -U postgres
+- psql -c "ALTER ROLE admin SET client_encoding TO 'utf8';" -U postgres
+- psql -c "ALTER ROLE admin SET default_transaction_isolation TO 'read committed';" -U postgres
+- psql -c "ALTER ROLE admin SET timezone TO 'UTC';" -U postgres
+- psql -c "GRANT ALL PRIVILEGES ON DATABASE happykh TO admin;" -U postgres
+- psql -c "ALTER USER admin CREATEDB;" -U postgres
+- python3 manage.py migrate
+script:
+- pytest
+- pylint users
+- pylint tests
+
+# Second Job in node js language.
+include:
+— language: node_js
+node_js:
+  — "8.12.0"
+addons:
+  chrome: stable
+before_install:
+  — cd frontend
+install:
+- npm install
+script:
+- npm run lint
+— npm run test:unit
