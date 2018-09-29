@@ -3,8 +3,11 @@
     <h1>Change your password:</h1>
     <input type="password" name="password" v-model="oldPassword" placeholder="Old password"/>
     <input type="password" name="password" v-model="newPassword" placeholder="New password"/>
-    <input type="password" name="password" v-model="confirmationPassword" placeholder="Confirm new password"/>
-    <button class="btn-save-password" type="button" v-on:click="saveNewPassword()">Save password</button>
+    <input type="password" name="password" v-model="confirmationPassword"
+           placeholder="Confirm new password"/>
+    <button class="btn-save-password" type="button"
+            v-on:click="saveNewPassword()"
+            >Save password</button>
   </div>
 </template>
 
