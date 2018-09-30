@@ -65,7 +65,6 @@ export default {
         this.userPassword = '';
         this.confirmPassword = '';
       }
-
       return Boolean(this.errors.email || this.errors.password.length);
     },
     register() {

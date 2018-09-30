@@ -65,9 +65,9 @@ export default {
             }
           });
       } else {
-        for (const index in this.passwordErrors) {
-          this.$awn.warning(this.passwordErrors[index]);
-        }
+        this.passwordError.forEach((error) => {
+          this.$awn.warning(error);
+        });
       }
       this.newPassword = '';
       this.confirmationPassword = '';

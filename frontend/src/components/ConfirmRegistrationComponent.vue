@@ -23,9 +23,9 @@ export default {
         emailToken,
       },
     ).then((response) => {
-      console.log(response.status);
+      console.log(response.status); /* eslint-disable-line no-console */
     }).catch((error) => {
-      console.log(error);
+      console.log(error); /* eslint-disable-line no-console */
     });
   },
 };
