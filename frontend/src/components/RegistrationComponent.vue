@@ -9,9 +9,9 @@
       <input id="confirmPassword" type="password" v-model="confirmPassword"
              placeholder="CONFIRM PASSWORD"/>
       <ul v-if="errors.password.length">
-        <li v-for="(error, index) in errors.password" :key="index"
-            class="error">{{ error }}
-        </li>
+        <li v-for="(error, index) in errors.password"
+            :key="index" class="error"
+            >{{ error }}</li>
       </ul>
     </div>
     <input class="btn-submit" type="submit"

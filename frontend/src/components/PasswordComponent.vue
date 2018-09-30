@@ -6,7 +6,8 @@
     <input type="password" name="password" v-model="confirmationPassword"
            placeholder="Confirm new password"/>
     <button class="btn-save-password" type="button"
-    @click="saveNewPassword()">Save password</button>
+            v-on:click="saveNewPassword()"
+            >Save password</button>
   </div>
 </template>
 
@@ -55,17 +56,18 @@ export default {
           {
             headers: { Authorization: Authentication.getAuthenticationHeader(this) },
           },
-        ).then(() => {
+        )
+          .then((response) => {
             this.$awn.success('Password successfully changed.');
-        }).catch((error) => {
-          if (error.response.data.message) {
+          }).catch((error) => {
+            if (error.response.data.message) {
               this.$awn.warning(error.response.data.message);
-          }
-        });
+            }
+          });
       } else {
-        this.passwordErrors.forEach((error) => {
-          this.$awn.warning(error);
-        });
+        for (const index in this.passwordErrors) {
+          this.$awn.warning(this.passwordErrors[index]);
+        }
       }
       this.newPassword = '';
       this.confirmationPassword = '';
