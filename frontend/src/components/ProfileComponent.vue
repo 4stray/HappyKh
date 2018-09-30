@@ -5,14 +5,16 @@
            v-model="userFirstName" placeholder="First name"/>
     <input type="text" :disabled="isDisabled" id="last_name"
            v-model="userLastName" placeholder="Last name"/>
-    <input type="number" :disabled="isDisabled" id="age" v-model="userAge" min="0" max="140" step="1"/>
+    <input type="number" :disabled="isDisabled" id="age"
+           v-model="userAge" min="0" max="140" step="1"/>
     <select :disabled="isDisabled" v-model="userGender">
       <option disabled value="">Choose your gender</option>
       <option>Man</option>
       <option>Woman</option>
     </select>
     <img v-bind:src=userImage id='image' alt="No profile image"/>
-    <input type="file" id="imageInput" :disabled="isDisabled" v-on:change="changeImage()" accept="image/*"/>
+    <input type="file" id="imageInput" :disabled="isDisabled"
+        @change="changeImage()" accept="image/*"/>
     <button class="btn-change" v-on:click=edit()>{{ enableText }}</button>
     <button class="btn-save" type="button" v-on:click="save()">Save changes</button>
   </div>
@@ -55,7 +57,7 @@ export default {
           this.userAge = response.data.age;
           this.userGender = GENDER_CHOISES[response.data.gender];
           this.userImage = response.data.profile_image;
-        }).catch((error) => {
+        }).catch(() => {
           Authentication.signout(this);
           this.$awn.warning(this.error.message);
         });
@@ -85,7 +87,7 @@ export default {
             this.userGender = GENDER_CHOISES[response.data.gender];
             this.userImage = response.data.profile_image;
             this.$awn.success('Your profile was successfully updated.');
-          }).catch((error) => {
+          }).catch(() => {
             Authentication.signout(this);
             this.$awn.warning(this.error.message);
           });

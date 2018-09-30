@@ -77,7 +77,7 @@ export default {
           user_password: this.userPassword,
         };
         axios.post('http://localhost:8000/api/users/registration/', userCredentials)
-          .then((response) => {
+          .then(() => {
             this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
             this.$router.push({ name: 'home' });
           }).catch((error) => {

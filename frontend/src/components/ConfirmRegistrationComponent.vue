@@ -14,6 +14,7 @@ export default {
   components: {
   },
   created() {
+    /* eslint-disable prefer-destructuring */
     const userId = this.$route.params.userId;
     const emailToken = this.$route.params.emailToken;
 
@@ -23,12 +24,9 @@ export default {
         userId,
         emailToken,
       },
-    ).then((response) => {
-      console.log(response.status);
-    })
-      .catch((error) => {
-        console.log(error);
-      });
+    ).then(() => {
+    }).catch(() => {
+    });
   },
 };
 </script>

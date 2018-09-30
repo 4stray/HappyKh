@@ -2,8 +2,8 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
+import Profile from './views/Profile.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
-import Profile from './views/Profile';
 import Auth from './components/Authentication/auth';
 
 const router = new Router({
@@ -38,6 +38,5 @@ router.beforeEach((to, from, next) => {
 });
 
 Vue.use(Router);
-
 
 export default router;

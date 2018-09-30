@@ -1,9 +1,9 @@
 import Vue from 'vue';
 import VueCookies from 'vue-cookies';
+import VueAWN from 'vue-awesome-notifications';
 import App from './App.vue';
 import router from './router';
 
-import VueAWN from 'vue-awesome-notifications';
 
 Vue.use(VueCookies);
 Vue.config.productionTip = false;

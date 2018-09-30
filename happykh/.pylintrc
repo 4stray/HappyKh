@@ -10,6 +10,7 @@ extension-pkg-whitelist=
 ignore=CVS,
         migrations,
         logs,
+        __init__.py
 
 
 # Add files or directories matching the regex patterns to the blacklist. The
@@ -142,7 +143,8 @@ disable=print-statement,
         xreadlines-attribute,
         deprecated-sys-function,
         exception-escape,
-        comprehension-escape
+        comprehension-escape,
+        logging-fstring-interpolation
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -246,14 +248,14 @@ function-naming-style=snake_case
 #function-rgx=
 
 # Good variable names which should always be accepted, separated by a comma.
-good-names=i,
+good-names=ve,
+           i,
            j,
            k,
            ex,
            Run,
-           _,
-           PASSWORD
-
+           _
+           
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
 

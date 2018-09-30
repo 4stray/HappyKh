@@ -25,7 +25,7 @@ export default {
   methods: {
     signOut() {
       Auth.signout(this);
-      if (document.location.pathname == '/') {
+      if (document.location.pathname === '/') {
         document.location.reload(true);
       }
     },
