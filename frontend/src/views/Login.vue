@@ -1,5 +1,6 @@
 <template>
   <div>
+    <Header/>
     <div id="panel">
       <div v-if="currentTab !== tabs.sendEmail" class="tabs">
         <button
@@ -10,8 +11,7 @@
         <button
                 v-bind:class="[{ active: currentTab === tabs.signUp }]"
                 v-on:click="currentTab = tabs.signUp"
-        >SIGN UP
-        </button>
+                >SIGN UP</button>
       </div>
       <div v-else class="tabs">
         <button v-bind:class="[{ active: currentTab === tabs.sendEmail }]"
@@ -31,6 +31,7 @@
 </template>
 
 <script>
+import Header from '@/components/Header.vue';
 import LoginComponent from '../components/LoginComponent.vue';
 import RegistrationComponent from '../components/RegistrationComponent.vue';
 import ConfirmationEmailComponent from '../components/ConfirmationEmailComponent.vue';
@@ -60,6 +61,7 @@ export default {
     };
   },
   components: {
+    Header,
     LoginComponent,
     RegistrationComponent,
     ConfirmationEmailComponent,

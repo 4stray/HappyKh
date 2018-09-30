@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h2>Congratulations!!!</h2>
-    <h3>You've just activated your account</h3>
+    <h1>Congratulations!</h1>
+    <p>You've just activated your account</p>
   </div>
 </template>
 
@@ -11,8 +11,6 @@ import axios from 'axios';
 
 export default {
   name: 'ConfirmRegistrationComponent',
-  components: {
-  },
   created() {
     const userId = this.$route.params.userId;
     const emailToken = this.$route.params.emailToken;
@@ -25,10 +23,12 @@ export default {
       },
     ).then((response) => {
       console.log(response.status);
-    })
-      .catch((error) => {
-        console.log(error);
-      });
+    }).catch((error) => {
+      console.log(error);
+    });
   },
 };
 </script>
+
+<style scoped>
+</style>
