@@ -38,7 +38,7 @@ class RegistrationViewTestCase(BaseTestCase, APITestCase):
                                         is_active=False)
         email_token = account_activation_token.make_token(user)
 
-        response = self.client.post(
+        response = self.client.get(
             f'/api/users/activate/{user.id}/{email_token}/'
         )
 
