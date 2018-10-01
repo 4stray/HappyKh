@@ -1,4 +1,4 @@
-import { shallowMount} from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import ProfileComponent from '../../src/components/ProfileComponent.vue';
 import Cookies from 'js-cookie';
 
@@ -39,10 +39,10 @@ describe('ProfileComponent data()', () => {
 });
 
 describe('mounted ProfileComponent', () => {
-  const wrapper = shallowMount(ProfileComponent,{
+  const wrapper = shallowMount(ProfileComponent, {
     mocks: {
-      $cookies: Cookies
-    }
+      $cookies: Cookies,
+    },
   });
 
   it('has 4 input fields', () => {
@@ -71,8 +71,8 @@ describe('mounted ProfileComponent', () => {
 describe('ProfileComponent interactions', () => {
   const wrapper = shallowMount(ProfileComponent, {
     mocks: {
-      $cookies: Cookies
-    }
+      $cookies: Cookies,
+    },
   });
   const btn = wrapper.find('.btn-change');
   btn.trigger('click');
