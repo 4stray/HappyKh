@@ -1,6 +1,7 @@
+import Cookies from 'js-cookie';
 import { shallowMount } from '@vue/test-utils';
 import ProfileComponent from '../../src/components/ProfileComponent.vue';
-import Cookies from 'js-cookie';
+
 
 const expect = require('chai').expect;
 const should = require('chai').should();
