@@ -49,7 +49,7 @@ const tabs = {
   sendEmail: {
     component:
       ConfirmationEmailComponent,
-  }
+  },
 };
 
 export default {

@@ -25,9 +25,11 @@ export default {
 
       Axios.post('http://127.0.0.1:8000/api/users/activate/send-email/', userCredentials)
         .then(() => {
-          this.$awn.success('Please check your mailbox for confirmation email')})
+          this.$awn.success('Please check your mailbox for confirmation email');
+        })
         .catch((error) => {
-          this.$awn.warning(error.response.data.message)});
+          this.$awn.warning(error.response.data.message);
+        });
 
       this.userEmail = '';
     },
