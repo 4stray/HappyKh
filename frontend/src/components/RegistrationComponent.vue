@@ -2,16 +2,16 @@
   <form id="register" @submit.prevent="register" method="post"
         novalidate>
     <div class="content">
-      <input type="email" v-model.trim="userEmail" placeholder="EMAIL"/>
+      <input id="userEmail" type="email" v-model.trim="userEmail" placeholder="EMAIL"/>
       <p v-if="errors.email" class="error">{{errors.email}}</p>
-      <input id="password" type="password" v-model="userPassword"
+      <input id="userPassword" type="password" v-model="userPassword"
              placeholder="PASSWORD"/>
-      <input type="password" v-model="confirmPassword"
+      <input id="confirmPassword" type="password" v-model="confirmPassword"
              placeholder="CONFIRM PASSWORD"/>
       <ul v-if="errors.password.length">
-        <li v-for="(error, index) in errors.password" :key="index"
-            class="error">{{ error }}
-        </li>
+        <li v-for="(error, index) in errors.password"
+            :key="index" class="error"
+            >{{ error }}</li>
       </ul>
     </div>
     <input class="btn-submit" type="submit"
@@ -65,7 +65,6 @@ export default {
         this.userPassword = '';
         this.confirmPassword = '';
       }
-
       return Boolean(this.errors.email || this.errors.password.length);
     },
     register() {
@@ -77,7 +76,7 @@ export default {
           user_password: this.userPassword,
         };
         axios.post('http://localhost:8000/api/users/registration/', userCredentials)
-          .then((response) => {
+          .then(() => {
             this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
             this.$router.push({ name: 'home' });
           }).catch((error) => {

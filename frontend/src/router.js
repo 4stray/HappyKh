@@ -3,9 +3,17 @@ import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
-import Profile from './views/Profile';
 import CreatePlace from './views/CreatePlace.vue';
-import Auth from './components/Authentication/auth';
+import Profile from './views/Profile.vue';
+import store from './store';
+
+const ifAuthenticated = (to, from, next) => {
+  if (store.getters.getAuthenticated) {
+    next();
+    return;
+  }
+  next('/login');
+};
 
 const router = new Router({
   routes: [
@@ -28,6 +36,7 @@ const router = new Router({
       path: '/profile',
       name: 'profile',
       component: Profile,
+      beforeEnter: ifAuthenticated,
     },
     {
       path: '/place/create',
@@ -38,12 +47,6 @@ const router = new Router({
 });
 
 
-router.beforeEach((to, from, next) => {
-  Auth.checkAuthentication();
-  next();
-});
-
 Vue.use(Router);
-
 
 export default router;

@@ -1,4 +1,5 @@
 """Test users api views"""
+# pylint: disable = no-member
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
@@ -29,7 +30,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.test_user = User.objects.create_user(**CORRECT_DATA)
         user_token = Token.objects.create(user=self.test_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
-        self.PASSWORDS = {
+        self.PASSWORD = {
             'old_password': CORRECT_DATA['password'],
             'new_password': 'password2',
         }
@@ -87,27 +88,27 @@ class TestUserProfile(BaseTestCase, APITestCase):
     def test_patch_update_password(self):
         """test update user's password"""
         response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
-                                     self.PASSWORDS)
+                                     self.PASSWORD)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_patch_invalid_update_password(self):
         """test update user's password with wrong old password"""
-        INVALID_PASSWORD = self.PASSWORDS.copy()
-        INVALID_PASSWORD['old_password'] = '123userPassword'
+        invalid_password = self.PASSWORD.copy()
+        invalid_password['old_password'] = '123userPassword'
         response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
-                                     INVALID_PASSWORD)
+                                     invalid_password)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
-            self.test_user.check_password(INVALID_PASSWORD['new_password'])
+            self.test_user.check_password(invalid_password['new_password'])
         )
 
     def test_patch_invalid_new_password(self):
         """test update user's password with invalid new password"""
-        INVALID_PASSWORD = self.PASSWORDS.copy()
-        INVALID_PASSWORD['new_password'] = ''
+        invalid_password = self.PASSWORD.copy()
+        invalid_password['new_password'] = ''
         response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
-                                     INVALID_PASSWORD)
+                                     invalid_password)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
-            self.test_user.check_password(INVALID_PASSWORD['new_password'])
+            self.test_user.check_password(invalid_password['new_password'])
         )

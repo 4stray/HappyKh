@@ -1,3 +1,4 @@
+"""Tests for database"""
 import pytest
 from tests.utils import BaseTestCase
 

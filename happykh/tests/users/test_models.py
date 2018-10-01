@@ -40,17 +40,17 @@ class UserTestCase(BaseTestCase):
 
     def test_email_exception(self):
         """Test empty email error"""
-        with self.assertRaises(ValueError) as ve:
+        with self.assertRaises(ValueError) as error:
             User.objects.create_user(email='', password='password')
-        self.assertEqual(ValueError, type(ve.exception))
+        self.assertEqual(ValueError, type(error.exception))
 
     def test_empty_password(self):
         """Test is usable empty password"""
-        with self.assertRaises(ValueError) as ve:
+        with self.assertRaises(ValueError) as error:
             User.objects.create_user(email='no@pass.com', password='')
-        self.assertEqual(type(ve.exception), ValueError)
+        self.assertEqual(type(error.exception), ValueError)
         self.assertEqual('Users must have an non-empty password',
-                         str(ve.exception))
+                         str(error.exception))
 
     def test_get_short_name_function(self):
         """Test 'get_short_name' function"""
