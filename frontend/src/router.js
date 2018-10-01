@@ -4,6 +4,7 @@ import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import Profile from './views/Profile';
+import CreatePlace from './views/CreatePlace.vue';
 import Auth from './components/Authentication/auth';
 
 const router = new Router({
@@ -27,6 +28,11 @@ const router = new Router({
       path: '/profile',
       name: 'profile',
       component: Profile,
+    },
+    {
+      path: '/place/create',
+      name: 'createPlace',
+      component: CreatePlace,
     },
   ],
 });
