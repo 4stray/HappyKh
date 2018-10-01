@@ -1,8 +1,8 @@
+/* eslint-disable */
 import Vue from 'vue';
 import Vuex from 'vuex';
 
 Vue.use(Vuex);
-
 const state = {
   Authenticated: window.$cookies.get('token'),
 };

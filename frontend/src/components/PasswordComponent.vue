@@ -40,7 +40,7 @@ export default {
       if (this.newPassword !== this.confirmationPassword) {
         this.passwordErrors.push("Your passwords don't match, please try again.");
       }
-      if (this.newPassword != this.confirmationPassword) {
+      if (this.newPassword !== this.confirmationPassword) {
         this.passwordErrors.push('Confirmation password is incorrect');
       }
       return this.passwordErrors.length < 1;
@@ -65,9 +65,9 @@ export default {
             }
           });
       } else {
-        for (const index in this.passwordErrors) {
-          this.$awn.warning(this.passwordErrors[index]);
-        }
+        this.passwordError.forEach((error) => {
+          this.$awn.warning(error);
+        });
       }
       this.newPassword = '';
       this.confirmationPassword = '';

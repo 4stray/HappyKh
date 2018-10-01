@@ -1,11 +1,12 @@
 """Views for app users"""
+# pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
+# pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
 import logging
 from smtplib import SMTPException
 
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
-from happykh.settings import EMAIL_HOST_USER
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -14,7 +15,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+#pylint: disable = no-name-in-module, import-error
+from happykh.settings import EMAIL_HOST_USER
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
@@ -51,6 +53,7 @@ class UserLogin(APIView):
 
         user = serializer.validated_data['user']
         if user.is_active:
+            #pylint: disable = unused-variable
             user_token, created = Token.objects.get_or_create(user=user)
             LOGGER.info('User has been logged in')
             return Response({
@@ -86,6 +89,7 @@ class UserLogout(APIView):
 
 
 class UserRegistration(APIView):
+    """ Class for registration view"""
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -132,6 +136,7 @@ class UserRegistration(APIView):
 
 
 class UserActivation(APIView):
+    """Class for activation user account after registration"""
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -176,6 +181,7 @@ class UserActivation(APIView):
         :param token: String
         :return: Response({message}, status)
         """
+        # pylint: disable=unused-argument
         try:
             user = User.objects.get(pk=user_id)
             if user.is_active:
@@ -241,7 +247,7 @@ class UserProfile(APIView):
     """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-
+    # pylint: disable = redefined-builtin
     def get(self, request, id):
         """
         Return user's data.
