@@ -39,7 +39,7 @@ const router = new Router({
       beforeEnter: ifAuthenticated,
     },
     {
-      path: '/place/create',
+      path: '/places/create',
       name: 'createPlace',
       component: CreatePlace,
     },

@@ -3,18 +3,17 @@
     <h1>Create your place:</h1>
     <input type="text" id="name"
            v-model="placeName" placeholder="Place name"/>
+    <textarea id="description"
+              v-model="placeDescription" placeholder="Description"></textarea>
+    <img v-bind:src=placeLogo id='logo' alt="No place image"/>
     <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
-    <input type="text" id="description"
-           v-model="placeDescription" placeholder="Description"/>
-    <img v-bind:src=placeLogo id='image' alt="No place image"/>
-    Creator: <a :href="BaseURL + '/users/' + creatorId">{{creatorName}}</a>
-    <button class="btn-save" type="button" v-on:click="save()">Save changes</button>
+    <h3>Creator: <a :href="'http://127.0.0.1:8080/users/' + creatorId">{{creatorName}}</a></h3>
+    <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import router from '../router';
 import Authentication from '../components/Authentication/auth';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
@@ -31,6 +30,7 @@ export default {
   },
   created() {
     this.getCreatorName();
+    this.getCreatorId();
   },
   methods: {
     getCreatorName() {
@@ -47,6 +47,7 @@ export default {
           this.$awn.warning(this.error.message);
         });
     },
+    getCreatorId() { this.creatorId = this.$cookies.get('user_id'); }, // TODO get user info from email
     save() {
       const placeInfo = {
         name: this.placeName,
@@ -61,16 +62,87 @@ export default {
       )
         .then(() => {
           this.$awn.success('Your place was successfully created.');
-          router.push({ name: 'home' }); // TODO Change redirect location
         }).catch(() => {
-          Authentication.signout(this);
           this.$awn.warning(this.error.message);
         });
+    },
+    changeImage() {
+      const file = document.getElementById('logoInput').files[0];
+      const reader = new FileReader();
+
+      const self = this;
+      reader.addEventListener('load', () => {
+        self.placeLogo = reader.result;
+      }, false);
+
+      reader.readAsDataURL(file);
     },
   },
 };
 </script>
 
 <style>
+  #createPlaceComponent {
+    width: 500px;
+    border: 1px solid #CCCCCC;
+    background-color: #FFFFFF;
+    margin: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
+  input, textarea {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    width: 300px;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
+  textarea{
+    height: 6em;
+  }
+  textarea::-webkit-scrollbar {
+    width: 1em;
+  }
+
+  textarea::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  }
+
+  textarea::-webkit-scrollbar-thumb {
+    background-color: darkgrey;
+    outline: 1px solid slategrey;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  img {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    width: 60%;
+    height: 20%;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
+
+  .btn-save {
+  width: 40%;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 25px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-family: 'Liberation Sans', sans, sans-serif;
+  cursor: pointer;
+  background-color: #0ca086;
+  }
 </style>
