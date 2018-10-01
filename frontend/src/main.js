@@ -1,6 +1,6 @@
-import VueAWN from 'vue-awesome-notifications';
 import Vue from 'vue';
 import VueCookies from 'vue-cookies';
+import VueAWN from 'vue-awesome-notifications';
 import App from './App.vue';
 import router from './router';
 import store from './store';

@@ -1,4 +1,5 @@
 """ Support class for user authentication """
+# pylint: disable=unused-argument, no-self-use
 import logging
 
 from users.models import User
@@ -20,12 +21,13 @@ class UserAuthentication:
         :param user_token: String
         :return: User object or None
         """
+
         try:
             user = User.objects.get(email=user_email)
             if user.check_password(user_password):
                 LOGGER.info('User authenticated')
                 return user
-        except User.DoesNotExist:
+        except User.DoesNotExist: #pylint: disable = no-member
             LOGGER.error('User does not exist while authentication')
         return None
 
@@ -37,5 +39,5 @@ class UserAuthentication:
         """
         try:
             return User.objects.get(pk=user_id)
-        except User.DoesNotExist:
+        except User.DoesNotExist: #pylint: disable = no-member
             return None
