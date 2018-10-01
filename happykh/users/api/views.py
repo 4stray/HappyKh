@@ -1,6 +1,6 @@
 """Views for app users"""
-#pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
-#pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
+# pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
+# pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
 import logging
 from smtplib import SMTPException
 
@@ -124,7 +124,7 @@ class UserRegistration(APIView):
             user = User.objects.create_user(email=user_email,
                                             password=user_password,
                                             is_active=False)
-            if self.send_email_confirmation(user):
+            if UserActivation.send_email_confirmation(user):
                 return Response(status=status.HTTP_201_CREATED)
             else:
                 LOGGER.error('Confirmation email has not been delivered')
@@ -134,40 +134,48 @@ class UserRegistration(APIView):
                                ' due to connection reasons'
                 }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    def send_email_confirmation(self, user):
-        """
-        Sends an email on specified user.email
-        :param user: User
-        :return: Boolean
-        """
-        try:
-            email_token = account_activation_token.make_token(user)
-            user_id = user.pk
-            send_mail(
-                f'Confirm {user.email} on HappyKH',
-                f'We just needed to verify that {user.email} '
-                f'is your email address.'
-                f' Just click the link below \n'
-                f'http://127.0.0.1:8080/#/confirm_registration/'
-                f'{user_id}/{email_token}/',
-                EMAIL_HOST_USER,
-                [user.email]
-            )
-            LOGGER.info('Confirmation mail has been sent')
-        except SMTPException:
-            LOGGER.error('Error occurred while sending mail')
-            return False
-
-        return True
-
 
 class UserActivation(APIView):
     """Class for activation user account after registration"""
     permission_classes = (AllowAny,)
 
-    def post(self, request, user_id, token):
+    def post(self, request):
         """
-        Processes POST request from user activation page
+        Check user credentials and send new confirmation email
+        :param request: http request
+        :return: Response({status, message})
+        """
+        user_email = request.data["user_email"]
+        try:
+            validate_email(user_email)
+        except ValidationError as error:
+            LOGGER.error(
+                f'ValidationError {error}, '
+                f'Email: {user_email}')
+            return Response({'message': 'Invalid email'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            return Response({'message': 'There is no user with such email'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        msg = 'The mail has not been delivered due to connection reasons'
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+
+        if user.is_active:
+            msg = 'User already activated'
+            status_code = status.HTTP_400_BAD_REQUEST
+        elif self.send_email_confirmation(user):
+            msg = 'Confirmation email has been sent'
+            status_code = status.HTTP_200_OK
+
+        return Response({'message': msg}, status=status_code)
+
+    def get(self, request, user_id, token):
+        """
+        Processes GET request from user activation page
         :param request: HttpRequest
         :param user_id: Integer
         :param token: String
@@ -204,6 +212,33 @@ class UserActivation(APIView):
             LOGGER.error(f'Error {error} while user activation')
             return Response({'message': str(error)},
                             status=status.HTTP_400_BAD_REQUEST)
+
+    @staticmethod
+    def send_email_confirmation(user):
+        """
+        Sends an email on specified user.email
+        :param user: User
+        :return: Boolean
+        """
+        try:
+            email_token = account_activation_token.make_token(user)
+            user_id = user.pk
+            send_mail(
+                f'Confirm {user.email} on HappyKH',
+                f'We just needed to verify that {user.email} '
+                f'is your email address.'
+                f' Just click the link below \n'
+                f'http://127.0.0.1:8080/#/confirm_registration/'
+                f'{user_id}/{email_token}/',
+                EMAIL_HOST_USER,
+                [user.email]
+            )
+            LOGGER.info('Confirmation mail has been sent')
+        except SMTPException:
+            LOGGER.error('Error occurred while sending mail')
+            return False
+
+        return True
 
 
 class UserProfile(APIView):

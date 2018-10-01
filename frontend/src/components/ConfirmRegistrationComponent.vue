@@ -16,7 +16,7 @@ export default {
     const userId = this.$route.params.userId;
     const emailToken = this.$route.params.emailToken;
 
-    axios.post(
+    axios.get(
       `http://localhost:8000/api/users/activate/${userId}/${emailToken}/`,
       {
         userId,
