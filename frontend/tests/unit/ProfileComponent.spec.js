@@ -1,10 +1,14 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount} from '@vue/test-utils';
 import ProfileComponent from '../../src/components/ProfileComponent.vue';
+import Cookies from 'js-cookie';
 
 const expect = require('chai').expect;
 const should = require('chai').should();
 
-describe('ProfileComponent data() check', () => {
+Cookies.set('token', 'value_');
+Cookies.set('user_id', 'value_');
+
+describe('ProfileComponent data()', () => {
   it('has userFirstName', () => {
     expect(ProfileComponent.data()).to.have.property('userFirstName');
   });
@@ -15,10 +19,6 @@ describe('ProfileComponent data() check', () => {
 
   it('has default userAge', () => {
     expect(ProfileComponent.data()).to.have.property('userAge');
-  });
-
-  it('has default userEmail', () => {
-    expect(ProfileComponent.data()).to.have.property('userEmail');
   });
 
   it('fields edit disabled initially', () => {
@@ -38,9 +38,19 @@ describe('ProfileComponent data() check', () => {
   });
 });
 
-describe('ProfileComponent after mounted check fields', () => {
-  const wrapper = shallowMount(ProfileComponent);
+describe('mounted ProfileComponent', () => {
+  const wrapper = shallowMount(ProfileComponent,{
+    mocks: {
+      $cookies: Cookies
+    }
+  });
 
+  it('has 4 input fields', () => {
+    expect(wrapper.findAll('input').length).to.be.equal(4);
+  });
+  it('has 1 selection element', () => {
+    expect(wrapper.findAll('select').length).to.be.equal(1);
+  });
   it('has LastName field with "text" type', () => {
     expect(wrapper.find('#last_name').attributes('type')).to.be.equal('text');
   });
@@ -53,50 +63,26 @@ describe('ProfileComponent after mounted check fields', () => {
     expect(wrapper.find('#age').attributes('type')).to.be.equal('number');
   });
 
-  it('has Email field with "text" type', () => {
-    expect(wrapper.find('#email').attributes('type')).to.be.equal('text');
-  });
-
   it('contains Image from data()', () => {
     expect(wrapper.find('#image').attributes('src')).to.be.equal(ProfileComponent.data().userImage);
   });
 });
 
 describe('ProfileComponent interactions', () => {
-  const wrapper = shallowMount(ProfileComponent);
+  const wrapper = shallowMount(ProfileComponent, {
+    mocks: {
+      $cookies: Cookies
+    }
+  });
   const btn = wrapper.find('.btn-change');
   btn.trigger('click');
 
   it('has interaction to enable fields on edit', () => {
-    const email = wrapper.find('#email');
+    const email = wrapper.find('#first_name');
     expect(email.attributes('disabled')).to.be.equal(undefined);
   });
 
   it('has interaction to change buttons text', () => {
     expect(btn.text()).to.be.equal('Disable editing');
-  });
-});
-
-describe('Django Server /profile', () => {
-  it('has 401 error in response to unauthorized request', () => {
-    const request = new XMLHttpRequest();
-
-    request.open('GET', 'http://localhost:8000/api/users/profile/1', false);
-
-    request.send();
-
-    expect(request.status).to.be.equal(401);
-  });
-
-  it('has 200 status response to authorized user using token', () => {
-    const request = new XMLHttpRequest();
-
-    request.open('GET', 'http://localhost:8000/api/users/profile/5', false);
-
-    request.setRequestHeader("Authorization", 'Token 1a0ccc1ff0455016164ddac9366af9c7711fe9ef');
-
-    request.send();
-
-    expect(request.status).to.be.equal(200);
   });
 });
