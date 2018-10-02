@@ -23,7 +23,6 @@
 
 <script>
 import axios from 'axios';
-import Authentication from '../components/Authentication/auth';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
 const GENDER_CHOISES = { M: 'Man', W: 'Woman' };
@@ -49,7 +48,7 @@ export default {
       axios.get(
         UserAPI + this.$cookies.get('user_id'),
         {
-          headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
       )
         .then((response) => {
@@ -59,7 +58,6 @@ export default {
           this.userGender = GENDER_CHOISES[response.data.gender];
           this.userImage = response.data.profile_image;
         }).catch((error) => {
-          Authentication.signout(this);
           this.$awn.warning(this.error.message);
         });
     },
@@ -76,7 +74,7 @@ export default {
         axios.patch(
           UserAPI + this.$cookies.get('user_id'), userCredentials,
           {
-            headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+            headers: { Authorization: `Token ${this.$cookies.get('token')}` },
           },
         )
           .then((response) => {
@@ -89,7 +87,6 @@ export default {
             this.userImage = response.data.profile_image;
             this.$awn.success('Your profile was successfully updated.');
           }).catch((error) => {
-            Authentication.signout(this);
             this.$awn.warning(this.error.message);
           });
       } else {

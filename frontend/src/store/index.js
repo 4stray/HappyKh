@@ -21,7 +21,6 @@ const mutations = {
   },
 };
 
-
 export default new Vuex.Store({
   getters,
   actions,
