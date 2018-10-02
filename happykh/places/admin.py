@@ -8,4 +8,3 @@ class PlaceAdmin(admin.ModelAdmin):
     fields = ['user', 'name', 'description']
     list_display = ('user', 'name')
     search_fields = ['name']
-    
