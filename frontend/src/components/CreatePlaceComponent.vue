@@ -13,7 +13,6 @@
 
 <script>
 import axios from 'axios';
-import Authentication from '../components/Authentication/auth';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
@@ -35,7 +34,7 @@ export default {
       axios.post(
         `${BaseURL}/places/`, placeInfo,
         {
-          headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
       )
         .then(() => {

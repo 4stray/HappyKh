@@ -42,6 +42,7 @@ const router = new Router({
       path: '/places/create',
       name: 'createPlace',
       component: CreatePlace,
+      beforeEnter: ifAuthenticated,
     },
   ],
 });
