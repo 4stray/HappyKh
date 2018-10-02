@@ -23,4 +23,16 @@ class PlaceTestCase(BaseTestCase):
         self.assertEqual('', place.name)
         self.assertEqual('', place.description)
         self.assertEqual('', place.image)
+
+    def test_deletion_user(self):
+        user_on_delete = self.regular_user
+        place = self.place
+
+        User.objects.get(email="any@mail.com").delete()
+        with self.assertRaises(Place.DoesNotExist) as dne:
+            Place.objects.get(user=user_on_delete)
+        self.assertEqual(type(dne.exception), Place.DoesNotExist)
+
+
+
     
