@@ -14,9 +14,10 @@
 </template>
 
 <script>
-import Authentication from './Authentication/auth';
-import PlaceComponent from './PlaceComponent';
 import axios from 'axios';
+import Authentication from './Authentication/auth';
+import PlaceComponent from './PlaceComponent.vue';
+
 
 export default {
   name: 'PlacesComponent',
@@ -29,12 +30,13 @@ export default {
     };
   },
   created() {
-    const apiUrl = 'http://localhost:8000/api/places/';
-    const header = {
+    const allPlacesUrl = 'http://localhost:8000/api/places/';
+    const apiConfig = {
       headers: {
-        Authorization: Authentication.getAuthenticationHeader(this)
+        Authorization: Authentication.getAuthenticationHeader(this),
       },
     };
+
     this.allPlaces = [
       {
         name: 'First',
@@ -45,16 +47,26 @@ export default {
       {
         name: 'Third',
       },
-    ]
-    // axios.get(apiUrl, {
-    //   apiUrl,
-    // }).then((response) => {
-    //   this.allPlaces = response.data
+      {
+        name: 'Third',
+      },
+      {
+        name: 'Third',
+      },
+      {
+        name: 'Third',
+      },
+      {
+        name: 'Third',
+      },
+    ];
+    // axios.get(allPlacesUrl, {}, apiConfig).then((response) => {
+    //   this.allPlaces = response.data.all_places
     // }).error((error) => {
     //   console.log(error);
-    //});
-  }
-}
+    // });
+  },
+};
 </script>
 
 <style scoped>

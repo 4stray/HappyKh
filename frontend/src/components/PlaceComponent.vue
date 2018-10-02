@@ -1,10 +1,11 @@
 <template>
   <div class="place-body">
     <div class="place-image">
-      <img v-on:src=place.logo alt="Blank">
+      <img v-bind:src=place.logo alt="uploading picture failed">
     </div>
+
     <div>
-      <p>Here {{ place.name }}</p>
+      <p>Name: {{ place.name }}</p>
     </div>
   </div>
 </template>
@@ -15,16 +16,17 @@ export default {
   props: [
     'place',
   ],
-}
+};
 </script>
 
 <style scoped>
   .place-body {
-    width: 25%;
+    width: 40%;
     border: 1px solid #CCCCCC;
-    background-color: #FFFFEE;
+    background-color: #FFFFFF;
     box-shadow: 3px 3px 2px grey;
-    margin: 0 20px;
+    margin: 20px;
+    display: inline-block;
   }
   .place-image {
     height: 60px;

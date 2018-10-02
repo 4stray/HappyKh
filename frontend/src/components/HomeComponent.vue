@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import PlacesComponent from "./PlacesComponent";
+import PlacesComponent from './PlacesComponent';
 import { mapGetters } from 'vuex';
 import store from '../store';
 
@@ -16,7 +16,7 @@ import store from '../store';
 export default {
   name: 'HomeComponent',
   components: {
-    PlacesComponent
+    PlacesComponent,
   },
   props: {
     msg: String,
