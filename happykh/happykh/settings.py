@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'customlogger.apps.CustomloggerConfig',
     'users.apps.UsersConfig',
+    'places.apps.PlacesConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
