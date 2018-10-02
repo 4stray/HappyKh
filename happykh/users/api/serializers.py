@@ -1,4 +1,5 @@
 """Custom serializers for users app"""
+# pylint: disable = logging-fstring-interpolation
 import logging
 
 from django.contrib.auth import authenticate
@@ -13,11 +14,15 @@ LOGGER = logging.getLogger('happy_logger')
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Serializer for custom user model"""
+
     class Meta:
+        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = '__all__'
 
 
+# pylint: disable = abstract-method
 class LoginSerializer(serializers.Serializer):
     """
     Serializer for user credentials
@@ -25,9 +30,9 @@ class LoginSerializer(serializers.Serializer):
     user_email = serializers.CharField()
     user_password = serializers.CharField()
 
-    def validate(self, data):
-        user_email = data.get('user_email', '')
-        user_password = data.get('user_password', '')
+    def validate(self, attrs):
+        user_email = attrs.get('user_email', '')
+        user_password = attrs.get('user_password', '')
 
         try:
             validate_email(user_email)
@@ -48,12 +53,12 @@ class LoginSerializer(serializers.Serializer):
                                 user_password=user_password)
             if user:
                 if user.is_active:
-                    data['user'] = user
+                    attrs['user'] = user
                 else:
                     account_activation_error = exceptions.ValidationError
                     account_activation_error.default_detail = \
                         'Please, check you mailbox in order ' \
-                                    'to activate your account'
+                        'to activate your account'
                     LOGGER.warning(
                         'Serializer: Validation warning,'
                         ' need to activate account'
@@ -74,11 +79,12 @@ class LoginSerializer(serializers.Serializer):
             authorization_error = exceptions.ValidationError
             authorization_error.default_detail = \
                 'Must provide user email and password'
-            LOGGER.warning(f'Serializer: Validation warning, '
-                           f'{authorization_error.default_detail}'
-           )
+            LOGGER.warning(
+                f'Serializer: Validation warning, '
+                f'{authorization_error.default_detail}'
+            )
             raise authorization_error
-        return data
+        return attrs
 
 
 class PasswordSerializer(serializers.ModelSerializer):
@@ -89,6 +95,7 @@ class PasswordSerializer(serializers.ModelSerializer):
     new_password = serializers.CharField(required=True)
 
     class Meta:
+        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = ('old_password', 'new_password')
 

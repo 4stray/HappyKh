@@ -13,7 +13,6 @@
 
 <script>
 import axios from 'axios';
-import Authentication from './Authentication/auth';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
@@ -40,7 +39,7 @@ export default {
       if (this.newPassword !== this.confirmationPassword) {
         this.passwordErrors.push("Your passwords don't match, please try again.");
       }
-      if (this.newPassword != this.confirmationPassword) {
+      if (this.newPassword !== this.confirmationPassword) {
         this.passwordErrors.push('Confirmation password is incorrect');
       }
       return this.passwordErrors.length < 1;
@@ -54,7 +53,7 @@ export default {
         axios.patch(
           UserAPI + this.$cookies.get('user_id'), userCredentials,
           {
-            headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+            headers: { Authorization: `Token ${this.$cookies.get('token')}` },
           },
         )
           .then((response) => {
@@ -65,9 +64,9 @@ export default {
             }
           });
       } else {
-        for (const index in this.passwordErrors) {
-          this.$awn.warning(this.passwordErrors[index]);
-        }
+        this.passwordError.forEach((error) => {
+          this.$awn.warning(error);
+        });
       }
       this.newPassword = '';
       this.confirmationPassword = '';
