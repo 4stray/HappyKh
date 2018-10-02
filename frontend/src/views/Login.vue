@@ -1,14 +1,15 @@
 <template>
   <div>
-    <Header/>
     <div id="panel">
       <div class="tabs">
         <button v-bind:class="[{ active: currentTab === tabs.signIn }]"
                 v-on:click="currentTab = tabs.signIn"
-                >SIGN IN</button>
+        >SIGN IN
+        </button>
         <button v-bind:class="[{ active: currentTab === tabs.signUp }]"
                 v-on:click="currentTab = tabs.signUp"
-                >SIGN UP</button>
+        >SIGN UP
+        </button>
       </div>
       <component v-bind:is="currentTab.component"></component>
     </div>
@@ -16,35 +17,35 @@
 </template>
 
 <script>
-import Header from '@/components/Header.vue';
-import LoginComponent from '../components/LoginComponent.vue';
-import RegistrationComponent from '../components/RegistrationComponent.vue';
+  import Header from '@/components/Header.vue';
+  import LoginComponent from '../components/LoginComponent.vue';
+  import RegistrationComponent from '../components/RegistrationComponent.vue';
 
-const tabs = {
-  signIn: {
-    component:
+  const tabs = {
+    signIn: {
+      component:
       LoginComponent,
-  },
-  signUp: {
-    component:
+    },
+    signUp: {
+      component:
       RegistrationComponent,
-  },
-};
+    },
+  };
 
-export default {
-  name: 'Login',
-  data() {
-    return {
-      tabs,
-      currentTab: tabs.signIn,
-    };
-  },
-  components: {
-    Header,
-    LoginComponent,
-    RegistrationComponent,
-  },
-};
+  export default {
+    name: 'Login',
+    data() {
+      return {
+        tabs,
+        currentTab: tabs.signIn,
+      };
+    },
+    components: {
+      Header,
+      LoginComponent,
+      RegistrationComponent,
+    },
+  };
 </script>
 
 <style lang="scss">

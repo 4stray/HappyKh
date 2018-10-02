@@ -1,5 +1,21 @@
 module.exports = {
-  presets: [
-    '@vue/app',
+  "presets": [
+    [
+      "@vue/app",
+      {
+        "useBuiltIns": "entry"
+      }
+    ]
   ],
+  "plugins": [
+    [
+      "transform-imports",
+      {
+        "vuetify": {
+          "transform": "vuetify/src/components/${member}", // eslint-disable-line no-template-curly-in-string
+          "preventFullImport": false
+        }
+      }
+    ]
+  ]
 };

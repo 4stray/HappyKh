@@ -1,19 +1,19 @@
 <template>
-  <nav id="nav">
-    <router-link :to="{ name: 'home'}">Home</router-link>
-    <router-link v-if="isAuthenticated" :to="{ name: 'profile'}">Profile
-    </router-link>
-    <router-link v-if="!isAuthenticated" :to="{ name: 'login'}">Login
-    </router-link>
-    <div id="left-nav">
-      <router-link
-          v-if="isAuthenticated"
-          v-on:click.native="signOut()"
-          :to="{name: 'login'}"
-          replace>Sign out
-      </router-link>
-    </div>
-  </nav>
+  <v-toolbar>
+    <v-btn :to="{ name: 'home'}" flat exact>Home</v-btn>
+    <v-btn v-if="isAuthenticated" :to="{ name: 'profile'}" flat exact>Profile
+    </v-btn>
+    <v-btn v-if="!isAuthenticated" :to="{ name: 'login'}" flat exact>Login
+    </v-btn>
+    <v-spacer></v-spacer>
+    <v-btn
+        v-if="isAuthenticated"
+        v-on:click.native="signOut()"
+        :to="{name: 'login'}"
+        flat color="error" exact>Sign out
+    </v-btn>
+
+  </v-toolbar>
 </template>
 
 <script>

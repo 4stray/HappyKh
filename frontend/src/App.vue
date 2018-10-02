@@ -1,7 +1,13 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+  <v-app>
+    <Header/>
+    <v-content>
+      <v-container fluid class="teal lighten-5">
+        <router-view></router-view>
+      </v-container>
+    </v-content>
+    <v-footer app></v-footer>
+  </v-app>
 </template>
 
 <style lang="scss">
@@ -14,6 +20,16 @@
     text-align: center;
     color: #2c3e50;
     width: 100%;
+
   }
 
 </style>
+<script>
+  import Header from '@/components/Header.vue';
+
+  export default {
+    components: {
+      Header,
+    }
+  }
+</script>

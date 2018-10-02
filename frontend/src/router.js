@@ -4,6 +4,7 @@ import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import Profile from './views/Profile.vue';
+import ProfileSettings from './views/ProfileSettings.vue';
 import store from './store';
 
 const ifAuthenticated = (to, from, next) => {
@@ -37,6 +38,11 @@ const router = new Router({
       component: Profile,
       beforeEnter: ifAuthenticated,
     },
+    {
+      path: '/profile/settings',
+      name: 'settings',
+      component: ProfileSettings,
+    }
   ],
 });
 
