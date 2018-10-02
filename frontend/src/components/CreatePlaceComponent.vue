@@ -7,7 +7,6 @@
               v-model="placeDescription" placeholder="Description"></textarea>
     <img v-bind:src=placeLogo id='logo' alt="No place image"/>
     <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
-    <h3>Creator: <a :href="'http://127.0.0.1:8080/users/' + creatorId">{{creatorName}}</a></h3>
     <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
   </div>
 </template>
@@ -24,30 +23,9 @@ export default {
       placeName: '',
       placeLogo: '',
       placeDescription: '',
-      creatorName: '',
-      creatorId: '',
     };
   },
-  created() {
-    this.getCreatorName();
-    this.getCreatorId();
-  },
   methods: {
-    getCreatorName() {
-      axios.get(
-        `${BaseURL}/users/${this.$cookies.get('user_id')}`,
-        {
-          headers: { Authorization: Authentication.getAuthenticationHeader(this) },
-        },
-      )
-        .then((response) => {
-          if (response.data.first_name && response.data.last_name) { this.creatorName = `${response.data.first_name} ${response.data.last_name}`; } else { this.creatorName = response.data.email; }
-        }).catch(() => {
-          Authentication.signout(this);
-          this.$awn.warning(this.error.message);
-        });
-    },
-    getCreatorId() { this.creatorId = this.$cookies.get('user_id'); }, // TODO get user info from email
     save() {
       const placeInfo = {
         name: this.placeName,
