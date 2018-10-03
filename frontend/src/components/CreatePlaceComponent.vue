@@ -99,7 +99,7 @@ export default {
     outline: none;
   }
 
-  img {
+  img#logo {
     padding: 10px 15px;
     margin-bottom: 10px;
     width: 60%;
@@ -111,15 +111,15 @@ export default {
   }
 
   .btn-save {
-  width: 40%;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 25px;
-  color: #fff;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-family: 'Liberation Sans', sans, sans-serif;
-  cursor: pointer;
-  background-color: #0ca086;
+    width: 40%;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 25px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: 'Liberation Sans', sans, sans-serif;
+    cursor: pointer;
+    background-color: #0ca086;
   }
 </style>
