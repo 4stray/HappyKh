@@ -1,22 +1,32 @@
-import Cookies from 'js-cookie';
 import { shallowMount, config } from '@vue/test-utils';
-import PlacesComponent from '../../src/components/PlacesComponent.vue';
+import PlacesComponent from '@/components/PlacesComponent.vue';
 
 
 const expect = require('chai').expect;
 const should = require('chai').should();
 
-Cookies.set('token', ' ');
+config.mocks['$store'] = {
+  state: {
+    Authenticated: 'test token value'
+  },
+  getters: {
+    getToken: state => state.Authenticated,
+  },
+};
 
 describe('PlacesComponent', () => {
-  const wrapper = shallowMount(PlacesComponent, {
-    mocks: {
-      $cookies: Cookies,
-    }
+  const wrapper = shallowMount(PlacesComponent, config);
+
+  it('has places container', () => {
+    expect(wrapper.contains('[class="places-container"]')).to.be.equal(true);
   });
 
-  it('has place holder', () => {
-    expect(wrapper.contains('[class="place-holder"]')).to.be.equal(true);
+  it('has button for adding place', () => {
+    expect(wrapper.contains('[class="add-place-button"]')).to.be.equal(true);
   });
 
+  it('has container for place components', () => {
+    expect(wrapper.contains('[class="place-components-container"]'))
+      .to.be.equal(true);
+  });
 });

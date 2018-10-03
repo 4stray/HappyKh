@@ -1,12 +1,12 @@
 <template>
-  <div class="place-holder">
+  <div class="places-container">
       <div class="add-place-button">
         <router-link :to="{ name: 'createPlace' }">
           Add Place
         </router-link>
       </div>
 
-      <div class="places">
+      <div class="place-components-container">
         <PlaceComponent v-for="place in allPlaces"
                         v-bind:place="place"/>
       </div>
@@ -32,7 +32,7 @@ export default {
     const allPlacesUrl = 'http://localhost:8000/api/places/';
     const apiConfig = {
       headers: {
-        Authorization: this.$cookies.get('token'),
+        Authorization: this.$store.getters.getToken,
       },
     };
 
@@ -69,7 +69,7 @@ export default {
 </script>
 
 <style scoped>
-.places-holder {
+.places-container {
   margin: 0 auto;
   padding: 0 auto;
   width: 60%;
