@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
+import CreatePlace from './views/CreatePlace.vue';
 import Profile from './views/Profile.vue';
 import store from './store';
 
@@ -35,6 +36,12 @@ const router = new Router({
       path: '/profile',
       name: 'profile',
       component: Profile,
+      beforeEnter: ifAuthenticated,
+    },
+    {
+      path: '/places/create',
+      name: 'createPlace',
+      component: CreatePlace,
       beforeEnter: ifAuthenticated,
     },
   ],
