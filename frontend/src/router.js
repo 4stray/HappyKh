@@ -42,7 +42,7 @@ const router = new Router({
       path: '/profile/settings',
       name: 'settings',
       component: ProfileSettings,
-    }
+    },
   ],
 });
 

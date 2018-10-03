@@ -17,35 +17,35 @@
 </template>
 
 <script>
-  import Header from '@/components/Header.vue';
-  import LoginComponent from '../components/LoginComponent.vue';
-  import RegistrationComponent from '../components/RegistrationComponent.vue';
+import Header from '@/components/Header.vue';
+import LoginComponent from '../components/LoginComponent.vue';
+import RegistrationComponent from '../components/RegistrationComponent.vue';
 
-  const tabs = {
-    signIn: {
-      component:
+const tabs = {
+  signIn: {
+    component:
       LoginComponent,
-    },
-    signUp: {
-      component:
+  },
+  signUp: {
+    component:
       RegistrationComponent,
-    },
-  };
+  },
+};
 
-  export default {
-    name: 'Login',
-    data() {
-      return {
-        tabs,
-        currentTab: tabs.signIn,
-      };
-    },
-    components: {
-      Header,
-      LoginComponent,
-      RegistrationComponent,
-    },
-  };
+export default {
+  name: 'Login',
+  data() {
+    return {
+      tabs,
+      currentTab: tabs.signIn,
+    };
+  },
+  components: {
+    Header,
+    LoginComponent,
+    RegistrationComponent,
+  },
+};
 </script>
 
 <style lang="scss">
