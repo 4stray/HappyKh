@@ -1,12 +1,12 @@
 <template>
-  <div class="places-body">
+  <div class="place-holder">
       <div class="add-place-button">
         <router-link :to="{ name: 'createPlace' }">
           Add Place
         </router-link>
       </div>
 
-      <div>
+      <div class="places">
         <PlaceComponent v-for="place in allPlaces"
                         v-bind:place="place"/>
       </div>
@@ -15,7 +15,6 @@
 
 <script>
 import axios from 'axios';
-import Authentication from './Authentication/auth';
 import PlaceComponent from './PlaceComponent.vue';
 
 
@@ -33,7 +32,7 @@ export default {
     const allPlacesUrl = 'http://localhost:8000/api/places/';
     const apiConfig = {
       headers: {
-        Authorization: Authentication.getAuthenticationHeader(this),
+        Authorization: this.$cookies.get('token'),
       },
     };
 
@@ -70,7 +69,7 @@ export default {
 </script>
 
 <style scoped>
-.places-body {
+.places-holder {
   margin: 0 auto;
   padding: 0 auto;
   width: 60%;

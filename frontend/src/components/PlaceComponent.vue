@@ -4,7 +4,7 @@
       <img v-bind:src=place.logo alt="Uploading picture has failed">
     </div>
 
-    <div>
+    <div class="place-name">
       <p>Name: {{ place.name }}</p>
     </div>
   </div>
@@ -13,9 +13,17 @@
 <script>
 export default {
   name: 'PlaceComponent',
-  props: [
-    'place',
-  ],
+  props: {
+    place: {
+      type: Object,
+      default: function () {
+        return {
+          name: '',
+          logo: '',
+        }
+      },
+    },
+  },
 };
 </script>
 
