@@ -5,7 +5,6 @@ from places.models import Place
 from users.models import User
 
 
-
 @pytest.mark.django_db
 class PlaceTestCase(BaseTestCase):
     """Tests for place model"""
@@ -27,7 +26,6 @@ class PlaceTestCase(BaseTestCase):
     def test_deletion_user(self):
         """Testing Place model behavior after deleting a user"""
         user_on_delete = self.regular_user
-        place = self.place
 
         User.objects.get(email="any@mail.com").delete()
         with self.assertRaises(Place.DoesNotExist) as dne:
