@@ -21,7 +21,7 @@ class PlaceTestCase(BaseTestCase):
         self.assertIsInstance(place, Place)
         self.assertEqual('', place.name)
         self.assertEqual('', place.description)
-        self.assertEqual('', place.image)
+        self.assertEqual('', place.logo)
 
     def test_deletion_user(self):
         """Testing Place model behavior after deleting a user"""
