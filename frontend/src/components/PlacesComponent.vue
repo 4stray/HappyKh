@@ -32,38 +32,15 @@ export default {
     const allPlacesUrl = 'http://localhost:8000/api/places/';
     const apiConfig = {
       headers: {
-        Authorization: this.$store.getters.getToken,
+        Authorization: `Token ${this.$store.getters.getToken}`,
       },
     };
 
-    this.allPlaces = [
-      {
-        name: 'First',
-      },
-      {
-        name: 'Second',
-      },
-      {
-        name: 'Third',
-      },
-      {
-        name: 'Third',
-      },
-      {
-        name: 'Third',
-      },
-      {
-        name: 'Third',
-      },
-      {
-        name: 'Third',
-      },
-    ];
-    // axios.get(allPlacesUrl, {}, apiConfig).then((response) => {
-    //   this.allPlaces = response.data.all_places
-    // }).error((error) => {
-    //   console.log(error);
-    // });
+    axios.get(allPlacesUrl, apiConfig).then((response) => {
+      this.allPlaces = response.data
+    }).error((error) => {
+      console.log(error);
+    });
   },
 };
 </script>
