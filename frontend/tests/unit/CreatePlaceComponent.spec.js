@@ -46,7 +46,7 @@ describe('mounted createPlaceComponent', () => {
   });
 
   it('has placeDescription textarea', () => {
-    expect(wrapper.find('#placeDescription'));
+    expect(wrapper.contains('textarea')).to.be.equal(true);
   });
 
   it('contains logo from data()', () => {
