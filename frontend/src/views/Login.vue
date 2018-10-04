@@ -76,7 +76,7 @@ export default {
     box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     -webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     -moz-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
-    height: 350px;
+      height: 350px;
     width: 70%;
     margin: 20px auto;
     padding: 30px 40px;
@@ -93,15 +93,18 @@ export default {
     display: block;
     list-style: none;
     margin: 10px;
-    padding: 10px;
-    width: 100%;
+    width: 98%;
     font-size: 12px;
     font-weight: 300;
     text-align: center;
     text-decoration: none;
     border: none;
     background-color: transparent;
-    color: #999;
+    color: $primaryColor;
+  }
+
+  #sendEmail:hover {
+    border-bottom: 1px solid $primaryColor;
   }
 
   .tabs {
