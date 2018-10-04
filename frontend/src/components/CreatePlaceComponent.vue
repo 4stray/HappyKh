@@ -30,6 +30,7 @@ export default {
         name: this.placeName,
         description: this.placeDescription,
         logo: this.placeLogo,
+        user: this.$cookies.get('user_id'),
       };
       axios.post(
         `${BaseURL}/places/`, placeInfo,
