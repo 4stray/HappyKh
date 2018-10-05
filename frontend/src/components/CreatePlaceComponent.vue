@@ -83,6 +83,7 @@ export default {
     border-radius: 5px;
   }
   #createPlaceComponent textarea{
+    resize: none;
     height: 6em;
   }
   #createPlaceComponent textarea::-webkit-scrollbar {
