@@ -1,4 +1,7 @@
 """Test users api views"""
+import os
+
+from django.conf import settings
 # pylint: disable = no-member
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -18,7 +21,8 @@ CORRECT_DATA = {
     'gender': 'M',
     'first_name': 'firstName',
     'last_name': 'lastName',
-    'is_active': True
+    'is_active': True,
+    'profile_image': '',
 }
 
 
@@ -34,6 +38,16 @@ class TestUserProfile(BaseTestCase, APITestCase):
             'old_password': CORRECT_DATA['password'],
             'new_password': 'password2',
         }
+
+    def tearDown(self):
+        """ teardown any state that was previously setup with a call of
+        setup.
+        """
+        instance = self.test_user
+        if instance.profile_image:
+            # delete image that was created in test
+            os.remove(
+                os.path.join(settings.MEDIA_ROOT, str(instance.profile_image)))
 
     def test_get(self):
         """test if user exists"""
@@ -53,7 +67,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
         response = new_client.get(USERS_PROFILE_URL % new_test_user.pk)
         self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
 
-    def test_patch_update_data(self):
+    def test_patch_update_age(self):
         """test update user's age"""
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = 41
@@ -68,6 +82,22 @@ class TestUserProfile(BaseTestCase, APITestCase):
         serializer = UserSerializer(self.test_user)
         self.assertNotEqual(serializer.data, response.data)
         self.assertIn(edited_user, User.objects.all())
+
+    def test_patch_update_profile_image(self):
+        """test update user's profile image"""
+        base64_image = 'data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAA' + \
+                       'AEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9aw' + \
+                       'AAAABJRU5ErkJggg=='
+        request_data = {'profile_image': base64_image}
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     request_data)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        self.assertEqual(base64_image, response.data['profile_image'])
+        self.test_user.refresh_from_db()
+        self.assertNotEqual('', self.test_user.profile_image)
+        self.assertTrue(os.path.exists(self.test_user.profile_image.path))
+        self.assertTrue(os.path.isfile(self.test_user.profile_image.path))
 
     def test_patch_invalid_update(self):
         """test update user's age with invalid value"""
@@ -112,3 +142,27 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertFalse(
             self.test_user.check_password(invalid_password['new_password'])
         )
+
+    def test_patch_invalid_profile_image(self):
+        """test update user's password with invalid new password"""
+        incorrect_data = {}
+        for key in CORRECT_DATA:
+            incorrect_data[key] = CORRECT_DATA[key]
+
+        incorrect_data['profile_image'] = 'not_base64'
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     incorrect_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertNotEqual(
+            self.test_user.profile_image, incorrect_data['profile_image']
+        )
+        self.assertEqual('', self.test_user.profile_image)
+
+        incorrect_data['profile_image'] = 'some_file.py'
+        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+                                     incorrect_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertNotEqual(
+            self.test_user.profile_image, incorrect_data['profile_image']
+        )
+        self.assertEqual('', self.test_user.profile_image)
