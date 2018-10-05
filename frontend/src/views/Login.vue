@@ -56,7 +56,7 @@ export default {
     -webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     -moz-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     height: 350px;
-    width: 70%;
+    width: 400px;
     margin: 20px auto;
     padding: 30px 40px;
   }
