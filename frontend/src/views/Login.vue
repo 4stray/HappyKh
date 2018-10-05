@@ -24,7 +24,7 @@
         v-if="currentTab===tabs.signUp"
         v-bind:class="[{ active: currentTab === tabs.sendEmail }]"
         v-on:click="currentTab = tabs.sendEmail" id="sendEmail">
-        Resend Confirmation Email
+        <span>Resend Confirmation Email</span>
       </button>
     </div>
   </div>
@@ -101,11 +101,12 @@ export default {
     border: none;
     background-color: transparent;
     color: $primaryColor;
+    cursor: pointer;
   }
 
-  #sendEmail:hover {
-    border-bottom: 1px solid $primaryColor;
-  }
+   #sendEmail span:hover{
+     border-bottom: 1px solid $primaryColor;
+   }
 
   .tabs {
     display: flex;
