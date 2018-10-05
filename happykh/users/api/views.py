@@ -128,7 +128,6 @@ class UserRegistration(APIView):
                 return Response(status=status.HTTP_201_CREATED)
             else:
                 LOGGER.error('Confirmation email has not been delivered')
-                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
                                ' due to connection reasons'
