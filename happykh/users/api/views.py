@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 #pylint: disable = no-name-in-module, import-error
 from happykh.settings import EMAIL_HOST_USER
 from .serializers import LoginSerializer
+from .serializers import EmailSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
 from .tokens import account_activation_token
@@ -247,6 +248,7 @@ class UserProfile(APIView):
     """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
     # pylint: disable = redefined-builtin
     def get(self, request, id):
         """
@@ -319,6 +321,41 @@ class UserProfile(APIView):
                 serializer.save(id=id, **serializer.validated_data)
                 LOGGER.info('User data updated')
                 return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserEmail(APIView):
+
+    def patch(self, request, id):
+        """
+        Changes user email
+        :param request: HTTP Request
+        :param id: Integer
+        :return: Response(data)
+        """
+        try:
+            user = User.objects.get(pk=id)
+        except User.DoesNotExist:
+            return Response({'message': 'Such user does not exist'},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = User.objects.get(email=request.data.get('email'))
+
+            return Response({'message': 'User with such email already exists'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+            serializer = EmailSerializer(user, request.data)
+
+            if serializer.is_valid():
+                serializer.update(user, serializer.validated_data)
+                # Send confirmation email
+                UserActivation.send_email_confirmation(user)
+                return Response({'message': 'Your email has been updated'},
+                                status=status.HTTP_200_OK)
 
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)

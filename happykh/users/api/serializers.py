@@ -108,3 +108,38 @@ class PasswordSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class EmailSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', )
+
+    def validate(self, attrs):
+        user_email = attrs.get('email')
+
+        try:
+            validate_email(user_email)
+        except ValidationError:
+            email_validation_error = exceptions.ValidationError
+
+            email_validation_error.default_detail = \
+                'Invalid user email format.'
+            LOGGER.error(
+                f'Serializer:Validation error '
+                f'{email_validation_error.default_detail}'
+                f'invalid email format, Email: {user_email}'
+            )
+            raise email_validation_error
+        return attrs
+
+    def update(self, instance, validated_data):
+        new_email = validated_data.get('email')
+
+        if new_email:
+            instance.is_active = False
+            instance.email = new_email
+            instance.save()
+
+        return instance

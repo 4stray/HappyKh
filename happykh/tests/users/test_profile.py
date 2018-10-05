@@ -112,3 +112,9 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertFalse(
             self.test_user.check_password(invalid_password['new_password'])
         )
+
+    def test_patch_update_email(self):
+        pass
+
+    def test_patch_invalid_email(self):
+        pass
