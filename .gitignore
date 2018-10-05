@@ -113,3 +113,4 @@ dmypy.json
 
 # custome ignore
 .idea
+media/

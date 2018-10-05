@@ -1,4 +1,6 @@
 """ Custom models for user """
+import uuid
+
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
@@ -64,13 +66,28 @@ class User(AbstractBaseUser, PermissionsMixin):
         (woman, 'woman'),
         (man, 'man')
     )
+
+    def make_upload_profile_image(self, filename):
+        if filename:
+            ext = filename.split('.')[-1]
+            filename = "%s.%s" % (uuid.uuid4(), ext)
+            return u'user/profile_image/%s/%s/%s' % (
+                filename[:1], filename[2:3],
+                filename)
+        return None
+
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     age = models.PositiveSmallIntegerField(blank=True, null=True, )
     gender = models.CharField(choices=GENDER_CHOICES, max_length=2,
                               default=woman)
-    profile_image = models.TextField(null=True, blank=True)
+    profile_image = models.ImageField(
+        upload_to=make_upload_profile_image,
+        blank=True,
+        null=True,
+        default='',
+    )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 

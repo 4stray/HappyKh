@@ -1,9 +1,15 @@
 """Custom serializers for users app"""
 # pylint: disable = logging-fstring-interpolation
+import base64
 import logging
+import os
+import six
+import uuid
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import validate_email
 from rest_framework import exceptions
 from rest_framework import serializers
@@ -13,13 +19,74 @@ from ..models import User
 LOGGER = logging.getLogger('happy_logger')
 
 
+class Base64ImageField(serializers.ImageField):
+
+    def to_internal_value(self, data):
+
+        # Check if this is a base64 string
+        if isinstance(data, six.string_types):
+            # Check if the base64 string is in the "data:" format
+            if 'data:' in data and ';base64,' in data:
+                # Break out the header from the base64 content
+                header, data = data.split(';base64,')
+
+                # Try to decode the file. Return validation error if it fails.
+                try:
+                    decoded_file = base64.b64decode(data)
+                except TypeError:
+                    self.fail('invalid_image')
+
+                # Get the file name extension:
+                file_extension = header.split('/')[-1]
+
+                # Generate file name:
+                file_name = uuid.uuid4()
+
+                complete_file_name = "%s.%s" % (file_name, file_extension,)
+
+                data = ContentFile(decoded_file, name=complete_file_name)
+
+        return super(Base64ImageField, self).to_internal_value(data)
+
+    def to_representation(self, obj):
+        if obj:
+            image_file = obj.path
+            if not os.path.isfile(image_file):
+                return None
+
+            encoded_string = ''
+            with open(image_file, 'rb') as img_f:
+                encoded_string = base64.b64encode(img_f.read())
+                encoded_string = encoded_string.decode()
+            extension = obj.path.split('.')[-1]
+            return f'data:image/{extension};base64,{encoded_string}'
+        return ''
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
+
+    profile_image = Base64ImageField(
+        max_length=None, use_url=True,
+    )
 
     class Meta:
         # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = '__all__'
+
+    def update(self, instance, validated_data):
+
+        if instance.profile_image:
+            # delete old image
+            os.remove(
+                os.path.join(settings.MEDIA_ROOT, str(instance.profile_image)))
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
 
 
 # pylint: disable = abstract-method
