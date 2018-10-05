@@ -249,6 +249,7 @@ class UserProfile(APIView):
     permission_classes = (IsAuthenticated,)
 
     # pylint: disable = redefined-builtin
+
     def get(self, request, id):
         """
         Return user's data.
