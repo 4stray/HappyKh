@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.com/Formeme/HappyKh.svg?branch=master)](https://travis-ci.com/Formeme/HappyKh)
 # HappyKh Project Setup
 ### Preinstalled Software Requirements
 ###### - [**NPM** (Node Package Manager)](https://www.digitalocean.com/community/tutorials/node-js-ubuntu-16-04-ru)

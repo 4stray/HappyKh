@@ -27,13 +27,11 @@
 
 <script>
 import axios from 'axios';
-import Authentication from './Authentication/auth';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
 export default {
   name: 'PasswordComponent',
-  components: {},
   data() {
     return {
       valid: true,
