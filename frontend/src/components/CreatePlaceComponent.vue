@@ -27,6 +27,7 @@ export default {
   methods: {
     save() {
       const placeInfo = {
+        user: this.$cookies.get('user_id'),
         name: this.placeName,
         description: this.placeDescription,
         logo: this.placeLogo,
