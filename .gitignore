@@ -114,3 +114,4 @@ dmypy.json
 # custome ignore
 .idea
 media/
+package-lock.json
