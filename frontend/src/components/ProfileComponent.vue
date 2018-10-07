@@ -12,7 +12,7 @@
       <option>Man</option>
       <option>Woman</option>
     </select>
-    <img v-if="userImage" v-bind:src=userImage id="image"/>
+    <img v-if="userImage" v-bind:src=userImage id="image" alt="Something happened with image" />
     <img v-else src='../assets/blank-profile-picture.png' id="blank" alt="No profile image"/>
     <input type="file" id="imageInput" :disabled="isDisabled"
            v-on:change="changeImage()"

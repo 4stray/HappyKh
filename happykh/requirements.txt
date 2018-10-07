@@ -2,7 +2,7 @@ astroid==2.0.4
 atomicwrites==1.2.0
 attrs==18.1.0
 coverage==4.5.1
-Django==2.1
+Django==2.1.2
 django-cors-headers==2.4.0
 django-sendgrid-v5==0.6.893
 djangorestframework==3.8.2

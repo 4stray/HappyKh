@@ -1,10 +1,24 @@
 """ Custom models for user """
-import uuid
 
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from utils import make_upload_image
+
+
+def make_upload_profile_image(instance, filename):
+    """
+    Function which creates path for user's image.
+    Should be used as base-function for function in parameter upload_to of
+    ImageField.
+
+    :param instance: instance of User
+    :param filename: name of the user's file, ex. 'image.png'
+    :return: path to image or None if filename is empty
+    """
+
+    return make_upload_image(filename, 'user/profile_image')
 
 
 class UserManager(BaseUserManager):
@@ -67,15 +81,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         (woman, 'woman'),
         (man, 'man')
     )
-
-    def make_upload_profile_image(self, filename):
-        if filename:
-            ext = filename.split('.')[-1]
-            filename = "%s.%s" % (uuid.uuid4(), ext)
-            return u'user/profile_image/%s/%s/%s' % (
-                filename[:1], filename[2:3],
-                filename)
-        return None
 
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=30, blank=True)

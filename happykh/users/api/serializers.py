@@ -3,8 +3,8 @@
 import base64
 import logging
 import os
-import six
 import uuid
+import six
 
 from django.conf import settings
 from django.contrib.auth import authenticate
@@ -20,6 +20,10 @@ LOGGER = logging.getLogger('happy_logger')
 
 
 class Base64ImageField(serializers.ImageField):
+    """
+    Class which converts a base64 string to a file when input and converts image
+    by path to it into base64 string
+    """
 
     def to_internal_value(self, data):
 
@@ -48,9 +52,9 @@ class Base64ImageField(serializers.ImageField):
 
         return super(Base64ImageField, self).to_internal_value(data)
 
-    def to_representation(self, obj):
-        if obj:
-            image_file = obj.path
+    def to_representation(self, value):
+        if value:
+            image_file = value.path
             if not os.path.isfile(image_file):
                 return None
 
@@ -58,7 +62,7 @@ class Base64ImageField(serializers.ImageField):
             with open(image_file, 'rb') as img_f:
                 encoded_string = base64.b64encode(img_f.read())
                 encoded_string = encoded_string.decode()
-            extension = obj.path.split('.')[-1]
+            extension = value.path.split('.')[-1]
             return f'data:image/{extension};base64,{encoded_string}'
         return ''
 
