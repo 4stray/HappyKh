@@ -59,7 +59,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
   #createPlaceComponent {
     width: 500px;
     font-family: 'Liberation Sans', sans, sans-serif;
