@@ -1,6 +1,6 @@
 """Views for app users"""
 # pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
-# pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
+# pylint: disable = unused-argument, logging-fstring-interpolation
 import logging
 from smtplib import SMTPException
 
@@ -15,7 +15,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-#pylint: disable = no-name-in-module, import-error
+# pylint: disable = no-name-in-module, import-error
 from happykh.settings import EMAIL_HOST_USER
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
@@ -53,7 +53,7 @@ class UserLogin(APIView):
 
         user = serializer.validated_data['user']
         if user.is_active:
-            #pylint: disable = unused-variable
+            # pylint: disable = unused-variable
             user_token, created = Token.objects.get_or_create(user=user)
             LOGGER.info('User has been logged in')
             return Response({
@@ -247,6 +247,7 @@ class UserProfile(APIView):
     """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
     # pylint: disable = redefined-builtin
 
     def get(self, request, id):

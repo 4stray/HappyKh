@@ -26,7 +26,8 @@
 import Header from '@/components/Header.vue';
 import LoginComponent from '../components/LoginComponent.vue';
 import RegistrationComponent from '../components/RegistrationComponent.vue';
-import ConfirmationEmailComponent from '../components/ConfirmationEmailComponent.vue';
+import ConfirmationEmailComponent
+  from '../components/ConfirmationEmailComponent.vue';
 
 
 const tabs = {
@@ -40,7 +41,7 @@ const tabs = {
   },
   sendEmail: {
     component:
-      ConfirmationEmailComponent,
+    ConfirmationEmailComponent,
   },
 };
 
@@ -68,24 +69,25 @@ export default {
     box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     -webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     -moz-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
-    height: 350px;
+    height: 400px;
     width: 70%;
     margin: 20px auto;
     padding: 30px 40px;
+    -webkit-background-clip: no-clip;
+    -moz-background-clip: no-clip;
+    background-color: #ffffff;
   }
 
   /* Small devices (portrait tablets and large phones, 600px and up) */
   @media only screen and (min-width: 600px) {
     #panel {
-      width: 300px;
+      width: 350px;
     }
   }
 
   #sendEmail {
     display: block;
     list-style: none;
-    margin: 10px;
-    padding: 10px;
     width: 100%;
     font-size: 12px;
     font-weight: 300;

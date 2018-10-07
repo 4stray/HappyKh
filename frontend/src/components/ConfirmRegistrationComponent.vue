@@ -23,9 +23,11 @@ export default {
         emailToken,
       },
     ).then((response) => {
-      console.log(response.status); /* eslint-disable-line no-console */
+      /* eslint-disable-next-line no-console */
+      console.log(response.status);
     }).catch((error) => {
-      console.log(error); /* eslint-disable-line no-console */
+      /* eslint-disable-next-line no-console */
+      console.log(error);
     });
   },
 };

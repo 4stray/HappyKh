@@ -11,9 +11,7 @@ const getters = {
   getAuthenticated: state => !!state.Authenticated,
 };
 
-const actions = {
-
-};
+const actions = {};
 
 const mutations = {
   setAuthenticated(state, isAuthenticated) {

@@ -12,10 +12,11 @@ form {
   input {
     background-color: transparent;
     border: none;
+    border-radius: 0;
     border-bottom: 2px solid $primaryColor;
     font-size: 16px;
     outline: none;
-    margin: 15px 0;
+    margin: 10px 0;
     width: 100%;
     &:focus {
       border-bottom: 2px solid #092d22;

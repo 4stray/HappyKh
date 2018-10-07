@@ -22,7 +22,7 @@ describe('Password mounted fields check', () => {
   const wrapper = shallowMount(PasswordComponent);
 
   it('has 3 input fields', () => {
-    expect(wrapper.findAll('input').length).to.be.equal(3);
+    expect(wrapper.findAll('v-text-field').length).to.be.equal(3);
   });
 
   it('has 3 fields with password type', () => {

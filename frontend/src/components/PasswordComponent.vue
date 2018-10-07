@@ -7,19 +7,21 @@
       <v-text-field type="password"
                     v-model="oldPassword"
                     label="Old password"
-                    :rules="passwordRules"/>
+                    :rules="passwordRules"></v-text-field>
       <v-text-field type="password"
                     v-model="newPassword"
                     label="New password"
-                    :rules="passwordRules"/>
-      <v-text-field type="password"
+                    :rules="passwordRules"></v-text-field>
+      <v-text-field name="confirmationPassword"
+                    type="password"
                     v-model="confirmationPassword"
-                    :rules="[passwordRules, passwordsMatch]"
-                    label="Confirm new password"/>
+                    :rules="passwordRules"
+                    label="Confirm new password"></v-text-field>
       <v-btn type="submit"
              :disabled="!valid"
              color="success"
-      > submit
+             block
+      >submit
       </v-btn>
     </v-form>
   </v-card>
@@ -32,29 +34,39 @@ const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
 export default {
   name: 'PasswordComponent',
+  components: {},
   data() {
     return {
-      valid: true,
+      valid: false,
       oldPassword: '',
       newPassword: '',
       confirmationPassword: '',
       passwordRules: [
         value => !!value || 'This field is required.',
-        value => value.length >= 8 || 'Your password must be at least 8 characters.',
+        value => (value && value.length >= 8) || 'Your password must be at least 8 characters.',
         value => /^[0-9a-zA-Z]+$/.test(value) || 'Your password must contain only numbers and alphabetical characters.',
       ],
     };
   },
   methods: {
-    passwordsMatch(confirmationPassword) {
-      if (confirmationPassword.length < 0) {
+    passwordsMatch() {
+      // if (this.confirmationPassword < this.newPassword) {
+      //   return false;
+      // }
+      if (this.newPassword !== this.confirmationPassword) {
+        this.$awn.warning('Passwords don\'t match');
         return false;
       }
-      return this.newPassword === confirmationPassword || "Passwords don't match";
+      return true;
     },
     saveNewPassword() {
       if (!this.$refs.form.validate()) {
         this.$refs.form.reset();
+        return;
+      } else if (this.newPassword !== this.confirmationPassword) {
+        this.$awn.warning('Passwords don\'t match');
+        this.$refs.form.reset();
+        return;
       }
       const userCredentials = {
         old_password: this.oldPassword,
@@ -63,7 +75,9 @@ export default {
       axios.patch(
         UserAPI + this.$cookies.get('user_id'), userCredentials,
         {
-          headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+          headers: {
+            Authorization: `Token ${this.$cookies.get('token')}`,
+          },
         },
       ).then(() => {
         this.$awn.success('Password successfully changed.');
@@ -72,6 +86,7 @@ export default {
           this.$awn.warning(error.response.data.message);
         }
       });
+
       this.$refs.form.reset();
     },
   },
