@@ -1,6 +1,7 @@
 """Views for app users"""
 # pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
 # pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
+import os
 import logging
 from smtplib import SMTPException
 
@@ -12,6 +13,7 @@ from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -259,8 +261,18 @@ class UserProfile(APIView):
         try:
             user = User.objects.get(pk=id)
             serializer = UserSerializer(user)
+
+            user_data = serializer.data
+            enable_editing_profile = self.is_same_user(request, id)
+            user_data['enable_editing_profile'] = enable_editing_profile
+
+            LOGGER.info(
+                f'Enable Editing User Profile is set '
+                f'to {enable_editing_profile}'
+            )
             LOGGER.info('Return user profile')
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response(user_data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             LOGGER.error(
                 f'Can`t get user profile because of invalid id,'
@@ -276,6 +288,14 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
+        if not self.is_same_user(request, id):
+            LOGGER.error(
+                "User's data were not updated."
+                "user_id must be equal to token user_id"
+            )
+            return Response({'message': 'Editing not allowed'},
+                            status=status.HTTP_403_FORBIDDEN)
+
         user = None
         try:
             user = User.objects.get(pk=id)
@@ -323,3 +343,15 @@ class UserProfile(APIView):
 
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
+    def is_same_user(self, request, user_id):
+        """
+        Returns True if urlpath user_id equals user_id from token
+        :param request: HttpRequest
+        :param user_id: Integer
+        :return: Boolean
+        """
+        user_token = request.META['HTTP_AUTHORIZATION'][6:]
+        token_user_id = Token.objects.get(key=user_token).user.id
+
+        return user_id == token_user_id

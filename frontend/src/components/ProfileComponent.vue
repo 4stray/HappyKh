@@ -87,7 +87,7 @@ export default {
             this.userImage = response.data.profile_image;
             this.$awn.success('Your profile was successfully updated.');
           }).catch((error) => {
-            this.$awn.warning(this.error.message);
+            this.$awn.alert(error.response.data.message)
           });
       } else {
         this.userAge = 0;
