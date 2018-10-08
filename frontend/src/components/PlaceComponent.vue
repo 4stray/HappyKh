@@ -1,7 +1,8 @@
 <template>
   <div class="place-body">
     <div class="place-image">
-      <img v-bind:src=place.logo alt="Uploading picture has failed">
+      <img v-bind:src=place.logo alt="No picture"
+           class="place-image">
     </div>
 
     <div class="place-name">
@@ -30,6 +31,7 @@ export default {
 <style scoped>
 .place-body {
   width: 40%;
+  height: 250px;
   border: 1px solid #CCCCCC;
   background-color: #FFFFFF;
   box-shadow: 3px 3px 2px grey;
@@ -37,6 +39,7 @@ export default {
   display: inline-block;
 }
 .place-image {
-  height: 60px;
+  width: 100%;
+  height: 200px;
 }
 </style>

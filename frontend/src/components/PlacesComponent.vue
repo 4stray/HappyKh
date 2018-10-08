@@ -37,7 +37,7 @@ export default {
     };
 
     // axios.get(allPlacesUrl, apiConfig).then((response) => {
-    //   this.allPlaces = response.data
+    //   this.allPlaces = response.data;
     // }).error((error) => {
     //   console.log(error);
     // });
