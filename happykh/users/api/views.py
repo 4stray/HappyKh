@@ -260,9 +260,9 @@ class UserProfile(APIView):
             user = User.objects.get(pk=id)
             serializer = UserSerializer(user)
 
-            user_data = serializer.data
+            response_data = serializer.data
             enable_editing_profile = UserProfile.is_same_user(request, id)
-            user_data['enable_editing_profile'] = enable_editing_profile
+            response_data['enable_editing_profile'] = enable_editing_profile
 
             LOGGER.info(
                 f'Enable Editing User Profile is set '
@@ -270,7 +270,7 @@ class UserProfile(APIView):
             )
             LOGGER.info('Return user profile')
 
-            return Response(user_data, status=status.HTTP_200_OK)
+            return Response(response_data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             LOGGER.error(
                 f'Can`t get user profile because of invalid id,'
