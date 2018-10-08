@@ -1,8 +1,8 @@
 """Tests for models of places app"""
 import pytest
-from tests.utils import BaseTestCase
 from places.models import Place
 from users.models import User
+from ..utils import BaseTestCase
 
 
 @pytest.mark.django_db
