@@ -19,5 +19,4 @@ describe('PlaceComponent', () => {
   it('has attribute for place image', () => {
     expect(wrapper.contains('[class="place-image"]')).to.be.equal(true);
   });
-
 });

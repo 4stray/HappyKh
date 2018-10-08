@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import PlacesComponent from './PlacesComponent';
 import { mapGetters } from 'vuex';
+import PlacesComponent from './PlacesComponent.vue';
 
 
 export default {

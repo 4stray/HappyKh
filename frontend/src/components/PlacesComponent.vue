@@ -8,7 +8,8 @@
 
       <div class="place-components-container">
         <PlaceComponent v-for="place in allPlaces"
-                        v-bind:place="place"/>
+                        v-bind:place="place"
+                        :key="place.id"/>
       </div>
   </div>
 </template>

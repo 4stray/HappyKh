@@ -17,11 +17,11 @@ export default {
   props: {
     place: {
       type: Object,
-      default: function () {
+      default() {
         return {
           name: '',
           logo: '',
-        }
+        };
       },
     },
   },

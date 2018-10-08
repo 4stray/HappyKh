@@ -5,9 +5,9 @@ import PlacesComponent from '@/components/PlacesComponent.vue';
 const expect = require('chai').expect;
 const should = require('chai').should();
 
-config.mocks['$store'] = {
+config.mocks.$store = {
   state: {
-    Authenticated: 'test token value'
+    Authenticated: 'test token value',
   },
   getters: {
     getToken: state => state.Authenticated,
