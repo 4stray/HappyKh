@@ -1,7 +1,6 @@
 """Test users api views"""
 import os
 
-from django.conf import settings
 # pylint: disable = no-member
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -10,6 +9,7 @@ from rest_framework.test import APITestCase
 from users.api.serializers import UserSerializer
 from users.models import User
 
+from utils import delete_std_images_from_media
 from ..utils import BaseTestCase
 
 USERS_PROFILE_URL = '/api/users/%d'
@@ -40,14 +40,15 @@ class TestUserProfile(BaseTestCase, APITestCase):
         }
 
     def tearDown(self):
-        """ teardown any state that was previously setup with a call of
+        """ teardown any state that were previously setup with a call of
         setup.
         """
         instance = self.test_user
         if instance.profile_image:
-            # delete image that was created in test
-            os.remove(
-                os.path.join(settings.MEDIA_ROOT, str(instance.profile_image)))
+            # delete images that were created in test
+            delete_std_images_from_media(instance.profile_image,
+                                         User.VARIATIONS_PROFILE_IMAGE
+                                         )
 
     def test_get(self):
         """test if user exists"""
@@ -86,8 +87,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
     def test_patch_update_profile_image(self):
         """test update user's profile image"""
         base64_image = 'data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAA' + \
-                       'AEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9aw' + \
-                       'AAAABJRU5ErkJggg=='
+                       'AEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9' + \
+                       'awAAAABJRU5ErkJggg=='
         request_data = {'profile_image': base64_image}
         response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
                                      request_data)

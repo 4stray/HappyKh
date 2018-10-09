@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from stdimage import models as std_models
 from utils import make_upload_image
 
 
@@ -82,17 +83,24 @@ class User(AbstractBaseUser, PermissionsMixin):
         (man, 'man')
     )
 
+    VARIATIONS_PROFILE_IMAGE = {
+        'large': (600, 400),
+        'thumbnail': (100, 100, True),
+        'medium': (300, 200),
+    }
+
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     age = models.PositiveSmallIntegerField(blank=True, null=True, )
     gender = models.CharField(choices=GENDER_CHOICES, max_length=2,
                               default=woman)
-    profile_image = models.ImageField(
+    profile_image = std_models.StdImageField(
         upload_to=make_upload_profile_image,
         blank=True,
         null=True,
         default='',
+        variations=VARIATIONS_PROFILE_IMAGE,
     )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)

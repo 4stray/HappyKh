@@ -2,6 +2,7 @@
 
 from django.db import models
 from users.models import User
+from stdimage import models as std_models
 from utils import make_upload_image
 
 
@@ -24,14 +25,21 @@ class Place(models.Model):
     Place model for creation new places
     """
 
+    VARIATIONS_LOGO = {
+        'large': (600, 400),
+        'thumbnail': (100, 100, True),
+        'medium': (300, 200),
+    }
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    logo = models.ImageField(
+    logo = std_models.StdImageField(
         upload_to=make_upload_logo,
         blank=True,
         null=True,
         default='',
+        variations=VARIATIONS_LOGO,
     )
 
     def __str__(self):
