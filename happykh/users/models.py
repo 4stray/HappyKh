@@ -8,20 +8,6 @@ from stdimage import models as std_models
 from utils import make_upload_image
 
 
-def make_upload_profile_image(instance, filename):
-    """
-    Function which creates path for user's image.
-    Should be used as base-function for function in parameter upload_to of
-    ImageField.
-
-    :param instance: instance of User
-    :param filename: name of the user's file, ex. 'image.png'
-    :return: path to image or None if filename is empty
-    """
-
-    return make_upload_image(filename, 'user/profile_image')
-
-
 class UserManager(BaseUserManager):
     """"
     Customized manager for customized user model
@@ -89,6 +75,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         'medium': (300, 200),
     }
 
+    def _make_upload_profile_image(self, filename):
+        """
+        Function which creates path for user's image.
+        Should be used as base-function for function in parameter upload_to of
+        ImageField.
+
+        :param self: instance of User
+        :param filename: name of the user's file, ex. 'image.png'
+        :return: path to image or None if filename is empty
+        """
+
+        return make_upload_image(filename, 'user/profile_image')
+
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
@@ -96,7 +95,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     gender = models.CharField(choices=GENDER_CHOICES, max_length=2,
                               default=woman)
     profile_image = std_models.StdImageField(
-        upload_to=make_upload_profile_image,
+        upload_to=_make_upload_profile_image,
         blank=True,
         null=True,
         default='',

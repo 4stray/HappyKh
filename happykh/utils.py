@@ -1,3 +1,5 @@
+"""Functions and classes which are used in different apps"""
+
 import base64
 import os
 import uuid
@@ -23,7 +25,7 @@ def make_upload_image(filename, path):
     return None
 
 
-def delete_std_images_from_media(std_image_file, variations={}):
+def delete_std_images_from_media(std_image_file, variations):
     """
     Delete images which were created by StdImageField.
 
