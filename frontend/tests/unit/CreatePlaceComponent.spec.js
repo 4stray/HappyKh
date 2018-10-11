@@ -22,9 +22,6 @@ describe('createPlaceComponent data()', () => {
     expect(createPlaceComponent.data()).to.have.property('placeLogo');
   });
 
-  // it('has default user', () => {
-  //  expect(createPlaceComponent.data()).to.have.property('user');
-  // });
 });
 
 describe('mounted createPlaceComponent', () => {
