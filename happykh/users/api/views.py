@@ -327,7 +327,11 @@ class UserProfile(APIView):
 
 
 class UserEmail(APIView):
+    """
+    Gets new email for user, changes it if value is valid
+    """
 
+    # pylint: disable = redefined-builtin
     def patch(self, request, id):
         """
         Changes user email
