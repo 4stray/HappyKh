@@ -344,6 +344,9 @@ class UserEmail(APIView):
         try:
             user = User.objects.get(email=request.data.get('email'))
 
+            LOGGER.warning(f'User with id: {id} tried to change '
+                           f'his email to existing')
+
             return Response({'message': 'User with such email already exists'},
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -353,6 +356,7 @@ class UserEmail(APIView):
             if serializer.is_valid():
                 serializer.update(user, serializer.validated_data)
                 # Send confirmation email
+                LOGGER.info(f'User with id: {id} changed his email')
                 UserActivation.send_email_confirmation(user)
                 return Response({'message': 'Your email has been updated'},
                                 status=status.HTTP_200_OK)

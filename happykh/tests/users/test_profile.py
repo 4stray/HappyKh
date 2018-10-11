@@ -4,12 +4,13 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
-from users.api.serializers import UserSerializer
+from users.api.serializers import UserSerializer, EmailSerializer
 from users.models import User
 
 from ..utils import BaseTestCase
 
 USERS_PROFILE_URL = '/api/users/%d'
+USERS_PROFILE_EMAIL_URL = '/api/users/%d/email/'
 
 CORRECT_DATA = {
     'email': 'test@mail.com',
@@ -114,7 +115,31 @@ class TestUserProfile(BaseTestCase, APITestCase):
         )
 
     def test_patch_update_email(self):
-        pass
+        """test update user's email"""
+        edited_email = 'valid@mail.com'
+        response = self.client.patch(USERS_PROFILE_EMAIL_URL % self.test_user.pk,
+                                     {'email': edited_email})
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        updated_user = User.objects.get(pk=self.test_user.pk)
+        self.assertFalse(updated_user.is_active)
 
     def test_patch_invalid_email(self):
-        pass
+        """test update user's email with invalid email format"""
+        invalid_email = 'invalid_email_format'
+        serializer = EmailSerializer(self.test_user, invalid_email)
+        response = self.client.patch(USERS_PROFILE_EMAIL_URL % self.test_user.pk,
+                                     {'email': invalid_email})
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_patch_existing_email(self):
+        """test update user's email with email of existing user"""
+        testing_email = "second@test.com"
+        User.objects.create_user(email=testing_email, password="password2")
+        response = self.client.patch(USERS_PROFILE_EMAIL_URL % self.test_user.pk,
+                                     {'email': testing_email})
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
