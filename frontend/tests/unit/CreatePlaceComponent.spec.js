@@ -4,7 +4,6 @@ import createPlaceComponent from '../../src/components/CreatePlaceComponent.vue'
 
 
 const expect = require('chai').expect;
-const should = require('chai').should();
 
 Cookies.set('token', 'value_');
 Cookies.set('user_id', 'value_');
@@ -49,18 +48,8 @@ describe('mounted createPlaceComponent', () => {
   it('contains logo from data()', () => {
     expect(wrapper.find('#logo').attributes('src')).to.be.equal(createPlaceComponent.data().placeLogo);
   });
-});
 
-describe('createPlaceComponent interactions', () => {
-  const wrapper = shallowMount(createPlaceComponent, {
-    mocks: {
-      $cookies: Cookies,
-    },
-  });
-  const btn = wrapper.find('.btn-save');
-  btn.trigger('click');
-
-  it('has interaction to change buttons text', () => {
-    expect(btn.text()).to.be.equal('Create Place');
+  it('check save button text', () => {
+    expect(wrapper.find('.btn-save').text()).to.be.equal('Create Place');
   });
 });
