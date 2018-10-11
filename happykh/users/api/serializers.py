@@ -19,7 +19,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         # pylint: disable=too-few-public-methods, missing-docstring
         model = User
-        fields = ('id', 'first_name', 'last_name', 'age', 'gender', 'profile_image', 'is_active', 'is_staff')
+        exclude = ('email', 'password')
 
 
 # pylint: disable = abstract-method
