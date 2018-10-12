@@ -13,7 +13,6 @@
 
 <script>
 import axios from 'axios';
-import Authentication from './Authentication/auth';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
@@ -52,9 +51,9 @@ export default {
           new_password: this.newPassword,
         };
         axios.patch(
-          UserAPI + this.$cookies.get('user_id'), userCredentials,
+          UserAPI + this.$cookies.get('user_id') + "/password/", userCredentials,
           {
-            headers: { Authorization: Authentication.getAuthenticationHeader(this) },
+            headers: { Authorization: `Token ${this.$cookies.get('token')}` },
           },
         )
           .then((response) => {

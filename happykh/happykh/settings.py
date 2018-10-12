@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'customlogger.apps.CustomloggerConfig',
     'users.apps.UsersConfig',
+    'places.apps.PlacesConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -100,8 +101,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'happykh',
-        'USER': 'admin',
-        'PASSWORD': 'admin123',
+        'USER': 'localadmin',
+        'PASSWORD': 'localpassword',
         'HOST': 'localhost',
         'PORT': '',
     }
