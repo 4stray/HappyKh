@@ -27,10 +27,10 @@ export default {
   methods: {
     save() {
       const placeInfo = {
+        user: this.$cookies.get('user_id'),
         name: this.placeName,
         description: this.placeDescription,
         logo: this.placeLogo,
-        user: this.$cookies.get('user_id'),
       };
       axios.post(
         `${BaseURL}/places/`, placeInfo,
@@ -59,9 +59,10 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
   #createPlaceComponent {
     width: 500px;
+    font-family: 'Liberation Sans', sans, sans-serif;
     border: 1px solid #CCCCCC;
     background-color: #FFFFFF;
     margin: auto;
@@ -71,7 +72,8 @@ export default {
     align-items: center;
   }
 
-  input, textarea {
+  #createPlaceComponent input, textarea {
+    font-family: 'Liberation Sans', sans, sans-serif;
     padding: 10px 15px;
     margin-bottom: 10px;
     width: 300px;
@@ -80,27 +82,30 @@ export default {
     -moz-border-radius: 5px;
     border-radius: 5px;
   }
-  textarea{
+  #createPlaceComponent textarea{
+    resize: none;
     height: 6em;
   }
-  textarea::-webkit-scrollbar {
+  #createPlaceComponent textarea::-webkit-scrollbar {
     width: 1em;
   }
 
-  textarea::-webkit-scrollbar-track {
+  #createPlaceComponent textarea::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   }
 
-  textarea::-webkit-scrollbar-thumb {
+  #createPlaceComponent textarea::-webkit-scrollbar-thumb {
     background-color: darkgrey;
     outline: 1px solid slategrey;
   }
 
-  input:focus {
+  #createPlaceComponent input:focus {
     outline: none;
   }
 
-  img {
+  #createPlaceComponent img {
+    font-family: 'Liberation Sans', sans, sans-serif;
+    font-size: 14px;
     padding: 10px 15px;
     margin-bottom: 10px;
     width: 60%;
@@ -112,15 +117,15 @@ export default {
   }
 
   .btn-save {
-  width: 40%;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 25px;
-  color: #fff;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-family: 'Liberation Sans', sans, sans-serif;
-  cursor: pointer;
-  background-color: #0ca086;
+    width: 40%;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 25px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: 'Liberation Sans', sans, sans-serif;
+    cursor: pointer;
+    background-color: #0ca086;
   }
 </style>

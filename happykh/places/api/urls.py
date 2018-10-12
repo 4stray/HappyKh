@@ -8,4 +8,3 @@ urlpatterns = [ #pylint: disable = invalid-name
          path('', views.PlacePage.as_view()),
          ])),
     ]
-

@@ -9,6 +9,7 @@ const state = {
 
 const getters = {
   getAuthenticated: state => !!state.Authenticated,
+  getToken: state => state.Authenticated,
 };
 
 const actions = {
