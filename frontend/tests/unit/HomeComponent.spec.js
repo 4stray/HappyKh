@@ -1,10 +1,11 @@
-import { shallowMount, mount, config } from '@vue/test-utils';
+import { shallowMount, mount, config, RouterLinkStub } from '@vue/test-utils';
 import HomeComponent from '@/components/HomeComponent.vue';
 import PlacesComponent from '@/components/PlacesComponent.vue';
 
 const expect = require('chai').expect;
 const should = require('chai').should();
 
+config.stubs['router-link'] = RouterLinkStub;
 config.mocks.$store = {
   state: {
     Authenticated: 'test token',
