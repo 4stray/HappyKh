@@ -46,7 +46,7 @@ export default {
   methods: {
     fetchUserCredentials() {
       axios.get(
-        UserAPI + this.$cookies.get('user_id'),
+        UserAPI + this.$cookies.get('user_id') + "/",
         {
           headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
@@ -72,7 +72,7 @@ export default {
         };
 
         axios.patch(
-          UserAPI + this.$cookies.get('user_id'), userCredentials,
+          UserAPI + this.$cookies.get('user_id') + "/", userCredentials,
           {
             headers: { Authorization: `Token ${this.$cookies.get('token')}` },
           },

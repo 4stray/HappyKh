@@ -40,4 +40,8 @@ class UserAuthentication:
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist: #pylint: disable = no-member
+            LOGGER.error(
+                f'Can`t get user profile because of invalid id,'
+                f' user_id: {id}'
+            )
             return None
