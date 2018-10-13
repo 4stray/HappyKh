@@ -11,10 +11,14 @@ class Place(models.Model):
     Place model for creation new places
     """
 
+    large = 'large'
+    thumbnail = 'thumbnail'
+    medium = 'medium'
+
     VARIATIONS_LOGO = {
-        'large': (600, 400),
-        'thumbnail': (100, 100, True),
-        'medium': (300, 200),
+        large: (600, 400, True),
+        thumbnail: (100, 100, True),
+        medium: (300, 200, True),
     }
 
     def _make_upload_logo(self, filename):

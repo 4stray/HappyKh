@@ -15,9 +15,9 @@ from users.models import User
 from utils import delete_std_images_from_media
 from ..utils import BaseTestCase
 
-USERS_PROFILE_URL = '/api/users/%d/'
-USERS_PROFILE_DATA_URL = '/api/users/%d/data/'
-USERS_PROFILE_PASSWORD_URL = '/api/users/%d/password/'
+USERS_PROFILE_URL = '/api/users/%d'
+USERS_PROFILE_DATA_URL = '/api/users/%d/data'
+USERS_PROFILE_PASSWORD_URL = '/api/users/%d/password'
 
 CORRECT_DATA = {
     'email': 'test@mail.com',
@@ -95,9 +95,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         image = Image.new('RGBA', size=(50, 50), color=(256, 0, 0))
         image.save(image_file, 'png')
         image_file.seek(0)
-        image = UploadedFile(image_file, "filename.png",
-                                          "image/png",
-                                          len(image_file.getvalue()))
+        image = UploadedFile(image_file, "filename.png", "image/png",
+                             len(image_file.getvalue()))
         request_data = {'profile_image': image}
         response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
                                      request_data)

@@ -53,6 +53,8 @@ class UploadedImageField(serializers.ImageField):
     def to_internal_value(self, data):
         if isinstance(data, UploadedFile):
             data = ContentFile(data.read(), name=data.name)
+        if data == 'undefined':
+            return None
         return super(UploadedImageField, self).to_internal_value(data)
 
     def to_representation(self, image_field):

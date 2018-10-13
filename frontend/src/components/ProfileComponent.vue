@@ -6,7 +6,7 @@
              v-model="userFirstName" placeholder="First name"/>
       <input type="text" :disabled="isDisabled" id="last_name"
              v-model="userLastName" placeholder="Last name"/>
-      <input type="number" :disabled="isDisabled" id="age" v-model="userAge"
+      <input type="number" v-model.number="userAge" :disabled="isDisabled" id="age"
              min="0" max="140" step="1"/>
       <select :disabled="isDisabled" v-model="userGender">
         <option disabled value="">Choose your gender</option>
@@ -49,7 +49,7 @@ export default {
   methods: {
     fetchUserCredentials() {
       axios.get(
-        UserAPI + this.$cookies.get('user_id') + '/',
+        UserAPI + this.$cookies.get('user_id'),
         {
           headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
@@ -66,8 +66,8 @@ export default {
     },
     save() {
       const imageFile = document.querySelector('#imageInput');
-
-      if (Number.isInteger(Number(this.userAge))) {
+      const age = this.userAge;
+      if (Number.isInteger(Number(age)) && age >= 0 && age <= 140 && age != null) {
         const formData = new FormData();
         formData.set('first_name', this.userFirstName);
         formData.set('last_name', this.userLastName);

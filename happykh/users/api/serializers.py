@@ -2,7 +2,6 @@
 # pylint: disable = logging-fstring-interpolation
 import logging
 
-from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email

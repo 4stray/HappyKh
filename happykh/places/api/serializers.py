@@ -9,11 +9,7 @@ from places.models import Place
 class PlaceSerializer(serializers.ModelSerializer):
     """Full ModelSerializer for model Place"""
 
-    logo = UploadedImageField(
-        max_length=None,
-        use_url=True,
-        required=False,
-    )
+    logo = UploadedImageField(max_length=None, )
 
     class Meta:
         model = Place
