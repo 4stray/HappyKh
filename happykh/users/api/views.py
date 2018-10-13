@@ -4,6 +4,7 @@
 import logging
 from smtplib import SMTPException
 
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
@@ -249,6 +250,7 @@ class UserProfile(APIView):
     permission_classes = (IsAuthenticated,)
 
     # pylint: disable = redefined-builtin
+    variation = User.medium
 
     def get(self, request, id):
         """
@@ -260,7 +262,11 @@ class UserProfile(APIView):
 
         try:
             user = User.objects.get(pk=id)
-            serializer = UserSerializer(user)
+            context = {
+                'variation': self.variation,
+                'domain': get_current_site(request)
+            }
+            serializer = UserSerializer(user, context=context)
             LOGGER.info('Return user profile')
             return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
@@ -316,7 +322,16 @@ class UserProfile(APIView):
 
         else:
             # Update data
-            serializer = UserSerializer(user, data=request.data, partial=True)
+            context = {
+                'variation': self.variation,
+                'domain': get_current_site(request)
+            }
+            serializer = UserSerializer(
+                user,
+                data=request.data,
+                partial=True,
+                context=context,
+            )
 
             if serializer.is_valid():
                 serializer.save(id=id, **serializer.validated_data)

@@ -69,10 +69,14 @@ class User(AbstractBaseUser, PermissionsMixin):
         (man, 'man')
     )
 
+    large = 'large'
+    thumbnail = 'thumbnail'
+    medium = 'medium'
+
     VARIATIONS_PROFILE_IMAGE = {
-        'large': (600, 400),
-        'thumbnail': (100, 100, True),
-        'medium': (300, 200),
+        large: (600, 400, True),
+        thumbnail: (100, 100, True),
+        medium: (300, 200, True),
     }
 
     def _make_upload_profile_image(self, filename):

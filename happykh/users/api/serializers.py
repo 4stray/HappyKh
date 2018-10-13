@@ -2,13 +2,14 @@
 # pylint: disable = logging-fstring-interpolation
 import logging
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from rest_framework import exceptions
 from rest_framework import serializers
 
-from utils import Base64ImageField
+from utils import UploadedImageField
 from utils import delete_std_images_from_media
 from ..models import User
 
@@ -18,10 +19,7 @@ LOGGER = logging.getLogger('happy_logger')
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
 
-    profile_image = Base64ImageField(
-        max_length=None,
-        use_url=True,
-    )
+    profile_image = UploadedImageField(max_length=None, )
 
     class Meta:
         # pylint: disable=too-few-public-methods, missing-docstring
@@ -31,9 +29,10 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         if instance.profile_image:
             # delete old images
-            delete_std_images_from_media(instance.profile_image,
-                                         User.VARIATIONS_PROFILE_IMAGE
-                                         )
+            delete_std_images_from_media(
+                instance.profile_image,
+                User.VARIATIONS_PROFILE_IMAGE
+            )
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)

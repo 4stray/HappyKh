@@ -45,49 +45,26 @@ def delete_std_images_from_media(std_image_file, variations):
             os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
-class Base64ImageField(serializers.ImageField):
+class UploadedImageField(serializers.ImageField):
     """
     Class which converts a base64 string to a file when input and converts image
     by path to it into base64 string
     """
 
     def to_internal_value(self, data):
+        data = ContentFile(data.read(), name=data.name)
+        return super(UploadedImageField, self).to_internal_value(data)
 
-        # Check if this is a base64 string
-        if isinstance(data, six.string_types):
-            # Check if the base64 string is in the "data:" format
-            if 'data:' in data and ';base64,' in data:
-                # Break out the header from the base64 content
-                header, data = data.split(';base64,')
-
-                # Try to decode the file. Return validation error if it fails.
-                try:
-                    decoded_file = base64.b64decode(data)
-                except TypeError:
-                    self.fail('invalid_image')
-
-                # Get the file name extension:
-                file_extension = header.split('/')[-1]
-
-                # Generate file name:
-                file_name = uuid.uuid4()
-
-                complete_file_name = "%s.%s" % (file_name, file_extension,)
-
-                data = ContentFile(decoded_file, name=complete_file_name)
-
-        return super(Base64ImageField, self).to_internal_value(data)
-
-    def to_representation(self, value):
-        if value:
-            image_file = value.path
-            if not os.path.isfile(image_file):
-                return None
-
-            encoded_string = ''
-            with open(image_file, 'rb') as img_f:
-                encoded_string = base64.b64encode(img_f.read())
-                encoded_string = encoded_string.decode()
-            extension = value.path.split('.')[-1]
-            return f'data:image/{extension};base64,{encoded_string}'
+    def to_representation(self, image_field):
+        if image_field:
+            domain = 'http://' + str(self.context['domain'])
+            original_url = image_field.url
+            variation = self.context['variation']
+            if variation:
+                extension = original_url.split('.')[-1]
+                original_url = original_url.split('.')[0]
+                image_url = f"{domain}{original_url}.{variation}.{extension}"
+            else:
+                image_url = f"{domain}{original_url}"
+            return image_url
         return ''

@@ -1,24 +1,26 @@
 <template>
   <div id="ProfileComponent">
     <h1>Your profile:</h1>
-    <input type="text" :disabled="isDisabled" id="first_name"
-           v-model="userFirstName" placeholder="First name"/>
-    <input type="text" :disabled="isDisabled" id="last_name"
-           v-model="userLastName" placeholder="Last name"/>
-    <input type="number" :disabled="isDisabled" id="age" v-model="userAge"
-           min="0" max="140" step="1"/>
-    <select :disabled="isDisabled" v-model="userGender">
-      <option disabled value="">Choose your gender</option>
-      <option>Man</option>
-      <option>Woman</option>
-    </select>
-    <img v-if="userImage" v-bind:src=userImage id="image" alt="Something happened with image" />
-    <img v-else src='../assets/blank-profile-picture.png' id="blank" alt="No profile image"/>
-    <input type="file" id="imageInput" :disabled="isDisabled"
-           v-on:change="changeImage()"
-           accept="image/*"/>
-    <button class="btn-change" v-on:click=edit()>{{ enableText }}</button>
-    <button class="btn-save" type="button" v-on:click="save()">Save changes</button>
+    <form id="profileForm" enctype="multipart/form-data">
+      <input type="text" :disabled="isDisabled" id="first_name"
+             v-model="userFirstName" placeholder="First name"/>
+      <input type="text" :disabled="isDisabled" id="last_name"
+             v-model="userLastName" placeholder="Last name"/>
+      <input type="number" :disabled="isDisabled" id="age" v-model="userAge"
+             min="0" max="140" step="1"/>
+      <select :disabled="isDisabled" v-model="userGender">
+        <option disabled value="">Choose your gender</option>
+        <option>Man</option>
+        <option>Woman</option>
+      </select>
+      <img v-if="userImage" v-bind:src=userImage id="image" alt="Something happened with image" />
+      <img v-else src='../assets/blank-profile-picture.png' id="blank" alt="No profile image"/>
+      <input type="file" id="imageInput" :disabled="isDisabled"
+             v-on:change="changeImage()"
+             accept="image/*"/>
+      <button class="btn-change" v-on:click=edit()>{{ enableText }}</button>
+      <button class="btn-save" type="button" v-on:click="save()">Save changes</button>
+    </form>
   </div>
 </template>
 
@@ -63,19 +65,23 @@ export default {
         });
     },
     save() {
+      const imageFile = document.querySelector('#imageInput');
+
       if (Number.isInteger(Number(this.userAge))) {
-        const userCredentials = {
-          first_name: this.userFirstName,
-          last_name: this.userLastName,
-          age: this.userAge,
-          gender: this.userGender.charAt(0),
-          profile_image: this.userImage,
-        };
+        const formData = new FormData();
+        formData.set('first_name', this.userFirstName);
+        formData.set('last_name', this.userLastName);
+        formData.set('age', this.userAge);
+        formData.set('gender', this.userGender.charAt(0));
+        formData.append('profile_image', imageFile.files[0]);
 
         axios.patch(
-          UserAPI + this.$cookies.get('user_id'), userCredentials,
+          UserAPI + this.$cookies.get('user_id'), formData,
           {
-            headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+            headers: {
+              Authorization: `Token ${this.$cookies.get('token')}`,
+              'Content-Type': 'multipart/form-data',
+            },
           },
         )
           .then((response) => {
