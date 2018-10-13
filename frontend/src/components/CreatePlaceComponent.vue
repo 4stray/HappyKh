@@ -77,6 +77,10 @@ export default {
     align-items: center;
   }
 
+  #placeForm {
+    display: block;
+  }
+
   #createPlaceComponent input, textarea {
     font-family: 'Liberation Sans', sans, sans-serif;
     padding: 10px 15px;

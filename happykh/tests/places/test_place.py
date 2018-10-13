@@ -13,6 +13,12 @@ TEST_PLACE_DATA = {
     'logo': '',
 }
 
+TEST_PLACE_DATA_POST = {
+    'name': 'test name',
+    'description': 'test description',
+    'logo': 'undefined',
+}
+
 CORRECT_USER_DATA = {
     'email': 'test@mail.com',
     'password': 'testpassword',
@@ -42,7 +48,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertEqual(expected, response.data)
 
     def test_post(self):
-        data = TEST_PLACE_DATA
+        data = TEST_PLACE_DATA_POST
         data['user'] = self.user.pk
         response = self.client.post(PLACE_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
