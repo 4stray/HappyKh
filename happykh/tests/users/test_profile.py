@@ -2,6 +2,9 @@
 import os
 
 # pylint: disable = no-member
+from django.core.files.uploadedfile import UploadedFile
+from io import BytesIO
+from PIL import Image
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
@@ -12,7 +15,9 @@ from users.models import User
 from utils import delete_std_images_from_media
 from ..utils import BaseTestCase
 
-USERS_PROFILE_URL = '/api/users/%d'
+USERS_PROFILE_URL = '/api/users/%d/'
+USERS_PROFILE_DATA_URL = '/api/users/%d/data/'
+USERS_PROFILE_PASSWORD_URL = '/api/users/%d/password/'
 
 CORRECT_DATA = {
     'email': 'test@mail.com',
@@ -65,14 +70,14 @@ class TestUserProfile(BaseTestCase, APITestCase):
         new_test_user = User.objects.create_user(email="second@test.com",
                                                  password="password2")
         new_client = APIClient()
-        response = new_client.get(USERS_PROFILE_URL % new_test_user.pk)
+        response = new_client.get(USERS_PROFILE_DATA_URL % new_test_user.pk)
         self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
 
     def test_patch_update_age(self):
         """test update user's age"""
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = 41
-        response = self.client.patch(USERS_PROFILE_URL % edited_user.pk,
+        response = self.client.patch(USERS_PROFILE_DATA_URL % edited_user.pk,
                                      {'age': edited_user.age})
 
         serializer_edited_user = UserSerializer(edited_user)
@@ -86,15 +91,18 @@ class TestUserProfile(BaseTestCase, APITestCase):
 
     def test_patch_update_profile_image(self):
         """test update user's profile image"""
-        base64_image = 'data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAA' + \
-                       'AEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9' + \
-                       'awAAAABJRU5ErkJggg=='
-        request_data = {'profile_image': base64_image}
+        image_file = BytesIO()
+        image = Image.new('RGBA', size=(50, 50), color=(256, 0, 0))
+        image.save(image_file, 'png')
+        image_file.seek(0)
+        image = UploadedFile(image_file, "filename.png",
+                                          "image/png",
+                                          len(image_file.getvalue()))
+        request_data = {'profile_image': image}
         response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
                                      request_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-        self.assertEqual(base64_image, response.data['profile_image'])
         self.test_user.refresh_from_db()
         self.assertNotEqual('', self.test_user.profile_image)
         self.assertTrue(os.path.exists(self.test_user.profile_image.path))
@@ -104,21 +112,21 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's age with invalid value"""
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = -41
-        response = self.client.patch(USERS_PROFILE_URL % edited_user.pk,
+        response = self.client.patch(USERS_PROFILE_DATA_URL % edited_user.pk,
                                      {'age': edited_user.age})
         serializer_edited_user = UserSerializer(edited_user)
         expected = serializer_edited_user.data["age"]
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertRaises(ValueError)
 
-        response = self.client.get(USERS_PROFILE_URL % self.test_user.pk)
+        response = self.client.get(USERS_PROFILE_DATA_URL % self.test_user.pk)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertNotEqual(expected, response.data["age"])
         self.assertIsNot(edited_user, User.objects.get(pk=self.test_user.pk))
 
     def test_patch_update_password(self):
         """test update user's password"""
-        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+        response = self.client.patch(USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
                                      self.password)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
@@ -126,7 +134,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's password with wrong old password"""
         invalid_password = self.password.copy()
         invalid_password['old_password'] = '123userPassword'
-        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+        response = self.client.patch(USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
                                      invalid_password)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
@@ -137,7 +145,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's password with invalid new password"""
         invalid_password = self.password.copy()
         invalid_password['new_password'] = ''
-        response = self.client.patch(USERS_PROFILE_URL % self.test_user.pk,
+        response = self.client.patch(USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
                                      invalid_password)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(

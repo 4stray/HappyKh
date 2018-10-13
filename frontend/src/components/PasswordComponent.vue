@@ -51,7 +51,7 @@ export default {
           new_password: this.newPassword,
         };
         axios.patch(
-          UserAPI + this.$cookies.get('user_id'), userCredentials,
+          `${UserAPI + this.$cookies.get('user_id')}/password/`, userCredentials,
           {
             headers: { Authorization: `Token ${this.$cookies.get('token')}` },
           },

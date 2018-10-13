@@ -1,11 +1,10 @@
 """Functions and classes which are used in different apps"""
 
-import base64
 import os
 import uuid
-import six
 
 from django.conf import settings
+from django.core.files.uploadedfile import UploadedFile
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
@@ -52,12 +51,14 @@ class UploadedImageField(serializers.ImageField):
     """
 
     def to_internal_value(self, data):
-        data = ContentFile(data.read(), name=data.name)
+        if isinstance(data, UploadedFile):
+            data = ContentFile(data.read(), name=data.name)
         return super(UploadedImageField, self).to_internal_value(data)
 
     def to_representation(self, image_field):
-        if image_field:
-            domain = 'http://' + str(self.context['domain'])
+        domain_site = self.context.get('domain')
+        if image_field and domain_site:
+            domain = 'http://' + str(domain_site)
             original_url = image_field.url
             variation = self.context['variation']
             if variation:

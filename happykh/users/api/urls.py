@@ -12,5 +12,7 @@ urlpatterns = [ #pylint: disable = invalid-name
              views.UserActivation.as_view()),
         path('activate/send-email/', views.UserActivation.as_view()),
         path('<int:id>', views.UserProfile.as_view()),
+        # path('<int:id>/data/', views.UserProfile.as_view()),
+        path('<int:id>/password/', views.UserPassword.as_view()),
     ])),
 ]

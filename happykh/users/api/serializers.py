@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         # pylint: disable=too-few-public-methods, missing-docstring
         model = User
-        fields = '__all__'
+        exclude = ('email', 'password')
 
     def update(self, instance, validated_data):
         if instance.profile_image:

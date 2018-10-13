@@ -49,7 +49,7 @@ export default {
   methods: {
     fetchUserCredentials() {
       axios.get(
-        UserAPI + this.$cookies.get('user_id'),
+        UserAPI + this.$cookies.get('user_id') + '/',
         {
           headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
