@@ -1,5 +1,5 @@
 <template>
-  <v-card class="v-card pa-4 mb-5">
+  <v-card class="v-card pa-5 mb-5">
     <v-card-title primary-title>
       <h3 class="headline mb-0">Change your email</h3>
     </v-card-title>

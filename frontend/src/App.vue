@@ -1,12 +1,11 @@
 <template>
   <v-app>
     <Header/>
-    <v-content>
-      <v-container fluid class="teal lighten-5">
+    <v-content class="teal lighten-5">
+      <v-container fluid>
         <router-view></router-view>
       </v-container>
     </v-content>
-    <v-footer app></v-footer>
   </v-app>
 </template>
 
@@ -20,7 +19,6 @@
     text-align: center;
     color: #2c3e50;
     width: 100%;
-
   }
 
 </style>

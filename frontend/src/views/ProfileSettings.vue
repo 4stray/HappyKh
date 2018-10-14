@@ -3,18 +3,17 @@
     <v-flex md4>
       <v-list class="mx-4 v-card">
         <v-list-tile
-          v-for="tab in tabs"
-          :key="tab.title"
-          @click="$vuetify.goTo(tab.component, {duration: 500, offset: 0, })"
+            v-for="tab in tabs"
+            :key="tab.title"
+            @click="currentTab = tab.component"
+            :class="{ active : currentTab===tab.component}"
         >{{tab.title}}
         </v-list-tile>
       </v-list>
     </v-flex>
-    <v-flex md8 align-content-space-around justify-space-around reverse
+    <v-flex md6 align-content-space-around justify-space-around reverse
             fill-height>
-      <ProfileEditComponent id="profile"/>
-      <PasswordComponent id="password"/>
-      <ChangeEmailComponent id="email"/>
+      <component v-bind:is="currentTab"></component>
     </v-flex>
   </v-layout>
 </template>
@@ -38,17 +37,15 @@ export default {
       tabs: [
         {
           title: 'Change your profile',
-          component: '#profile',
+          component: ProfileEditComponent,
         },
         {
           title: 'Change password',
-          component:
-            '#password',
+          component: PasswordComponent,
         },
         {
           title: 'Change email',
-          component:
-            '#email',
+          component: ChangeEmailComponent,
         },
       ],
     };
@@ -57,5 +54,9 @@ export default {
 </script>
 
 <style lang="scss">
+  $primaryColor: #0ca086;
 
+  .active {
+    border-left: 3px solid $primaryColor;
+  }
 </style>

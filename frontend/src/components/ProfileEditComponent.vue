@@ -16,9 +16,8 @@
         <v-radio label="Woman" color="primary" value="W"></v-radio>
         <v-radio label="Male" color="primary" value="M"></v-radio>
       </v-radio-group>
-      <v-label for="imageInput">Choose image for download</v-label>
-      <img v-bind:src=userImage id='image' alt="No profile image"
-           width="300px"/>
+      <img v-if="userImage" v-bind:src=userImage alt="No image"/>
+      <img v-else src="../assets/default_user.png" alt="No user avatar"/>
       <input type="file"
              id="imageInput"
              class="file-upload"
@@ -55,7 +54,7 @@ export default {
       axios.get(
         UserAPI + this.$cookies.get('user_id'),
         {
-          headers: {Authorization: `Token ${this.$cookies.get('token')}`},
+          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
       ).then((response) => {
         this.userFirstName = response.data.first_name;
@@ -80,7 +79,7 @@ export default {
         axios.patch(
           UserAPI + this.$cookies.get('user_id'), userCredentials,
           {
-            headers: {Authorization: `Token ${this.$cookies.get('token')}`},
+            headers: { Authorization: `Token ${this.$cookies.get('token')}` },
           },
         ).then((response) => {
           this.userFirstName = response.data.first_name;
@@ -111,5 +110,8 @@ export default {
 </script>
 
 <style scoped>
-
+  img {
+    width: 300px;
+    margin: auto;
+  }
 </style>

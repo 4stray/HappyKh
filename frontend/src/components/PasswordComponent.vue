@@ -1,5 +1,5 @@
 <template>
-  <v-card class="v-card pa-4 mb-5">
+  <v-card class="v-card pa-5 mb-5">
     <v-card-title primary-title>
       <h3 class="headline mb-0">Change your password</h3>
     </v-card-title>
@@ -50,9 +50,6 @@ export default {
   },
   methods: {
     passwordsMatch() {
-      // if (this.confirmationPassword < this.newPassword) {
-      //   return false;
-      // }
       if (this.newPassword !== this.confirmationPassword) {
         this.$awn.warning('Passwords don\'t match');
         return false;
