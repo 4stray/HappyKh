@@ -27,7 +27,7 @@ class UserAuthentication:
             if user.check_password(user_password):
                 LOGGER.info('User authenticated')
                 return user
-        except User.DoesNotExist:  # pylint: disable = no-member
+        except User.DoesNotExist: #pylint: disable = no-member
             LOGGER.error('User does not exist while authentication')
         return None
 
@@ -39,5 +39,9 @@ class UserAuthentication:
         """
         try:
             return User.objects.get(pk=user_id)
-        except User.DoesNotExist:  # pylint: disable = no-member
+        except User.DoesNotExist: #pylint: disable = no-member
+            LOGGER.error(
+                f'Can`t get user profile because of invalid id,'
+                f' user_id: {id}'
+            )
             return None

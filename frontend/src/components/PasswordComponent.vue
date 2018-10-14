@@ -34,7 +34,6 @@ const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
 export default {
   name: 'PasswordComponent',
-  components: {},
   data() {
     return {
       valid: false,
@@ -92,4 +91,46 @@ export default {
 
 <style scoped>
 
+  #PasswordComponent {
+    width: 500px;
+    border: 1px solid #CCCCCC;
+    background-color: #FFFFFF;
+    margin: auto;
+    margin-top: 30px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  input {
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    width: 300px;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
+
+  input:focus {
+    outline: none;
+  }
+
+  .btn-save-password {
+    margin-top: 5px;
+    background-color: #ffc107;
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: "Liberation Sans", sans;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+
+  .btn-save-password:hover {
+    background-color: #ffa000;
+  }
 </style>
