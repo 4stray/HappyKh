@@ -10,6 +10,8 @@ TEST_USER_DATA = {
     'user_password': 'testpassword'
 }
 
+REGISTRATION_URL = '/api/users/registration'
+
 
 class RegistrationViewTestCase(BaseTestCase, APITestCase):
     """Test user api registration view /api/users/registration/"""
@@ -20,14 +22,14 @@ class RegistrationViewTestCase(BaseTestCase, APITestCase):
     def test_create_deactivated_user(self):
         """test new user creation"""
         data = TEST_USER_DATA.copy()
-        response = self.client.post('/api/users/registration/', data)
+        response = self.client.post(REGISTRATION_URL, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_invalid_email(self):
         """test user registration with invalid email"""
         data = TEST_USER_DATA.copy()
         data['user_email'] = 'invalidemail.com'
-        response = self.client.post('/api/users/registration/', data)
+        response = self.client.post(REGISTRATION_URL, data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_activate_valid_account(self):

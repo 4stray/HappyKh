@@ -48,56 +48,64 @@ describe('RegistrationComponent contains the corrcet values', () => {
   it('contains userEmail input field', () => {
     expect(wrapper
       .find('#userEmail')
-      .attributes('type'))
+      .attributes())
+      .property('type')
       .to.be.equal('email');
   });
 
   it('contains userEmail placeholder suitable field attribute', () => {
     expect(wrapper
       .find('#userEmail')
-      .attributes('placeholder'))
+      .attributes())
+      .property('placeholder')
       .to.be.equal('EMAIL');
   });
 
   it('contains userPassword input field', () => {
     expect(wrapper
       .find('#userPassword')
-      .attributes('type'))
+      .attributes())
+      .property('type')
       .to.be.equal('password');
   });
 
   it('contains userPassword placeholder suitable field attribute', () => {
     expect(wrapper
       .find('#userPassword')
-      .attributes('placeholder'))
+      .attributes())
+      .property('placeholder')
       .to.be.equal('PASSWORD');
   });
 
   it('contains userPassword input field', () => {
     expect(wrapper
       .find('#confirmPassword')
-      .attributes('type'))
+      .attributes())
+      .property('type')
       .to.be.equal('password');
   });
 
   it('contains userPassword placeholder suitable field attribute', () => {
     expect(wrapper
       .find('#confirmPassword')
-      .attributes('placeholder'))
+      .attributes())
+      .property('placeholder')
       .to.be.equal('CONFIRM PASSWORD');
   });
 
   it('contains button for submitting user credentials', () => {
     expect(wrapper
       .find('.btn-submit')
-      .attributes('type'))
+      .attributes())
+      .property('type')
       .to.be.equal('submit');
   });
 
   it('contains button with certain value', () => {
     expect(wrapper
       .find('.btn-submit')
-      .attributes('value'))
+      .attributes())
+      .property('value')
       .to.be.equal('REGISTER');
   });
 });
@@ -108,6 +116,6 @@ describe('RegistrationComponent interactions', () => {
   const btn = wrapper.find('.btn-submit');
 
   it('button is not active if conditions are not met', () => {
-    expect(btn.attributes('disabled')).to.be.equal('disabled');
+    expect(btn.attributes()).property('disabled').to.be.equal('disabled');
   });
 });
