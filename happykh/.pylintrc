@@ -9,8 +9,7 @@ extension-pkg-whitelist=
 # paths.
 ignore=CVS,
         migrations,
-        logs,
-        __init__.py
+        logs
 
 
 # Add files or directories matching the regex patterns to the blacklist. The
