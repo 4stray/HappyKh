@@ -75,7 +75,7 @@ export default {
           user_email: this.userEmail,
           user_password: this.userPassword,
         };
-        axios.post('http://localhost:8000/api/users/registration/', userCredentials)
+        axios.post('http://localhost:8000/api/users/registration', userCredentials)
           .then(() => {
             this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
             this.$router.push({ name: 'home' });

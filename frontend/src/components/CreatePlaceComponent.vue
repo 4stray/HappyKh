@@ -1,13 +1,15 @@
 <template>
   <div id="createPlaceComponent">
     <h1>Create your place:</h1>
-    <input type="text" id="name"
-           v-model="placeName" placeholder="Place name"/>
-    <textarea id="description"
-              v-model="placeDescription" placeholder="Description"></textarea>
-    <img v-bind:src=placeLogo id='logo' alt="No place image"/>
-    <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
-    <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
+    <form id="placeForm" enctype="multipart/form-data">
+      <input type="text" id="name"
+             v-model="placeName" placeholder="Place name"/>
+      <textarea id="description"
+                v-model="placeDescription" placeholder="Description"></textarea>
+      <img v-bind:src=placeLogo id='logo' alt="No place image"/>
+      <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
+      <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
+    </form>
   </div>
 </template>
 
@@ -26,16 +28,19 @@ export default {
   },
   methods: {
     save() {
-      const placeInfo = {
-        user: this.$cookies.get('user_id'),
-        name: this.placeName,
-        description: this.placeDescription,
-        logo: this.placeLogo,
-      };
+      const imageFile = document.querySelector('#logoInput');
+      const formData = new FormData();
+      formData.set('user', this.$cookies.get('user_id'));
+      formData.set('name', this.placeName);
+      formData.set('description', this.placeDescription);
+      formData.append('logo', imageFile.files[0]);
       axios.post(
-        `${BaseURL}/places/`, placeInfo,
+        `${BaseURL}/places/`, formData,
         {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+          headers: {
+            Authorization: `Token ${this.$cookies.get('token')}`,
+            'Content-Type': 'multipart/form-data',
+          },
         },
       )
         .then(() => {
@@ -70,6 +75,10 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+
+  #placeForm {
+    display: block;
   }
 
   #createPlaceComponent input, textarea {

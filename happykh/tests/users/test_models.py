@@ -23,6 +23,7 @@ class UserTestCase(BaseTestCase):
         self.assertEqual('', user.last_name)
         self.assertIsNone(user.age)
         self.assertEqual('W', user.gender)
+        self.assertEqual('', user.profile_image)
         self.assertEqual('any@mail.com', user.email)
         self.assertEqual(True, user.check_password('password'))
         self.assertEqual(True, user.has_usable_password())

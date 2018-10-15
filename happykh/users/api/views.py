@@ -4,6 +4,7 @@
 import logging
 from smtplib import SMTPException
 
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
@@ -15,8 +16,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-#pylint: disable = no-name-in-module, import-error
+# pylint: disable = no-name-in-module, import-error
 from happykh.settings import EMAIL_HOST_USER
+from ..backends import UserAuthentication
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
@@ -53,7 +55,7 @@ class UserLogin(APIView):
 
         user = serializer.validated_data['user']
         if user.is_active:
-            #pylint: disable = unused-variable
+            # pylint: disable = unused-variable
             user_token, created = Token.objects.get_or_create(user=user)
             LOGGER.info('User has been logged in')
             return Response({
@@ -128,7 +130,6 @@ class UserRegistration(APIView):
                 return Response(status=status.HTTP_201_CREATED)
             else:
                 LOGGER.error('Confirmation email has not been delivered')
-                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
                                ' due to connection reasons'
@@ -247,7 +248,9 @@ class UserProfile(APIView):
     """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
     # pylint: disable = redefined-builtin
+    variation = User.medium
 
     def get(self, request, id):
         """
@@ -256,18 +259,17 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        try:
-            user = User.objects.get(pk=id)
-            serializer = UserSerializer(user)
-            LOGGER.info('Return user profile')
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            LOGGER.error(
-                f'Can`t get user profile because of invalid id,'
-                f' user_id: {id}'
-            )
-            return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+
+        user = UserAuthentication.get_user(self, id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        context = {
+            'variation': self.variation,
+            'domain': get_current_site(request)
+        }
+        serializer = UserSerializer(user, context=context)
+        LOGGER.info('Return user profile')
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
         """
@@ -276,50 +278,64 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        user = None
-        try:
-            user = User.objects.get(pk=id)
-        except User.DoesNotExist:
-            LOGGER.error(
-                'Can`t get user profile because of invalid id,'
-                ' user_id: {user.pk}'
-            )
-            return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        user = UserAuthentication.get_user(self, id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-        if 'old_password' in self.request.data:
-            # Change password
+        context = {
+            'variation': self.variation,
+            'domain': get_current_site(request)
+        }
+        serializer = UserSerializer(
+            user,
+            data=request.data,
+            partial=True,
+            context=context,
+        )
+        if serializer.is_valid():
+            serializer.save(id=id, **serializer.validated_data)
+            LOGGER.info('User data updated')
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
-            serializer = PasswordSerializer(data=request.data)
+        LOGGER.error(
+            f'Serializer error {serializer.errors} while changing data'
+        )
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
-            if serializer.is_valid():
-                if not user.check_password(
-                        serializer.data.get('old_password')):
-                    LOGGER.error(
-                        'Received wrong old password while changing password'
-                    )
-                    return Response({'message': 'Wrong password.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
 
-                serializer.update(user, serializer.data)
-                LOGGER.info('Updated user password')
-                return Response({'message': 'Password was updated.'},
-                                status=status.HTTP_200_OK)
+class UserPassword(APIView):
+    """
+    Change user's password
+    """
 
-            LOGGER.critical(
-                f'Serializer error {serializer.errors} while changing password'
-            )
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, id):
+        """
+        :param request: HTTP request
+        :param id: integer
+        :return: Response(message, status)
+        """
+        user = UserAuthentication.get_user(self, id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-        else:
-            # Update data
-            serializer = UserSerializer(user, data=request.data, partial=True)
+        serializer = PasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            if not user.check_password(
+                    serializer.data.get('old_password')):
+                LOGGER.error(
+                    'Received wrong old password while changing password'
+                )
+                return Response({'message': 'Wrong password.'},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-            if serializer.is_valid():
-                serializer.save(id=id, **serializer.validated_data)
-                LOGGER.info('User data updated')
-                return Response(serializer.data, status=status.HTTP_200_OK)
+            serializer.update(user, serializer.data)
+            LOGGER.info('Updated user password')
+            return Response({'message': 'Password was updated.'},
+                            status=status.HTTP_200_OK)
 
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        LOGGER.error(
+            f'Serializer error {serializer.errors} while changing password'
+        )
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
