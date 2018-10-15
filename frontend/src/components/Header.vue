@@ -29,9 +29,6 @@ export default {
       store.dispatch('signOut');
       store.commit('signOut');
       this.$router.push({ name: 'home' });
-      // if (document.location.pathname === '/') {
-      //   document.location.reload(true);
-      // }
     },
   },
 };

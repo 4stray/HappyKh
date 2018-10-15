@@ -49,24 +49,21 @@ router.beforeEach((to, from, next) => {
       'Authorization',
       `Token ${store.getters.getToken}`,
     );
-    try {
-      xhr.send();
-    } catch (err) {
 
-    }
+    xhr.send();
 
     const statusCode = xhr.status;
 
     if (statusCode === 200) {
       console.log(`Token exists, status: ${statusCode}`);
       next();
-    } else {
+    } else if (statusCode === 401) {
       console.log(`Token doesn't exist, status: ${statusCode}`);
 
       store.dispatch('signOut');
       store.commit('signOut');
 
-      next('/login/');
+      next({ name: 'login' });
     }
   } else {
     console.log('executed beforeEach');
