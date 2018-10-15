@@ -130,7 +130,6 @@ class UserRegistration(APIView):
                 return Response(status=status.HTTP_201_CREATED)
             else:
                 LOGGER.error('Confirmation email has not been delivered')
-                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
                                ' due to connection reasons'
@@ -297,16 +296,19 @@ class UserProfile(APIView):
             serializer.save(id=id, **serializer.validated_data)
             LOGGER.info('User data updated')
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         LOGGER.error(
             f'Serializer error {serializer.errors} while changing data'
         )
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserPassword(APIView):
     """
     Change user's password
     """
+
     def patch(self, request, id):
         """
         :param request: HTTP request

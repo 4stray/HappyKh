@@ -125,16 +125,18 @@ class TestUserProfile(BaseTestCase, APITestCase):
 
     def test_patch_update_password(self):
         """test update user's password"""
-        response = self.client.patch(USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
-                                     self.password)
+        response = self.client.patch(
+            USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
+            self.password)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_patch_invalid_update_password(self):
         """test update user's password with wrong old password"""
         invalid_password = self.password.copy()
         invalid_password['old_password'] = '123userPassword'
-        response = self.client.patch(USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
-                                     invalid_password)
+        response = self.client.patch(
+            USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
+            invalid_password)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
             self.test_user.check_password(invalid_password['new_password'])
@@ -144,8 +146,9 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's password with invalid new password"""
         invalid_password = self.password.copy()
         invalid_password['new_password'] = ''
-        response = self.client.patch(USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
-                                     invalid_password)
+        response = self.client.patch(
+            USERS_PROFILE_PASSWORD_URL % self.test_user.pk,
+            invalid_password)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
             self.test_user.check_password(invalid_password['new_password'])
