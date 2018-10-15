@@ -1,12 +1,14 @@
 """Views for app users"""
 # pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
 # pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
+import datetime
 import logging
 from smtplib import SMTPException
 
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
+from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -80,9 +82,12 @@ class UserLogout(APIView):
         :param request: HttpRequest
         :return: Response({message}, status)
         """
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        print(token_key)
+        Token.objects.get(key=token_key).delete()
 
-        Token.objects.get(key=request.data['user_token']).delete()
         LOGGER.info('User has been logged out')
+
         return Response({
             'message': 'User has been logged out'
         }, status=status.HTTP_201_CREATED)
@@ -261,14 +266,14 @@ class UserProfile(APIView):
             serializer = UserSerializer(user)
 
             response_data = serializer.data
-            enable_editing_profile = UserProfile.is_same_user(request, id)
-            response_data['enable_editing_profile'] = enable_editing_profile
+            # enable_editing_profile = UserProfile.is_same_user(request, id)
+            # response_data['enable_editing_profile'] = enable_editing_profile
 
-            LOGGER.info(
-                f'Enable Editing User Profile is set '
-                f'to {enable_editing_profile}'
-            )
-            LOGGER.info('Return user profile')
+            # LOGGER.info(
+            #     f'Enable Editing User Profile is set '
+            #     f'to {enable_editing_profile}'
+            # )
+            # LOGGER.info('Return user profile')
 
             return Response(response_data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
@@ -286,13 +291,13 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        if not UserProfile.is_same_user(request, id):
-            LOGGER.error(
-                "User's data were not updated."
-                "user_id must be equal to token user_id"
-            )
-            return Response({'message': 'Editing not allowed'},
-                            status=status.HTTP_403_FORBIDDEN)
+        # if not UserProfile.is_same_user(request, id):
+        #     LOGGER.error(
+        #         "User's data were not updated."
+        #         "user_id must be equal to token user_id"
+        #     )
+        #     return Response({'message': 'Editing not allowed'},
+        #                     status=status.HTTP_403_FORBIDDEN)
 
         user = None
         try:
@@ -341,15 +346,30 @@ class UserProfile(APIView):
 
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-    @staticmethod
-    def is_same_user(request, user_id):
-        """
-        Returns True if urlpath user_id equals user_id from token
-        :param request: HttpRequest
-        :param user_id: Integer
-        :return: Boolean
-        """
-        user_token = request.META['HTTP_AUTHORIZATION'][6:]
-        token_user_id = Token.objects.get(key=user_token).user.id
 
-        return user_id == token_user_id
+
+class TokenValidation(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        try:
+            token = Token.objects.get(key=token_key)
+
+            if (timezone.now() <= token.created
+                    + datetime.timedelta(seconds=5)):
+                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        except Token.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+
+
+
+
+
+
+

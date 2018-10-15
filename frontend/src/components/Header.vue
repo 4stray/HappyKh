@@ -13,7 +13,9 @@
 </template>
 
 <script>
+import store from '../store';
 import { mapGetters } from 'vuex';
+
 
 export default {
   name: 'Header',
@@ -24,12 +26,12 @@ export default {
   },
   methods: {
     signOut() {
-      this.$cookies.remove('token');
-      this.$cookies.remove('user_id');
+      store.dispatch('signOut');
+      store.commit('signOut');
       this.$router.push({ name: 'home' });
-      if (document.location.pathname === '/') {
-        document.location.reload(true);
-      }
+      // if (document.location.pathname === '/') {
+      //   document.location.reload(true);
+      // }
     },
   },
 };

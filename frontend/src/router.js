@@ -7,13 +7,6 @@ import CreatePlace from './views/CreatePlace.vue';
 import Profile from './views/Profile.vue';
 import store from './store';
 
-const ifAuthenticated = (to, from, next) => {
-  if (store.getters.getAuthenticated) {
-    next();
-    return;
-  }
-  next('/login');
-};
 
 const router = new Router({
   routes: [
@@ -36,17 +29,50 @@ const router = new Router({
       path: '/profile',
       name: 'profile',
       component: Profile,
-      beforeEnter: ifAuthenticated,
     },
     {
       path: '/places/create',
       name: 'createPlace',
       component: CreatePlace,
-      beforeEnter: ifAuthenticated,
     },
   ],
 });
 
+router.beforeEach((to, from, next) => {
+  if (store.getters.getAuthenticated) {
+    const urlTokenValidation =
+      'http://127.0.0.1:8000/api/users/token-validation/';
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', urlTokenValidation, false);
+    xhr.setRequestHeader(
+      'Authorization',
+      `Token ${store.getters.getToken}`,
+    );
+    try {
+      xhr.send();
+    } catch (err) {
+
+    }
+
+    const statusCode = xhr.status;
+
+    if (statusCode === 200) {
+      console.log(`Token exists, status: ${statusCode}`);
+      next();
+    } else {
+      console.log(`Token doesn't exist, status: ${statusCode}`);
+
+      store.dispatch('signOut');
+      store.commit('signOut');
+
+      next('/login/');
+    }
+  } else {
+    console.log('executed beforeEach');
+    next();
+  }
+});
 
 Vue.use(Router);
 
