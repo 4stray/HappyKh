@@ -30,7 +30,7 @@ export default {
         user_email: this.userEmail,
         user_password: this.userPassword,
       };
-      axios.post(`${UserAPI}/login/`, userCredentials)
+      axios.post(`${UserAPI}/login`, userCredentials)
         .then((response) => {
           this.$cookies.set('token', response.data.token);
           this.$store.commit('setAuthenticated', response.data.token);
