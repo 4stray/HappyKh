@@ -31,7 +31,3 @@ class PlaceTestCase(BaseTestCase):
         with self.assertRaises(Place.DoesNotExist) as dne:
             Place.objects.get(user=user_on_delete)
         self.assertEqual(type(dne.exception), Place.DoesNotExist)
-
-
-
-    

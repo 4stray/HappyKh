@@ -20,7 +20,6 @@ describe('createPlaceComponent data()', () => {
   it('has default placeLogo', () => {
     expect(createPlaceComponent.data()).to.have.property('placeLogo');
   });
-
 });
 
 describe('mounted createPlaceComponent', () => {
