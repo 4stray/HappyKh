@@ -28,8 +28,7 @@ def delete_std_images_from_media(std_image_file, variations):
     """
     Delete images which were created by StdImageField.
 
-    :param std_image_file: instance of StdImageFile from
-    django-stdimage library
+    :param std_image_file: instance of StdImageFile from django-stdimage library
     :param variations: iterable obj with names of declared variations for
                         std_image_file
     :return: None
@@ -47,8 +46,7 @@ def delete_std_images_from_media(std_image_file, variations):
 
 class UploadedImageField(serializers.ImageField):
     """
-    Class which converts a base64 string to a file when input and converts
-    image
+    Class which converts a base64 string to a file when input and converts image
     by path to it into base64 string
     """
 

@@ -1,3 +1,5 @@
+"""Crates app place for django"""
+
 from django.apps import AppConfig
 
 

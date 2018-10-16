@@ -20,7 +20,7 @@ const getters = {
 const actions = {
   signOut(state) {
     const urlLogOut =
-      'http://127.0.0.1:8000/api/users/logout/';
+      'http://127.0.0.1:8000/api/users/logout';
 
     const token = this.getters.getToken;
 

@@ -5,6 +5,7 @@ import datetime
 import logging
 from smtplib import SMTPException
 
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
@@ -17,8 +18,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-#pylint: disable = no-name-in-module, import-error
+# pylint: disable = no-name-in-module, import-error
 from happykh.settings import EMAIL_HOST_USER
+from ..backends import UserAuthentication
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
@@ -55,7 +57,7 @@ class UserLogin(APIView):
 
         user = serializer.validated_data['user']
         if user.is_active:
-            #pylint: disable = unused-variable
+            # pylint: disable = unused-variable
             user_token, created = Token.objects.get_or_create(user=user)
             LOGGER.info('User has been logged in')
             return Response({
@@ -133,7 +135,6 @@ class UserRegistration(APIView):
                 return Response(status=status.HTTP_201_CREATED)
             else:
                 LOGGER.error('Confirmation email has not been delivered')
-                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
                                ' due to connection reasons'
@@ -252,7 +253,9 @@ class UserProfile(APIView):
     """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
+
     # pylint: disable = redefined-builtin
+    variation = User.medium
 
     def get(self, request, id):
         """
@@ -262,18 +265,27 @@ class UserProfile(APIView):
         :return: Response(data, status)
         """
         try:
-            user = User.objects.get(pk=id)
-            serializer = UserSerializer(user)
+            user = UserAuthentication.get_user_by_id(id)
+            print(user)
+            if user is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            context = {
+                'variation': self.variation,
+                'domain': get_current_site(request)
+            }
+
+            serializer = UserSerializer(user, context=context)
 
             response_data = serializer.data
-            # enable_editing_profile = UserProfile.is_same_user(request, id)
-            # response_data['enable_editing_profile'] = enable_editing_profile
-            #
-            # LOGGER.info(
-            #     f'Enable Editing User Profile is set '
-            #     f'to {enable_editing_profile}'
-            # )
-            # LOGGER.info('Return user profile')
+            enable_editing_profile = UserAuthentication.is_owner(request, id)
+            response_data['enable_editing_profile'] = enable_editing_profile
+
+            LOGGER.info(
+                f'Enable Editing User Profile is set '
+                f'to {enable_editing_profile}'
+            )
+            LOGGER.info('Return user profile')
 
             return Response(response_data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
@@ -291,17 +303,36 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        # if not UserProfile.is_same_user(request, id):
-        #     LOGGER.error(
-        #         "User's data were not updated."
-        #         "user_id must be equal to token user_id"
-        #     )
-        #     return Response({'message': 'Editing not allowed'},
-        #                     status=status.HTTP_403_FORBIDDEN)
+        if not UserAuthentication.is_owner(request, id):
+            LOGGER.error(
+                "User's data were not updated."
+                "user_id must be equal to token user_id"
+            )
+            return Response({'message': 'Editing not allowed'},
+                            status=status.HTTP_403_FORBIDDEN)
 
         user = None
         try:
             user = User.objects.get(pk=id)
+            if user is None:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+            context = {
+                'variation': self.variation,
+                'domain': get_current_site(request)
+            }
+
+            serializer = UserSerializer(
+                user,
+                data=request.data,
+                partial=True,
+                context=context,
+            )
+
+            if serializer.is_valid():
+                serializer.save(id=id, **serializer.validated_data)
+                LOGGER.info('User data updated')
+                return Response(serializer.data, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             LOGGER.error(
                 'Can`t get user profile because of invalid id,'
@@ -310,42 +341,42 @@ class UserProfile(APIView):
             return Response({'message': 'No user with such id.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        if 'old_password' in self.request.data:
-            # Change password
 
-            serializer = PasswordSerializer(data=request.data)
+class UserPassword(APIView):
+    """
+    Change user's password
+    """
 
-            if serializer.is_valid():
-                if not user.check_password(
-                        serializer.data.get('old_password')):
-                    LOGGER.error(
-                        'Received wrong old password while changing password'
-                    )
-                    return Response({'message': 'Wrong password.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, id):
+        """
+        :param request: HTTP request
+        :param id: integer
+        :return: Response(message, status)
+        """
+        user = UserAuthentication.get_user_by_id(id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-                serializer.update(user, serializer.data)
-                LOGGER.info('Updated user password')
-                return Response({'message': 'Password was updated.'},
-                                status=status.HTTP_200_OK)
+        serializer = PasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            if not user.check_password(
+                    serializer.data.get('old_password')):
+                LOGGER.error(
+                    'Received wrong old password while changing password'
+                )
+                return Response({'message': 'Wrong password.'},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-            LOGGER.critical(
-                f'Serializer error {serializer.errors} while changing password'
-            )
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+            serializer.update(user, serializer.data)
+            LOGGER.info('Updated user password')
+            return Response({'message': 'Password was updated.'},
+                            status=status.HTTP_200_OK)
 
-        else:
-            # Update data
-            serializer = UserSerializer(user, data=request.data, partial=True)
-
-            if serializer.is_valid():
-                serializer.save(id=id, **serializer.validated_data)
-                LOGGER.info('User data updated')
-                return Response(serializer.data, status=status.HTTP_200_OK)
-
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        LOGGER.error(
+            f'Serializer error {serializer.errors} while changing password'
+        )
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class TokenValidation(APIView):
@@ -358,18 +389,8 @@ class TokenValidation(APIView):
             token = Token.objects.get(key=token_key)
 
             if (timezone.now() <= token.created
-                    + datetime.timedelta(days=1)):
+                    + datetime.timedelta(seconds=5)):
                 return Response(status=status.HTTP_200_OK)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         except Token.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-
-
-
-
-
-
-
-
-
