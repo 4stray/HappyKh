@@ -7,5 +7,6 @@ from . import views
 urlpatterns = [ #pylint: disable = invalid-name
     path('places/', include([
          path('', views.PlacePage.as_view()),
+         path('<int:id>', views.PlaceSinglePage.as_view()),
          ])),
     ]
