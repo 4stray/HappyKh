@@ -6,6 +6,7 @@ const expect = require('chai').expect;
 const should = require('chai').should();
 
 config.stubs['router-link'] = RouterLinkStub;
+config.stubs.PlacesComponent = '<div/>';
 config.mocks.$store = {
   state: {
     Authenticated: 'test token',
