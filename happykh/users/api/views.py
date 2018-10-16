@@ -266,7 +266,7 @@ class UserProfile(APIView):
         """
         try:
             user = UserAuthentication.get_user_by_id(id)
-            print(user)
+
             if user is None:
                 return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -311,41 +311,40 @@ class UserProfile(APIView):
             return Response({'message': 'Editing not allowed'},
                             status=status.HTTP_403_FORBIDDEN)
 
-        user = None
-        try:
-            user = User.objects.get(pk=id)
-            if user is None:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+        user = UserAuthentication.get_user_by_id(id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-            context = {
-                'variation': self.variation,
-                'domain': get_current_site(request)
-            }
+        context = {
+            'variation': self.variation,
+            'domain': get_current_site(request)
+        }
 
-            serializer = UserSerializer(
-                user,
-                data=request.data,
-                partial=True,
-                context=context,
-            )
+        serializer = UserSerializer(
+            user,
+            data=request.data,
+            partial=True,
+            context=context,
+        )
 
-            if serializer.is_valid():
-                serializer.save(id=id, **serializer.validated_data)
-                LOGGER.info('User data updated')
-                return Response(serializer.data, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            LOGGER.error(
-                'Can`t get user profile because of invalid id,'
-                ' user_id: {user.pk}'
-            )
-            return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        if serializer.is_valid():
+            serializer.save(id=id, **serializer.validated_data)
+            LOGGER.info('User data updated')
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        LOGGER.error(
+            f'Serializer error {serializer.errors} while changing data'
+        )
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserPassword(APIView):
     """
     Change user's password
     """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def patch(self, request, id):
         """

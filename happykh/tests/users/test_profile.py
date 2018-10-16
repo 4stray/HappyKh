@@ -39,23 +39,11 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.test_user = User.objects.create_user(**CORRECT_DATA)
         user_token = Token.objects.create(user=self.test_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
-<<<<<<< HEAD
-
-        other_test_user = CORRECT_DATA.copy()
-        other_test_user['email'] = 'test2@gmail.com'
-        self.other_test_user = User.objects.create_user(**other_test_user)
-
-        self.PASSWORD = {
-=======
         self.password = {
->>>>>>> develop
             'old_password': CORRECT_DATA['password'],
             'new_password': 'password2',
         }
 
-<<<<<<< HEAD
-    def test_get_user_with_access_for_editing_own_profile(self):
-=======
     def tearDown(self):
         """ teardown any state that were previously setup with a call of
         setup.
@@ -70,20 +58,10 @@ class TestUserProfile(BaseTestCase, APITestCase):
     def test_get(self):
         """test if user exists"""
 
->>>>>>> develop
         response = self.client.get(USERS_PROFILE_URL % self.test_user.pk)
         serializer = UserSerializer(self.test_user)
         expected = serializer.data
         expected['enable_editing_profile'] = True
-
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertDictEqual(expected, response.data)
-
-    def test_get_user_without_access_for_editing_own_profile(self):
-        response = self.client.get(USERS_PROFILE_URL % self.other_test_user.id)
-        serializer = UserSerializer(self.other_test_user)
-        expected = serializer.data
-        expected['enable_editing_profile'] = False
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertDictEqual(expected, response.data)
@@ -96,12 +74,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         response = new_client.get(USERS_PROFILE_DATA_URL % new_test_user.pk)
         self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
 
-<<<<<<< HEAD
-    def test_patch_update_user_data_with_editing_profile_access(self):
-=======
     def test_patch_update_age(self):
         """test update user's age"""
->>>>>>> develop
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = 41
         response = self.client.patch(USERS_PROFILE_DATA_URL % edited_user.pk,
@@ -116,15 +90,6 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertNotEqual(serializer.data, response.data)
         self.assertIn(edited_user, User.objects.all())
 
-<<<<<<< HEAD
-    def test_patch_update_user_data_without_editing_profile_access(self):
-        response = self.client.patch(
-            USERS_PROFILE_URL % self.other_test_user.id,
-            {'age': self.other_test_user.age},
-        )
-
-        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
-=======
     def test_patch_update_profile_image(self):
         """test update user's profile image"""
         image_file = BytesIO()
@@ -142,7 +107,6 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertNotEqual('', self.test_user.profile_image)
         self.assertTrue(os.path.exists(self.test_user.profile_image.path))
         self.assertTrue(os.path.isfile(self.test_user.profile_image.path))
->>>>>>> develop
 
     def test_patch_invalid_update(self):
         """test update user's age with invalid value"""
