@@ -44,8 +44,10 @@ describe('mounted ProfileComponent', () => {
     mocks: {
       $cookies: Cookies,
     },
+    methods: {
+      fetchUserCredentials: () => {},
+    },
   });
-
   it('has 4 input fields', () => {
     expect(wrapper.findAll('input').length).to.be.equal(4);
   });
@@ -79,6 +81,9 @@ describe('ProfileComponent interactions', () => {
   const wrapper = shallowMount(ProfileComponent, {
     mocks: {
       $cookies: Cookies,
+    },
+    methods: {
+      fetchUserCredentials: () => {},
     },
   });
   const btn = wrapper.find('.btn-change');

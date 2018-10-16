@@ -1,6 +1,5 @@
 import { shallowMount, config, RouterLinkStub } from '@vue/test-utils';
-import VueAWN from 'vue-awesome-notifications';
-import PlacesComponent from '@/components/PlacesComponent.vue';
+import PlacesComponent from '../../src/components/PlacesComponent.vue';
 
 
 const expect = require('chai').expect;
@@ -15,10 +14,10 @@ config.mocks.$store = {
     getToken: state => state.Authenticated,
   },
 };
+config.methods.getAllPlaces = () => {};
 
 describe('PlacesComponent', () => {
   const wrapper = shallowMount(PlacesComponent, config);
-
   it('has places container', () => {
     expect(wrapper.contains('[class="places-container"]')).to.be.equal(true);
   });
