@@ -29,19 +29,22 @@ export default {
       allPlaces: [],
     };
   },
-  created() {
-    const allPlacesUrl = 'http://localhost:8000/api/places/';
-    const apiConfig = {
-      headers: {
-        Authorization: `Token ${this.$store.getters.getToken}`,
-      },
-    };
+  created() { this.getAllPlaces(); },
+  methods: {
+    getAllPlaces() {
+      const allPlacesUrl = 'http://localhost:8000/api/places/';
+      const apiConfig = {
+        headers: {
+          Authorization: `Token ${this.$store.getters.getToken}`,
+        },
+      };
 
-    axios.get(allPlacesUrl, apiConfig).then((response) => {
-      this.allPlaces = response.data;
-    }).catch((error) => {
-      this.$awn.alert(error);
-    });
+      axios.get(allPlacesUrl, apiConfig).then((response) => {
+        this.allPlaces = response.data;
+      }).catch((error) => {
+        this.$awn.alert(error);
+      });
+    },
   },
 };
 </script>
