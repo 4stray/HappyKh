@@ -216,24 +216,28 @@ class UserActivation(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
-    def send_email_confirmation(user):
+    def send_email_confirmation(user, email=None):
         """
         Sends an email on specified user.email
         :param user: User
+        :param email: target email to send confirmation
         :return: Boolean
         """
+        if email is None:
+            email = user.email
+
         try:
             email_token = account_activation_token.make_token(user)
             user_id = user.pk
             send_mail(
-                f'Confirm {user.email} on HappyKH',
-                f'We just needed to verify that {user.email} '
+                f'Confirm {email} on HappyKH',
+                f'We just needed to verify that {email} '
                 f'is your email address.'
                 f' Just click the link below \n'
                 f'http://127.0.0.1:8080/#/confirm_registration/'
                 f'{user_id}/{email_token}/',
                 EMAIL_HOST_USER,
-                [user.email]
+                [email]
             )
             LOGGER.info('Confirmation mail has been sent')
         except SMTPException:
@@ -335,13 +339,18 @@ class UserEmail(APIView):
             serializer = EmailSerializer(user, request.data)
 
             if serializer.is_valid():
-                serializer.update(user, serializer.validated_data)
-                # Send confirmation email
-                LOGGER.info(f'User with id: {id} changed his email')
-                UserActivation.send_email_confirmation(user)
-                return Response({'message': 'Your email has been updated, '
-                                'please check your new email to confirm it'},
-                                status=status.HTTP_200_OK)
+                valid_mail = serializer.validated_data['email']
+                if UserActivation.send_email_confirmation(user, valid_mail):
+                    serializer.update(user, serializer.validated_data)
+                    # Send confirmation email
+                    LOGGER.info(f'User with id: {id} changed his email')
+                    return Response(status=status.HTTP_200_OK)
+                else:
+                    LOGGER.error('Confirmation email has not been delivered')
+                    return Response({
+                        'message': 'The mail has not been delivered'
+                                   ' due to connection reasons'
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
