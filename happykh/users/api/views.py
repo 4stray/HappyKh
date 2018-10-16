@@ -339,7 +339,8 @@ class UserEmail(APIView):
                 # Send confirmation email
                 LOGGER.info(f'User with id: {id} changed his email')
                 UserActivation.send_email_confirmation(user)
-                return Response({'message': 'Your email has been updated'},
+                return Response({'message': 'Your email has been updated, '
+                                'please check your new email to confirm it'},
                                 status=status.HTTP_200_OK)
 
             return Response(serializer.errors,

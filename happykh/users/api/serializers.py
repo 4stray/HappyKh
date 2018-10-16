@@ -138,10 +138,10 @@ class EmailSerializer(serializers.ModelSerializer):
         fields = ('email', )
 
     def validate(self, attrs):
-        user_email = attrs.get('email')
+        new_email = attrs.get('email')
 
         try:
-            validate_email(user_email)
+            validate_email(new_email)
         except ValidationError:
             email_validation_error = exceptions.ValidationError
 
@@ -150,7 +150,7 @@ class EmailSerializer(serializers.ModelSerializer):
             LOGGER.error(
                 f'Serializer:Validation error '
                 f'{email_validation_error.default_detail}'
-                f'invalid email format, Email: {user_email}'
+                f'invalid email format, Email: {new_email}'
             )
             raise email_validation_error
         return attrs
