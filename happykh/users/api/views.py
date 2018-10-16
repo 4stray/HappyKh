@@ -268,7 +268,7 @@ class UserProfile(APIView):
             response_data = serializer.data
             # enable_editing_profile = UserProfile.is_same_user(request, id)
             # response_data['enable_editing_profile'] = enable_editing_profile
-
+            #
             # LOGGER.info(
             #     f'Enable Editing User Profile is set '
             #     f'to {enable_editing_profile}'
@@ -358,7 +358,7 @@ class TokenValidation(APIView):
             token = Token.objects.get(key=token_key)
 
             if (timezone.now() <= token.created
-                    + datetime.timedelta(seconds=5)):
+                    + datetime.timedelta(days=1)):
                 return Response(status=status.HTTP_200_OK)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         except Token.DoesNotExist:
