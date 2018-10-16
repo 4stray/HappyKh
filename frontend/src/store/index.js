@@ -24,6 +24,8 @@ const actions = {
 
     const token = this.getters.getToken;
 
+    state.commit('signOut');
+
     axios.post(
       urlLogOut,
       {},

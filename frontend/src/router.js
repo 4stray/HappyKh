@@ -61,7 +61,6 @@ router.beforeEach((to, from, next) => {
       console.log(`Token doesn't exist, status: ${statusCode}`);
 
       store.dispatch('signOut');
-      store.commit('signOut');
 
       next({ name: 'login' });
     }
