@@ -74,7 +74,7 @@ Log into an interactive session:
 ```sh
 sudo -u postgres psql
 ```
-Create database and user:
+Create database and user **localuser**:
 ```sh
 CREATE DATABASE happykh;
 CREATE USER localadmin WITH PASSWORD 'localpassword';
