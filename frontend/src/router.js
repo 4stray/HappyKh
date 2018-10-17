@@ -8,6 +8,13 @@ import CreatePlace from './views/CreatePlace.vue';
 import Profile from './views/Profile.vue';
 import store from './store';
 
+const ifAuthenticated = (to, from, next) => {
+  if (store.getters.getAuthenticated) {
+    next();
+  } else {
+    next({ name: 'login' });
+  }
+};
 
 const router = new Router({
   routes: [
@@ -30,18 +37,13 @@ const router = new Router({
       path: '/profile',
       name: 'profile',
       component: Profile,
-      beforeEnter: (to, from, next) => {
-        if (store.getters.getAuthenticated) {
-          next();
-        } else {
-          next({ name: 'login' });
-        }
-      },
+      beforeEnter: ifAuthenticated,
     },
     {
       path: '/places/create',
       name: 'createPlace',
       component: CreatePlace,
+      beforeEnter: ifAuthenticated,
     },
   ],
 });

@@ -7,7 +7,7 @@
     <router-link v-if="!isAuthenticated" :to="{ name: 'login'}">Login</router-link>
     <router-link v-if="isAuthenticated"
                  v-on:click.native="signOut()"
-                 to="{name: login}"
+                 :to="{ name: 'home' }"
                  replace>Sign out</router-link>
   </div>
 </template>
@@ -27,7 +27,7 @@ export default {
   methods: {
     signOut() {
       store.dispatch('signOut');
-      this.$router.push({ name: 'home' });
+      this.$awn.success('You have been signed out');
     },
   },
 };

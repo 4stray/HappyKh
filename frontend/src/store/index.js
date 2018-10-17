@@ -40,14 +40,14 @@ const actions = {
 };
 
 const mutations = {
+  signOut(state) {
+    mutations.setAuthenticated(state, false);
+    window.$cookies.remove('token');
+    window.$cookies.remove('user_id');
+  },
   setAuthenticated(state, isAuthenticated) {
     state.Authenticated = isAuthenticated;
   },
-  signOut(state) {
-    mutations.setAuthenticated(state, null);
-    window.$cookies.remove('token');
-    window.$cookies.remove('user_id');
-  }
 };
 
 export default new Vuex.Store({

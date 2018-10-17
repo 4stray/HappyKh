@@ -19,6 +19,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 # pylint: disable = no-name-in-module, import-error
+from utils import is_user_owner
 from happykh.settings import EMAIL_HOST_USER
 from ..backends import UserAuthentication
 from .serializers import LoginSerializer
@@ -86,7 +87,6 @@ class UserLogout(APIView):
         :return: Response({message}, status)
         """
         token_key = request.META['HTTP_AUTHORIZATION'][6:]
-        print(token_key)
         Token.objects.get(key=token_key).delete()
 
         LOGGER.info('User has been logged out')
@@ -269,7 +269,7 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        user = UserAuthentication.get_user_by_id(id)
+        user = UserAuthentication.get_user(id)
 
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -282,7 +282,7 @@ class UserProfile(APIView):
         serializer = UserSerializer(user, context=context)
 
         response_data = serializer.data
-        enable_editing_profile = UserAuthentication.is_owner(request, id)
+        enable_editing_profile = is_user_owner(request, id)
         response_data['enable_editing_profile'] = enable_editing_profile
 
         LOGGER.info(
@@ -300,7 +300,7 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        if not UserAuthentication.is_owner(request, id):
+        if not is_user_owner(request, id):
             LOGGER.error(
                 "User's data were not updated."
                 "user_id must be equal to token user_id"
@@ -308,7 +308,7 @@ class UserProfile(APIView):
             return Response({'message': 'Editing not allowed'},
                             status=status.HTTP_403_FORBIDDEN)
 
-        user = UserAuthentication.get_user_by_id(id)
+        user = UserAuthentication.get_user(id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -349,7 +349,7 @@ class UserEmail(APIView):
         :param id: Integer
         :return: Response(data)
         """
-        user = UserAuthentication.get_user_by_id(id)
+        user = UserAuthentication.get_user(id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -395,7 +395,7 @@ class UserPassword(APIView):
         :param id: integer
         :return: Response(message, status)
         """
-        user = UserAuthentication.get_user_by_id(id)
+        user = UserAuthentication.get_user(id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -431,7 +431,7 @@ class TokenValidation(APIView):
             token = Token.objects.get(key=token_key)
 
             if (timezone.now() <= token.created
-                    + datetime.timedelta(days=1)):
+                    + datetime.timedelta(seconds=5)):
                 return Response(status=status.HTTP_200_OK)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         except Token.DoesNotExist:

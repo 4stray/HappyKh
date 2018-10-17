@@ -2,7 +2,6 @@
 # pylint: disable=unused-argument, no-self-use
 import logging
 
-from rest_framework.authtoken.models import Token
 from users.models import User
 
 LOGGER = logging.getLogger('happy_logger')
@@ -10,15 +9,6 @@ LOGGER = logging.getLogger('happy_logger')
 
 class UserAuthentication:
     """ Performes user authentication """
-    @staticmethod
-    def is_owner(request, user_id):
-        token_key = request.META['HTTP_AUTHORIZATION'][6:]
-        token_user_id = Token.objects.get(key=token_key).user.id
-        return user_id == token_user_id
-
-    @staticmethod
-    def get_user_by_id(id):
-        return UserAuthentication().get_user(id)
 
     def authenticate(self, request, user_email=None,
                      user_password=None, user_token=None):
@@ -42,7 +32,8 @@ class UserAuthentication:
             LOGGER.error('User does not exist while authentication')
         return None
 
-    def get_user(self, user_id):
+    @staticmethod
+    def get_user(user_id):
         """
         Return user object by id
         :param user_id: Number
