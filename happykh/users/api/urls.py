@@ -15,5 +15,6 @@ urlpatterns = [ #pylint: disable = invalid-name
         path('token-validation/', views.TokenValidation.as_view()),
         path('<int:id>/data', views.UserProfile.as_view()),
         path('<int:id>/password', views.UserPassword.as_view()),
+        path('<int:id>/email', views.UserEmail.as_view()),
     ])),
 ]

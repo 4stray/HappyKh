@@ -9,7 +9,7 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
-from users.api.serializers import UserSerializer
+from users.api.serializers import UserSerializer, EmailSerializer
 from users.models import User
 
 from utils import delete_std_images_from_media
@@ -17,7 +17,9 @@ from ..utils import BaseTestCase
 
 USERS_PROFILE_URL = '/api/users/%d'
 USERS_PROFILE_DATA_URL = '/api/users/%d/data'
+USERS_PROFILE_EMAIL_URL = '/api/users/%d/email'
 USERS_PROFILE_PASSWORD_URL = '/api/users/%d/password'
+
 
 CORRECT_DATA = {
     'email': 'test@mail.com',
@@ -155,6 +157,36 @@ class TestUserProfile(BaseTestCase, APITestCase):
             self.test_user.check_password(invalid_password['new_password'])
         )
 
+    def test_patch_update_email(self):
+        """test update user's email"""
+        edited_email = 'valid@mail.com'
+        response = self.client.patch(USERS_PROFILE_EMAIL_URL % self.test_user.pk,
+                                     {'email': edited_email})
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+        updated_user = User.objects.get(pk=self.test_user.pk)
+        self.assertFalse(updated_user.is_active)
+
+    def test_patch_invalid_email(self):
+        """test update user's email with invalid email format"""
+        invalid_email = 'invalid_email_format'
+        serializer = EmailSerializer(self.test_user, invalid_email)
+        response = self.client.patch(USERS_PROFILE_EMAIL_URL % self.test_user.pk,
+                                     {'email': invalid_email})
+
+        self.assertFalse(serializer.is_valid())
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_patch_existing_email(self):
+        """test update user's email with email of existing user"""
+        testing_email = "second@test.com"
+        User.objects.create_user(email=testing_email, password="password2")
+        response = self.client.patch(USERS_PROFILE_EMAIL_URL % self.test_user.pk,
+                                     {'email': testing_email})
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
     def test_patch_invalid_profile_image(self):
         """test update user's password with invalid new password"""
         incorrect_data = {}
@@ -178,3 +210,4 @@ class TestUserProfile(BaseTestCase, APITestCase):
             self.test_user.profile_image, incorrect_data['profile_image']
         )
         self.assertEqual('', self.test_user.profile_image)
+
