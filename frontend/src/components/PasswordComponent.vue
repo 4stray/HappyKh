@@ -56,6 +56,15 @@ export default {
       return true;
     },
     saveNewPassword() {
+      if (this.isPasswordValid()) {
+        const userCredentials = {
+          old_password: this.oldPassword,
+          new_password: this.newPassword,
+        };
+        axios.patch(
+          `${UserAPI + this.$cookies.get('user_id')}/password`, userCredentials,
+          {
+            headers: { Authorization: `Token ${this.$cookies.get('token')}` },
       if (!this.$refs.form.validate()) {
         this.$refs.form.reset();
         return;

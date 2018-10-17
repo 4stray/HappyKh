@@ -6,7 +6,7 @@ from users.models import User
 
 CORRECT_EMAIL = 'test@mail.com'
 CORRECT_PASSWORD = 'testPassword'
-LOGIN_URL = '/api/users/login/'
+LOGIN_URL = '/api/users/login'
 
 CORRECT_DATA = {'user_email': CORRECT_EMAIL,
                 'user_password': CORRECT_PASSWORD}

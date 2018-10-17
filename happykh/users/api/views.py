@@ -4,6 +4,7 @@
 import logging
 from smtplib import SMTPException
 
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
@@ -129,7 +130,6 @@ class UserRegistration(APIView):
                 return Response(status=status.HTTP_201_CREATED)
             else:
                 LOGGER.error('Confirmation email has not been delivered')
-                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
                                ' due to connection reasons'
@@ -250,6 +250,7 @@ class UserProfile(APIView):
     permission_classes = (IsAuthenticated,)
 
     # pylint: disable = redefined-builtin
+    variation = User.medium
 
     def get(self, request, id):
         """
@@ -258,11 +259,15 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
+
         user = UserAuthentication.get_user(self, id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
-
-        serializer = UserSerializer(user)
+        context = {
+            'variation': self.variation,
+            'domain': get_current_site(request)
+        }
+        serializer = UserSerializer(user, context=context)
         LOGGER.info('Return user profile')
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -277,7 +282,16 @@ class UserProfile(APIView):
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = UserSerializer(user, data=request.data, partial=True)
+        context = {
+            'variation': self.variation,
+            'domain': get_current_site(request)
+        }
+        serializer = UserSerializer(
+            user,
+            data=request.data,
+            partial=True,
+            context=context,
+        )
         if serializer.is_valid():
             serializer.save(id=id, **serializer.validated_data)
             LOGGER.info('User data updated')
@@ -294,6 +308,7 @@ class UserPassword(APIView):
     """
     Change user's password
     """
+
     def patch(self, request, id):
         """
         :param request: HTTP request
