@@ -18,6 +18,8 @@
 <script>
 import axios from 'axios';
 
+const UserAPI = 'http://127.0.0.1:8000/api/users/';
+
 export default {
   name: 'ChangeEmailComponent',
   data: () => (
@@ -36,11 +38,11 @@ export default {
         this.$refs.form.reset();
         return;
       }
-      const userAPI = `http://127.0.0.1:8000/api/users/${this.$cookies.get('user_id')}/email/`;
-
-      axios.post(userAPI, {
-        user_email: this.email,
-      }).then(() => {
+      const newEmail = { user_email: this.email };
+      axios.post(
+        `${UserAPI + this.$cookies.get('user_id')}/email`,
+        newEmail,
+      ).then(() => {
         this.$awn.success('Please check your mailbox for confirmation email');
       })
         .catch((error) => {

@@ -46,8 +46,6 @@ export default {
       userAge: 0,
       userGender: 'M',
       userImage: '',
-      isDisabled: true,
-      enableText: 'Enable editing',
     };
   },
   created() {
@@ -64,7 +62,7 @@ export default {
     },
     fetchUserCredentials() {
       axios.get(
-        `${UserAPI + this.$cookies.get('user_id')}`,
+        UserAPI + this.$cookies.get('user_id'),
         {
           headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
@@ -83,84 +81,4 @@ export default {
 </script>
 
 <style scoped>
-  #ProfileComponent {
-    width: 500px;
-    border: 1px solid #CCCCCC;
-    background-color: #FFFFFF;
-    margin: auto;
-    margin-top: 130px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  input {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 300px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  input:focus {
-    outline: none;
-  }
-
-  img {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 300px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  select {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 332px;
-    height: 40px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  .btn-change {
-    margin-top: 5px;
-    background-color: #ffc107;
-    color: #fff;
-    border: none;
-    padding: 10px 25px;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-family: "Liberation Sans", sans;
-    border-radius: 20px;
-    cursor: pointer;
-  }
-
-  .btn-change:hover {
-    background-color: #ffa000;
-  }
-
-  .btn-save {
-    margin-top: 5px;
-    background-color: #ffc107;
-    color: #fff;
-    border: none;
-    padding: 10px 25px;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-family: "Liberation Sans", sans;
-    border-radius: 20px;
-    cursor: pointer;
-  }
-
-  .btn-save:hover {
-    background-color: #ffa000;
-  }
 </style>
