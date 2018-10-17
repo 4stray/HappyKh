@@ -30,6 +30,13 @@ const router = new Router({
       path: '/profile',
       name: 'profile',
       component: Profile,
+      beforeEnter: (to, from, next) => {
+        if (store.getters.getAuthenticated) {
+          next();
+        } else {
+          next({ name: 'login' });
+        }
+      }
     },
     {
       path: '/places/create',
