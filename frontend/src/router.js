@@ -42,7 +42,7 @@ const router = new Router({
 router.beforeEach((to, from, next) => {
   if (store.getters.getAuthenticated) {
     const urlTokenValidation =
-      'http://127.0.0.1:8000/api/users/token-validation/';
+      'http://127.0.0.1:8000/api/users/token-validation';
 
     const headers = {
       Authorization: `Token ${store.getters.getToken}`,
