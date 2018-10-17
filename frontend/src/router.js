@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import axios from 'axios';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
@@ -43,29 +44,27 @@ router.beforeEach((to, from, next) => {
     const urlTokenValidation =
       'http://127.0.0.1:8000/api/users/token-validation/';
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', urlTokenValidation, false);
-    xhr.setRequestHeader(
-      'Authorization',
-      `Token ${store.getters.getToken}`,
-    );
+    const headers = {
+      Authorization: `Token ${store.getters.getToken}`,
+    };
 
-    xhr.send();
-
-    const statusCode = xhr.status;
-
-    if (statusCode === 200) {
-      console.log(`Token exists, status: ${statusCode}`);
+    axios.get(
+      urlTokenValidation,
+      {
+        headers,
+      },
+    ).then((response) => {
+      console.log(`Token exists, status: ${response.status}`);
       next();
-    } else if (statusCode === 401) {
-      console.log(`Token doesn't exist, status: ${statusCode}`);
+    }).catch((error) => {
+      console.log(`Token doesn't exist, status: ${error.response.status}`);
 
       store.dispatch('signOut');
 
       next({ name: 'login' });
-    }
+    });
   } else {
-    console.log('executed beforeEach');
+    console.log('executed beforeEach for a guest user');
     next();
   }
 });

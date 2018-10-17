@@ -388,7 +388,7 @@ class TokenValidation(APIView):
             token = Token.objects.get(key=token_key)
 
             if (timezone.now() <= token.created
-                    + datetime.timedelta(hours=5)):
+                    + datetime.timedelta(days=1)):
                 return Response(status=status.HTTP_200_OK)
             return Response(status=status.HTTP_401_UNAUTHORIZED)
         except Token.DoesNotExist:
