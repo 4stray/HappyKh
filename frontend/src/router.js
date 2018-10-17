@@ -36,7 +36,7 @@ const router = new Router({
         } else {
           next({ name: 'login' });
         }
-      }
+      },
     },
     {
       path: '/places/create',
@@ -61,17 +61,13 @@ router.beforeEach((to, from, next) => {
         headers,
       },
     ).then((response) => {
-      console.log(`Token exists, status: ${response.status}`);
       next();
     }).catch((error) => {
-      console.log(`Token doesn't exist, status: ${error.response.status}`);
-
       store.dispatch('signOut');
 
       next({ name: 'login' });
     });
   } else {
-    console.log('executed beforeEach for a guest user');
     next();
   }
 });
