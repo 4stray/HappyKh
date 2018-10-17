@@ -1,8 +1,11 @@
 """ Custom models for user """
+
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from stdimage import models as std_models
+from utils import make_upload_image
 
 
 class UserManager(BaseUserManager):
@@ -65,13 +68,43 @@ class User(AbstractBaseUser, PermissionsMixin):
         (woman, 'woman'),
         (man, 'man')
     )
+
+    large = 'large'
+    thumbnail = 'thumbnail'
+    medium = 'medium'
+
+    VARIATIONS_PROFILE_IMAGE = {
+        large: (600, 400, True),
+        thumbnail: (100, 100, True),
+        medium: (300, 200, True),
+    }
+
+    def _make_upload_profile_image(self, filename):
+        """
+        Function which creates path for user's image.
+        Should be used as base-function for function in parameter upload_to of
+        ImageField.
+
+        :param self: instance of User
+        :param filename: name of the user's file, ex. 'image.png'
+        :return: path to image or None if filename is empty
+        """
+
+        return make_upload_image(filename, 'user/profile_image')
+
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     age = models.PositiveSmallIntegerField(blank=True, null=True, )
     gender = models.CharField(choices=GENDER_CHOICES, max_length=2,
                               default=woman)
-    profile_image = models.TextField(null=True, blank=True)
+    profile_image = std_models.StdImageField(
+        upload_to=_make_upload_profile_image,
+        blank=True,
+        null=True,
+        default='',
+        variations=VARIATIONS_PROFILE_IMAGE,
+    )
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
 

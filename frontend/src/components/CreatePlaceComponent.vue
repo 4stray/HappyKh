@@ -1,13 +1,15 @@
 <template>
   <div id="createPlaceComponent">
     <h1>Create your place:</h1>
-    <input type="text" id="name"
-           v-model="placeName" placeholder="Place name"/>
-    <textarea id="description"
-              v-model="placeDescription" placeholder="Description"></textarea>
-    <img v-bind:src=placeLogo id='logo' alt="No place image"/>
-    <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
-    <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
+    <form id="placeForm" enctype="multipart/form-data">
+      <input type="text" id="name"
+             v-model="placeName" placeholder="Place name"/>
+      <textarea id="description"
+                v-model="placeDescription" placeholder="Description"></textarea>
+      <img v-bind:src=placeLogo id='logo' alt="No place image"/>
+      <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
+      <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
+    </form>
   </div>
 </template>
 
@@ -26,16 +28,19 @@ export default {
   },
   methods: {
     save() {
-      const placeInfo = {
-        name: this.placeName,
-        description: this.placeDescription,
-        logo: this.placeLogo,
-        user: this.$cookies.get('user_id'),
-      };
+      const imageFile = document.querySelector('#logoInput');
+      const formData = new FormData();
+      formData.set('user', this.$cookies.get('user_id'));
+      formData.set('name', this.placeName);
+      formData.set('description', this.placeDescription);
+      formData.append('logo', imageFile.files[0]);
       axios.post(
-        `${BaseURL}/places/`, placeInfo,
+        `${BaseURL}/places/`, formData,
         {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+          headers: {
+            Authorization: `Token ${this.$cookies.get('token')}`,
+            'Content-Type': 'multipart/form-data',
+          },
         },
       )
         .then(() => {
@@ -59,9 +64,10 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
   #createPlaceComponent {
     width: 500px;
+    font-family: 'Liberation Sans', sans, sans-serif;
     border: 1px solid #CCCCCC;
     background-color: #FFFFFF;
     margin: auto;
@@ -71,7 +77,12 @@ export default {
     align-items: center;
   }
 
-  input, textarea {
+  #placeForm {
+    display: block;
+  }
+
+  #createPlaceComponent input, textarea {
+    font-family: 'Liberation Sans', sans, sans-serif;
     padding: 10px 15px;
     margin-bottom: 10px;
     width: 300px;
@@ -80,27 +91,30 @@ export default {
     -moz-border-radius: 5px;
     border-radius: 5px;
   }
-  textarea{
+  #createPlaceComponent textarea{
+    resize: none;
     height: 6em;
   }
-  textarea::-webkit-scrollbar {
+  #createPlaceComponent textarea::-webkit-scrollbar {
     width: 1em;
   }
 
-  textarea::-webkit-scrollbar-track {
+  #createPlaceComponent textarea::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
   }
 
-  textarea::-webkit-scrollbar-thumb {
+  #createPlaceComponent textarea::-webkit-scrollbar-thumb {
     background-color: darkgrey;
     outline: 1px solid slategrey;
   }
 
-  input:focus {
+  #createPlaceComponent input:focus {
     outline: none;
   }
 
-  img {
+  #createPlaceComponent img {
+    font-family: 'Liberation Sans', sans, sans-serif;
+    font-size: 14px;
     padding: 10px 15px;
     margin-bottom: 10px;
     width: 60%;
@@ -112,15 +126,15 @@ export default {
   }
 
   .btn-save {
-  width: 40%;
-  border: none;
-  border-radius: 10px;
-  padding: 10px 25px;
-  color: #fff;
-  text-transform: uppercase;
-  font-weight: 600;
-  font-family: 'Liberation Sans', sans, sans-serif;
-  cursor: pointer;
-  background-color: #0ca086;
+    width: 40%;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 25px;
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 600;
+    font-family: 'Liberation Sans', sans, sans-serif;
+    cursor: pointer;
+    background-color: #0ca086;
   }
 </style>

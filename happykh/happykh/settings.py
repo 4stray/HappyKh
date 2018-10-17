@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
+    'stdimage',
 ]
 
 # Basic Django REST Token setup
@@ -101,8 +102,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'happykh',
-        'USER': 'admin',
-        'PASSWORD': 'admin123',
+        'USER': 'localadmin',
+        'PASSWORD': 'localpassword',
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -187,6 +188,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 CORS_ORIGIN_REGEX_WHITELIST = (
     # For Client

@@ -1,8 +1,8 @@
 """Tests for models of places app"""
 import pytest
-from tests.utils import BaseTestCase
 from places.models import Place
 from users.models import User
+from ..utils import BaseTestCase
 
 
 @pytest.mark.django_db
@@ -31,7 +31,3 @@ class PlaceTestCase(BaseTestCase):
         with self.assertRaises(Place.DoesNotExist) as dne:
             Place.objects.get(user=user_on_delete)
         self.assertEqual(type(dne.exception), Place.DoesNotExist)
-
-
-
-    

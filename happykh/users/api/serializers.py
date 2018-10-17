@@ -8,6 +8,8 @@ from django.core.validators import validate_email
 from rest_framework import exceptions
 from rest_framework import serializers
 
+from utils import UploadedImageField
+from utils import delete_std_images_from_media
 from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
@@ -16,10 +18,26 @@ LOGGER = logging.getLogger('happy_logger')
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
 
+    profile_image = UploadedImageField(max_length=None, )
+
     class Meta:
         # pylint: disable=too-few-public-methods, missing-docstring
         model = User
-        fields = '__all__'
+        exclude = ('email', 'password')
+
+    def update(self, instance, validated_data):
+        if instance.profile_image:
+            # delete old images
+            delete_std_images_from_media(
+                instance.profile_image,
+                User.VARIATIONS_PROFILE_IMAGE
+            )
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        return instance
 
 
 # pylint: disable = abstract-method
@@ -106,5 +124,43 @@ class PasswordSerializer(serializers.ModelSerializer):
         if password:
             instance.set_password(password)
         instance.save()
+
+        return instance
+
+
+class EmailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for email change
+    """
+    class Meta:
+        # pylint: disable=too-few-public-methods, missing-docstring
+        model = User
+        fields = ('email', )
+
+    def validate(self, attrs):
+        new_email = attrs.get('email')
+
+        try:
+            validate_email(new_email)
+        except ValidationError:
+            email_validation_error = exceptions.ValidationError
+
+            email_validation_error.default_detail = \
+                'Invalid user email format.'
+            LOGGER.error(
+                f'Serializer:Validation error '
+                f'{email_validation_error.default_detail}'
+                f'invalid email format, Email: {new_email}'
+            )
+            raise email_validation_error
+        return attrs
+
+    def update(self, instance, validated_data):
+        new_email = validated_data.get('email')
+
+        if new_email:
+            instance.is_active = False
+            instance.email = new_email
+            instance.save()
 
         return instance
