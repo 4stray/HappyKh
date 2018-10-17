@@ -269,37 +269,29 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        try:
-            user = UserAuthentication.get_user_by_id(id)
+        user = UserAuthentication.get_user_by_id(id)
 
-            if user is None:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
-            context = {
-                'variation': self.variation,
-                'domain': get_current_site(request)
-            }
+        context = {
+            'variation': self.variation,
+            'domain': get_current_site(request)
+        }
 
-            serializer = UserSerializer(user, context=context)
+        serializer = UserSerializer(user, context=context)
 
-            response_data = serializer.data
-            enable_editing_profile = UserAuthentication.is_owner(request, id)
-            response_data['enable_editing_profile'] = enable_editing_profile
+        response_data = serializer.data
+        enable_editing_profile = UserAuthentication.is_owner(request, id)
+        response_data['enable_editing_profile'] = enable_editing_profile
 
-            LOGGER.info(
-                f'Enable Editing User Profile is set '
-                f'to {enable_editing_profile}'
-            )
-            LOGGER.info('Return user profile')
+        LOGGER.info(
+            f'Enable Editing User Profile is set '
+            f'to {enable_editing_profile}'
+        )
+        LOGGER.info('Return user profile')
 
-            return Response(response_data, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            LOGGER.error(
-                f'Can`t get user profile because of invalid id,'
-                f' user_id: {id}'
-            )
-            return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
         """
@@ -357,7 +349,7 @@ class UserEmail(APIView):
         :param id: Integer
         :return: Response(data)
         """
-        user = UserAuthentication.get_user(self, id)
+        user = UserAuthentication.get_user_by_id(id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
