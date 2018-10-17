@@ -1,8 +1,8 @@
 """Creation model for place"""
 
 from django.db import models
-from users.models import User
 from stdimage import models as std_models
+from users.models import User
 from utils import make_upload_image
 
 

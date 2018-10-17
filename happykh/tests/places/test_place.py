@@ -1,10 +1,10 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from tests.utils import BaseTestCase
 from places.models import Place
 from places.api.serializers import PlaceSerializer
 from users.models import User
-from rest_framework.authtoken.models import Token
 
 PLACE_URL = '/api/places/'
 TEST_PLACE_DATA = {

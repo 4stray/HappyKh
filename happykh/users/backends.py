@@ -1,5 +1,4 @@
 """ Support class for user authentication """
-# pylint: disable=unused-argument, no-self-use
 import logging
 
 from users.models import User

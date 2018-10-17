@@ -27,7 +27,6 @@ matrix:
     - pytest
     - pylint --load-plugins pylint_django users
     - pylint --load-plugins pylint_django places
-    - pylint --load-plugins pylint_django tests
   - language: node_js
     node_js: 8.12.0
     cache:

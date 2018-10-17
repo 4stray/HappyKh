@@ -1,5 +1,4 @@
 """Custom serializers for users app"""
-# pylint: disable = logging-fstring-interpolation
 import logging
 
 from django.contrib.auth import authenticate
@@ -21,7 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
     profile_image = UploadedImageField(max_length=None, )
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         exclude = ('email', 'password')
 
@@ -113,7 +111,6 @@ class PasswordSerializer(serializers.ModelSerializer):
     new_password = serializers.CharField(required=True)
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = ('old_password', 'new_password')
 

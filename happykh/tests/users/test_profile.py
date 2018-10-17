@@ -2,8 +2,8 @@
 import os
 
 # pylint: disable = no-member
-from django.core.files.uploadedfile import UploadedFile
 from io import BytesIO
+from django.core.files.uploadedfile import UploadedFile
 from PIL import Image
 from rest_framework import status
 from rest_framework.authtoken.models import Token
