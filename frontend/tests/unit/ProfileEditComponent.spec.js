@@ -35,10 +35,6 @@ describe('ProfileEditComponent', () => {
     expect(wrapper.find('#age').attributes('type')).to.be.equal('number');
   });
 
-  it('contains default Image ', () => {
-    expect(wrapper.find('#profileImage').attributes('src')).to.be.equal('../assets/default_user.png');
-  });
-
   it('has change Image button', () => {
     expect(wrapper.find('[type="file"]').exists()).to.be.equal(true);
   });

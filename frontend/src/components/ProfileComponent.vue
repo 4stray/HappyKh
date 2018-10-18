@@ -35,7 +35,7 @@
 import axios from 'axios';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
-const GENDER_CHOICES = {M: 'Man', W: 'Woman'};
+const GENDER_CHOICES = { M: 'Man', W: 'Woman' };
 
 export default {
   name: 'ProfileComponent',
@@ -64,7 +64,7 @@ export default {
       axios.get(
         UserAPI + this.$cookies.get('user_id'),
         {
-          headers: {Authorization: `Token ${this.$cookies.get('token')}`},
+          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
       ).then((response) => {
         this.userFirstName = response.data.first_name;
