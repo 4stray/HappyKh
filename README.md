@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.com/Formeme/HappyKh.svg?branch=master)](https://travis-ci.com/Formeme/HappyKh)
-# HappyKh Project Setup
+# HappyKh Project Setup (for unix systems)
+## Supported platforms: Linux, MacOS
 ## Preinstalled Software Requirements
 * Install npm locally:
 ```sh
