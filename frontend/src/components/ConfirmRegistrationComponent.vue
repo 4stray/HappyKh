@@ -1,10 +1,3 @@
-<template>
-  <div>
-    <h1>Congratulations!</h1>
-    <p>You've just activated your account</p>
-  </div>
-</template>
-
 <script>
 // @ is an alias to /src
 import axios from 'axios';
@@ -23,12 +16,13 @@ export default {
         emailToken,
       },
     ).then((response) => {
-      /* eslint-disable-next-line no-console */
-      console.log(response.status);
+      console.log(response.status); /* eslint-disable-line no-console */
+      this.$awn.success("Your account has been activated successfully");
     }).catch((error) => {
-      /* eslint-disable-next-line no-console */
-      console.log(error);
+      console.log(error); /* eslint-disable-line no-console */
+      this.$awn.warning(error.response.data.message);
     });
+    this.$router.push({name: 'login'})
   },
 };
 </script>
