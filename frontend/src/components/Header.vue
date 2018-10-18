@@ -17,7 +17,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import Cookies from 'js-cookie';
+import store from '../store';
+
 
 export default {
   name: 'Header',
@@ -28,12 +29,8 @@ export default {
   },
   methods: {
     signOut() {
-      this.$cookies.remove('token');
-      this.$cookies.remove('user_id');
-      this.$router.push({ name: 'home' });
-      if (document.location.pathname === '/') {
-        document.location.reload(true);
-      }
+      store.dispatch('signOut');
+      this.$awn.success('You have been signed out');
     },
   },
 };

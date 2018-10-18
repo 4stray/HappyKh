@@ -8,6 +8,7 @@ from utils import make_upload_image
 
 
 class Place(models.Model):
+
     """
     Place model for creation new places
     """

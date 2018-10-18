@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import axios from 'axios';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
@@ -11,9 +12,9 @@ import store from './store';
 const ifAuthenticated = (to, from, next) => {
   if (store.getters.getAuthenticated) {
     next();
-    return;
+  } else {
+    next({ name: 'login' });
   }
-  next('/login');
 };
 
 const router = new Router({
@@ -52,6 +53,32 @@ const router = new Router({
       beforeEnter: ifAuthenticated,
     },
   ],
+});
+
+router.beforeEach((to, from, next) => {
+  if (store.getters.getAuthenticated) {
+    const urlTokenValidation =
+      'http://127.0.0.1:8000/api/users/token-validation';
+
+    const headers = {
+      Authorization: `Token ${store.getters.getToken}`,
+    };
+
+    axios.get(
+      urlTokenValidation,
+      {
+        headers,
+      },
+    ).then((response) => {
+      next();
+    }).catch((error) => {
+      store.dispatch('signOut');
+
+      next({ name: 'login' });
+    });
+  } else {
+    next();
+  }
 });
 
 Vue.use(Router);
