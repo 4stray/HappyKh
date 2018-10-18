@@ -22,8 +22,8 @@ const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
 export default {
   name: 'ChangeEmailComponent',
-  data: () => (
-    {
+  data() {
+    return {
       valid: false,
       email: '',
       emailRules: [
@@ -31,22 +31,30 @@ export default {
         v => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(v)
           || 'E-mail must be valid',
       ],
-    }),
+    };
+  },
   methods: {
     changeEmail() {
       if (!this.$refs.form.validate()) {
         this.$refs.form.reset();
         return;
       }
-      const newEmail = { user_email: this.email };
-      axios.post(
+      const newEmail = { email: this.email };
+      axios.patch(
         `${UserAPI + this.$cookies.get('user_id')}/email`,
         newEmail,
+        {
+          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+        },
       ).then(() => {
         this.$awn.success('Please check your mailbox for confirmation email');
       })
         .catch((error) => {
-          this.$awn.warning(error.response.data.message);
+          if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          } else {
+            this.$awn.warning(error.message);
+          }
         });
       this.$refs.form.reset();
     },

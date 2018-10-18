@@ -3,24 +3,25 @@
     <v-card-title primary-title>
       <h3 class="headline mb-0">Edit your profile:</h3>
     </v-card-title>
-    <v-form @submit.prevent="save" enctype="multipart/form-data">
-      <v-text-field type="text" id="first_name" label="First name"
+    <v-form ref="form" v-model="valid" @submit.prevent="save"
+            enctype="multipart/form-data">
+      <v-text-field type="text" id="firstName" label="First name"
                     v-model="userFirstName"
                     placeholder="First name"></v-text-field>
-      <v-text-field type="text" id="last_name" label="Last name"
+      <v-text-field type="text" id="lastName" label="Last name"
                     v-model="userLastName"
                     placeholder="Last name"></v-text-field>
       <v-text-field type="number" id="age" v-model="userAge" label="Age"
-                    min="0" max="140" step="1" :rules="ageRules"></v-text-field>
+                    min="0" max="140" step="1"
+                    :rules="ageRules"></v-text-field>
       <v-radio-group v-model="userGender" label="Gender">
         <v-radio label="Woman" color="primary" value="W"></v-radio>
         <v-radio label="Male" color="primary" value="M"></v-radio>
       </v-radio-group>
       <img v-if="userImage" v-bind:src=userImage alt="No image"/>
-      <img v-else src="../assets/default_user.png" alt="No user avatar"/>
+      <img v-else id="profileImage" src="../assets/default_user.png" alt="No user avatar"/>
       <input type="file"
              id="imageInput"
-             class="file-upload"
              v-on:change="changeImage()"
              accept="image/*"/>
       <v-btn class="success" type="submit" block>Save</v-btn>
@@ -45,7 +46,7 @@ export default {
       userImage: '',
       valid: true,
       ageRules: [
-        age => (age < 0 || age > 140) || 'Invalid age value',
+        age => (age > 0 || age <= 140) || 'Invalid age value',
       ],
     };
   },
@@ -60,11 +61,11 @@ export default {
           headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
       ).then((response) => {
-        this.userFirstName = response.data.first_name;
-        this.userLastName = response.data.last_name;
+        this.userFirstName = response.data.firstName;
+        this.userLastName = response.data.lastName;
         this.userAge = response.data.age;
         this.userGender = response.data.gender;
-        this.userImage = response.data.profile_image;
+        this.userImage = response.data.profileImage;
       }).catch((error) => {
         this.$awn.warning(error.message);
       });
@@ -72,14 +73,16 @@ export default {
     save() {
       if (this.$refs.form.validate()) {
         const formData = new FormData();
-        formData.set('first_name', this.userFirstName);
-        formData.set('last_name', this.userLastName);
+        formData.set('firstName', this.userFirstName);
+        formData.set('lastName', this.userLastName);
         formData.set('age', this.userAge);
         formData.set('gender', this.userGender);
-        formData.append('profile_image', this.userImage);
+
+        const imageFile = document.querySelector('#imageInput');
+        formData.append('profileImage', imageFile.files[0]);
 
         axios.patch(
-          UserAPI + this.$cookies.get('user_id'), formData,
+          `${UserAPI + this.$cookies.get('user_id')}/data`, formData,
           {
             headers: {
               Authorization: `Token ${this.$cookies.get('token')}`,
@@ -87,11 +90,11 @@ export default {
             },
           },
         ).then((response) => {
-          this.userFirstName = response.data.first_name;
-          this.userLastName = response.data.last_name;
+          this.userFirstName = response.data.firstName;
+          this.userLastName = response.data.lastName;
           this.userAge = response.data.age;
           this.userGender = response.data.gender;
-          this.userImage = response.data.profile_image;
+          this.userImage = response.data.profileImage;
           this.$awn.success('Your profile was successfully updated.');
         }).catch((error) => {
           this.$awn.warning(error.message);
@@ -119,4 +122,5 @@ img {
   width: 300px;
   margin: auto;
 }
+
 </style>

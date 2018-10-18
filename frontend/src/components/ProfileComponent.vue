@@ -1,6 +1,6 @@
 <template>
   <v-layout v-if="isEmptyProfile()" justify-space-around row fill-height>
-    <v-card class="px-5 py-3 fill-height">
+    <v-card id="default" class="px-5 py-3 fill-height">
       <img src="../assets/default_user.png" alt="user avatar"/>
       <h3 class="headline mb-0 mb-5">
         Your profile is empty. You can edit it.
@@ -16,15 +16,15 @@
     </v-flex>
     <v-flex md6 xs12>
       <v-layout justify-start column fill-height>
-        <v-card class="px-5 py-3 fill-height">
+        <v-card id="main" class="px-5 py-3 fill-height">
           <v-btn :to="{name: 'settings'}"
                  fab dark absolute bottom right color="green">
             <v-icon>edit</v-icon>
           </v-btn>
           <h3 class="headline mb-2"> {{fullName}}</h3>
           <v-label v-if="userAge" class="">Age</v-label>
-          <p v-if="userAge">{{userAge}}</p>
-          <p class="text--secondary">{{userGender}}</p>
+          <p id="userAge" v-if="userAge">{{userAge}}</p>
+          <p id="userGender" class="text--secondary">{{userGender}}</p>
         </v-card>
       </v-layout>
     </v-flex>
@@ -35,7 +35,7 @@
 import axios from 'axios';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
-const GENDER_CHOICES = { M: 'Man', W: 'Woman' };
+const GENDER_CHOICES = {M: 'Man', W: 'Woman'};
 
 export default {
   name: 'ProfileComponent',
@@ -58,13 +58,13 @@ export default {
   },
   methods: {
     isEmptyProfile() {
-      return !(this.fullName || this.userAge || this.userImage);
+      return !(!!this.fullName || this.userAge || this.userImage);
     },
     fetchUserCredentials() {
       axios.get(
         UserAPI + this.$cookies.get('user_id'),
         {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+          headers: {Authorization: `Token ${this.$cookies.get('token')}`},
         },
       ).then((response) => {
         this.userFirstName = response.data.first_name;
@@ -81,4 +81,7 @@ export default {
 </script>
 
 <style scoped>
+.material-icons {
+  display: inherit;
+}
 </style>

@@ -1,5 +1,6 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Cookies from 'js-cookie';
+import Vuetify from 'vuetify';
 import ProfileEditComponent
   from '../../src/components/ProfileEditComponent.vue';
 
@@ -10,26 +11,32 @@ Cookies.set('token', 'value_');
 Cookies.set('user_id', 'value_');
 
 describe('ProfileEditComponent', () => {
-  const wrapper = shallowMount(ProfileEditComponent, {
-    mocks: {
-      $cookies: Cookies,
-    },
+  let wrapper;
+  beforeEach(() => {
+    const localVue = createLocalVue();
+    localVue.use(Vuetify);
+    wrapper = shallowMount(ProfileEditComponent, {
+      localVue,
+      mocks: {
+        $cookies: Cookies,
+      },
+    });
   });
 
   it('has LastName field with "text" type', () => {
-    expect(wrapper.find('#last_name').attributes('type')).to.be.equal('text');
+    expect(wrapper.find('#lastName').attributes('type')).to.be.equal('text');
   });
 
   it('has FirstName field with "text" type', () => {
-    expect(wrapper.find('#first_name').attributes('type')).to.be.equal('text');
+    expect(wrapper.find('#firstName').attributes('type')).to.be.equal('text');
   });
 
   it('has Age field with "number" type', () => {
     expect(wrapper.find('#age').attributes('type')).to.be.equal('number');
   });
 
-  it('contains Image from data()', () => {
-    expect(wrapper.find('#image').attributes('src')).to.be.equal(ProfileEditComponent.data().userImage);
+  it('contains default Image ', () => {
+    expect(wrapper.find('#profileImage').attributes('src')).to.be.equal('../assets/default_user.png');
   });
 
   it('has change Image button', () => {

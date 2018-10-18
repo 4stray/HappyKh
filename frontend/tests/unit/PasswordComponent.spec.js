@@ -1,4 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
+import Cookies from 'js-cookie';
 import PasswordComponent from '../../src/components/PasswordComponent.vue';
 
 const expect = require('chai').expect;
@@ -19,7 +20,11 @@ describe('Password data() check', () => {
 });
 
 describe('Password mounted fields check', () => {
-  const wrapper = shallowMount(PasswordComponent);
+  const wrapper = shallowMount(PasswordComponent, {
+    mocks: {
+      $cookies: Cookies,
+    },
+  });
 
   it('has 3 input fields', () => {
     expect(wrapper.findAll('v-text-field').length).to.be.equal(3);

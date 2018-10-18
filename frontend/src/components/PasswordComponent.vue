@@ -17,11 +17,8 @@
                     v-model="confirmationPassword"
                     :rules="passwordRules"
                     label="Confirm new password"></v-text-field>
-      <v-btn type="submit"
-             :disabled="!valid"
-             color="success"
-             block
-      >submit
+      <v-btn type="submit" :disabled="!valid" color="success" block>
+        submit
       </v-btn>
     </v-form>
   </v-card>
