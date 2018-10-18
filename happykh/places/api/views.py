@@ -10,6 +10,7 @@ from ..models import Place
 
 
 class PlacePage(APIView):
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 

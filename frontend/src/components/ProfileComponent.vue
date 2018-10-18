@@ -13,7 +13,8 @@
         <option>Man</option>
         <option>Woman</option>
       </select>
-      <img v-if="userImage" v-bind:src=userImage id="image" alt="Something happened with image" />
+      <img v-if="userImage" v-bind:src=userImage id="image"
+           alt="Something happened with an image" />
       <img v-else src='../assets/blank-profile-picture.png' id="blank" alt="No profile image"/>
       <input type="file" id="imageInput" :disabled="isDisabled"
              v-on:change="changeImage()"
@@ -94,7 +95,7 @@ export default {
             this.userImage = response.data.profile_image;
             this.$awn.success('Your profile was successfully updated.');
           }).catch((error) => {
-            this.$awn.warning(this.error.message);
+            this.$awn.warning(error.response.data.message);
           });
       } else {
         this.userAge = 0;
