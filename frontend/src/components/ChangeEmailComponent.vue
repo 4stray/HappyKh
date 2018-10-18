@@ -48,14 +48,11 @@ export default {
         },
       ).then(() => {
         this.$awn.success('Please check your mailbox for confirmation email');
-      })
-        .catch((error) => {
-          if (error.response.data.message) {
-            this.$awn.warning(error.response.data.message);
-          } else {
-            this.$awn.warning(error.message);
-          }
-        });
+      }).catch((error) => {
+        if (error.response.data.message) {
+          this.$awn.warning(error.response.data.message);
+        }
+      });
       this.$refs.form.reset();
     },
   },

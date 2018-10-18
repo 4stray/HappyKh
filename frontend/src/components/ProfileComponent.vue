@@ -16,7 +16,7 @@
     </v-flex>
     <v-flex md6 xs12>
       <v-layout justify-start column fill-height>
-        <v-card id="main" class="px-5 py-3 fill-height">
+        <v-card id="main" class="px-5 py-3">
           <v-btn :to="{name: 'settings'}"
                  fab dark absolute bottom right color="green">
             <v-icon>edit</v-icon>
@@ -53,7 +53,10 @@ export default {
   },
   computed: {
     fullName() {
-      return `${this.userFirstName} ${this.userLastName}`;
+      if (this.userFirstName && this.userLastName) {
+        return `${this.userFirstName} ${this.userLastName}`;
+      }
+      return '';
     },
   },
   methods: {
@@ -73,7 +76,9 @@ export default {
         this.userGender = GENDER_CHOICES[response.data.gender];
         this.userImage = response.data.profile_image;
       }).catch((error) => {
-        this.$awn.warning(error.message);
+        if (error.response.data.message) {
+          this.$awn.warning(error.response.data.message);
+        }
       });
     },
   },

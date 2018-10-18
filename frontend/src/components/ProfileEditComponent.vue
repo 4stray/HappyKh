@@ -19,7 +19,7 @@
         <v-radio label="Male" color="primary" value="M"></v-radio>
       </v-radio-group>
       <img v-if="userImage" v-bind:src=userImage alt="No image"/>
-      <img v-else id="profileImage" src="../assets/default_user.png" alt="No user avatar"/>
+      <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
       <input type="file"
              id="imageInput"
              v-on:change="changeImage()"
@@ -36,17 +36,16 @@ const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
 export default {
   name: 'ProfileEditComponent',
-  components: {},
   data() {
     return {
       userFirstName: '',
       userLastName: '',
-      userAge: 0,
+      userAge: 1,
       userGender: 'M',
       userImage: '',
-      valid: true,
+      valid: false,
       ageRules: [
-        age => (age > 0 || age <= 140) || 'Invalid age value',
+        age => (age >= 10 && age <= 140) || 'Invalid age value',
       ],
     };
   },
@@ -61,25 +60,35 @@ export default {
           headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
       ).then((response) => {
-        this.userFirstName = response.data.firstName;
-        this.userLastName = response.data.lastName;
+        if (response.data.first_name === 'undefined') {
+          this.userFirstName = '';
+        } else {
+          this.userFirstName = response.data.first_name;
+        }
+        if (response.data.first_name === 'undefined') {
+          this.userLastName = '';
+        } else {
+          this.userLastName = response.data.last_name;
+        }
         this.userAge = response.data.age;
         this.userGender = response.data.gender;
-        this.userImage = response.data.profileImage;
+        this.userImage = response.data.profile_image;
       }).catch((error) => {
-        this.$awn.warning(error.message);
+        if (error.response.data.message) {
+          this.$awn.warning(error.response.data.message);
+        }
       });
     },
     save() {
       if (this.$refs.form.validate()) {
         const formData = new FormData();
-        formData.set('firstName', this.userFirstName);
-        formData.set('lastName', this.userLastName);
+        formData.set('first_name', this.userFirstName);
+        formData.set('last_name', this.userLastName);
         formData.set('age', this.userAge);
         formData.set('gender', this.userGender);
 
         const imageFile = document.querySelector('#imageInput');
-        formData.append('profileImage', imageFile.files[0]);
+        formData.append('profile_image', imageFile.files[0]);
 
         axios.patch(
           `${UserAPI + this.$cookies.get('user_id')}/data`, formData,
@@ -90,18 +99,19 @@ export default {
             },
           },
         ).then((response) => {
-          this.userFirstName = response.data.firstName;
-          this.userLastName = response.data.lastName;
+          this.userFirstName = response.data.first_name;
+          this.userLastName = response.data.last_name;
           this.userAge = response.data.age;
           this.userGender = response.data.gender;
-          this.userImage = response.data.profileImage;
+          this.userImage = response.data.profile_image;
           this.$awn.success('Your profile was successfully updated.');
         }).catch((error) => {
-          this.$awn.warning(error.message);
+          if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
         });
       } else {
-        this.userAge = 0;
-        this.$awn.warning('Enter valid age.');
+        this.$awn.warning('Please correct mistakes');
       }
     },
     changeImage() {

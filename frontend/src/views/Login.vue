@@ -41,7 +41,7 @@ const tabs = {
   },
   sendEmail: {
     component:
-    ConfirmationEmailComponent,
+      ConfirmationEmailComponent,
   },
 };
 
@@ -88,6 +88,8 @@ export default {
   #sendEmail {
     display: block;
     list-style: none;
+    margin: 10px;
+    width: 98%;
     width: 100%;
     font-size: 12px;
     font-weight: 300;
@@ -95,8 +97,13 @@ export default {
     text-decoration: none;
     border: none;
     background-color: transparent;
-    color: #999;
+    color: $primaryColor;
+    cursor: pointer;
   }
+
+   #sendEmail span:hover{
+     border-bottom: 1px solid $primaryColor;
+   }
 
   .tabs {
     display: flex;
