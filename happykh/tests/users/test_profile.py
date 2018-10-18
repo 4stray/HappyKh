@@ -63,6 +63,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
         response = self.client.get(USERS_PROFILE_URL % self.test_user.pk)
         serializer = UserSerializer(self.test_user)
         expected = serializer.data
+        expected['enable_editing_profile'] = True
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertDictEqual(expected, response.data)
