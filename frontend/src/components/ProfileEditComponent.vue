@@ -43,9 +43,9 @@ export default {
       userAge: 1,
       userGender: 'M',
       userImage: '',
-      valid: false,
+      valid: true,
       ageRules: [
-        age => (age >= 10 && age <= 140) || 'Invalid age value',
+        age => (age >= 10 && age <= 140) || (age === null) || 'Invalid age value',
       ],
     };
   },
