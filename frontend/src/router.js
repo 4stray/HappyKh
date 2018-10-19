@@ -6,6 +6,7 @@ import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import CreatePlace from './views/CreatePlace.vue';
 import Profile from './views/Profile.vue';
+import ProfileSettings from './views/ProfileSettings.vue';
 import store from './store';
 
 const ifAuthenticated = (to, from, next) => {
@@ -43,6 +44,12 @@ const router = new Router({
       path: '/places/create',
       name: 'createPlace',
       component: CreatePlace,
+      beforeEnter: ifAuthenticated,
+    },
+    {
+      path: '/profile/settings',
+      name: 'settings',
+      component: ProfileSettings,
       beforeEnter: ifAuthenticated,
     },
   ],

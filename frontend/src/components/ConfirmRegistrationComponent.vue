@@ -17,12 +17,12 @@ export default {
       },
     ).then((response) => {
       console.log(response.status); /* eslint-disable-line no-console */
-      this.$awn.success("Your account has been activated successfully");
+      this.$awn.success('Your account has been activated successfully');
     }).catch((error) => {
       console.log(error); /* eslint-disable-line no-console */
       this.$awn.warning(error.response.data.message);
     });
-    this.$router.push({name: 'login'})
+    this.$router.push({ name: 'login' });
   },
 };
 </script>
