@@ -1,4 +1,3 @@
-
 """Urls to api's views for app places"""
 from django.urls import path, include
 

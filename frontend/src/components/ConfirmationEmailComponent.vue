@@ -1,5 +1,6 @@
 <template>
-  <form id="confirmationEmail" method="post" @submit.prevent="sendEmail" novalidate>
+  <form id="confirmationEmail" method="post" @submit.prevent="sendEmail"
+        novalidate>
     <div class="content">
       <input type="email" name="userEmail" v-model.trim="userEmail"
              placeholder="EMAIL"/>
@@ -40,9 +41,9 @@ export default {
   },
   computed: {
     /**
-       * @description Checks if user filled all fields
-       * @returns {boolean}
-       * */
+     * @description Checks if user filled all fields
+     * @returns {boolean}
+     * */
     isDisabledButton() {
       return !(this.isEmailValid());
     },

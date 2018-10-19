@@ -16,4 +16,4 @@ class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
         return six.text_type(user.pk) + six.text_type(timestamp)
 
 
-account_activation_token = AccountActivationTokenGenerator() #pylint: disable = invalid-name
+account_activation_token = AccountActivationTokenGenerator()  # pylint: disable = invalid-name
