@@ -40,7 +40,11 @@ export default {
     axios.get(allPlacesUrl, apiConfig).then((response) => {
       this.allPlaces = response.data;
     }).catch((error) => {
-      this.$awn.alert(error);
+      if (error.response === undefined) {
+        this.$awn.alert('A server error has occurred, try again later');
+      } else {
+        this.$awn.alert(error);
+      }
     });
   },
 };

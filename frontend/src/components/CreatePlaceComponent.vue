@@ -46,7 +46,11 @@ export default {
         .then(() => {
           this.$awn.success('Your place was successfully created.');
         }).catch(() => {
-          this.$awn.warning(this.error.message);
+          if (this.error.message === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.warning(this.error.message);
+          }
         });
     },
     changeImage() {

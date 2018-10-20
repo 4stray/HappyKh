@@ -19,8 +19,11 @@ export default {
       console.log(response.status); /* eslint-disable-line no-console */
       this.$awn.success('Your account has been activated successfully');
     }).catch((error) => {
-      console.log(error); /* eslint-disable-line no-console */
-      this.$awn.warning(error.response.data.message);
+      if (error.response === undefined) {
+        this.$awn.alert('A server error has occurred, try again later');
+      } else {
+        this.$awn.warning(error.response.data.message);
+      }
     });
     this.$router.push({ name: 'login' });
   },
