@@ -35,7 +35,7 @@ const router = new Router({
       component: ConfirmRegistration,
     },
     {
-      path: '/profile',
+      path: '/profile/:id',
       name: 'profile',
       component: Profile,
       beforeEnter: ifAuthenticated,
