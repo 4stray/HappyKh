@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import PlaceComponent from '../../src/components/PlaceComponent.vue';
+import PlaceComponent from '../../src/components/PlaceCollectionComponent.vue';
 
 
 const expect = require('chai').expect;

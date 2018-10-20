@@ -1,5 +1,5 @@
 <template>
-  <div class="place-body">
+  <div class="place-body" v-on:click="detail">
     <div class="place-image">
       <img v-bind:src=place.logo alt="No picture"
            class="place-image">
@@ -13,7 +13,7 @@
 
 <script>
 export default {
-  name: 'PlaceComponent',
+  name: 'PlaceCollectionComponent',
   props: {
     place: {
       type: Object,
@@ -21,8 +21,14 @@ export default {
         return {
           name: '',
           logo: '',
+          id: '',
         };
       },
+    },
+  },
+  methods: {
+    detail() {
+      this.$router.push({ name: 'placeDetail', params: { id: this.place.id } });
     },
   },
 };

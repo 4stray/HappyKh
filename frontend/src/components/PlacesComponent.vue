@@ -7,7 +7,7 @@
       </div>
 
       <div class="place-components-container">
-        <PlaceComponent v-for="place in allPlaces"
+        <PlaceCollectionComponent v-for="place in allPlaces"
                         v-bind:place="place"
                         :key="place.id"/>
       </div>
@@ -16,13 +16,13 @@
 
 <script>
 import axios from 'axios';
-import PlaceComponent from './PlaceComponent.vue';
+import PlaceCollectionComponent from './PlaceCollectionComponent.vue';
 
 
 export default {
   name: 'PlacesComponent',
   components: {
-    PlaceComponent,
+    PlaceCollectionComponent,
   },
   data() {
     return {
