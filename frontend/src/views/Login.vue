@@ -1,22 +1,14 @@
 <template>
   <div>
-    <Header/>
     <div id="panel">
-      <div v-if="currentTab !== tabs.sendEmail" class="tabs">
-        <button
-                v-bind:class="[{ active: currentTab === tabs.signIn }]"
-                v-on:click="currentTab = tabs.signIn">
-          SIGN IN
+      <div class="tabs">
+        <button v-bind:class="[{ active: currentTab === tabs.signIn }]"
+                v-on:click="currentTab = tabs.signIn"
+        >SIGN IN
         </button>
-        <button
-                v-bind:class="[{ active: currentTab === tabs.signUp }]"
+        <button v-bind:class="[{ active: currentTab === tabs.signUp }]"
                 v-on:click="currentTab = tabs.signUp"
-                >SIGN UP</button>
-      </div>
-      <div v-else class="tabs">
-        <button v-bind:class="[{ active: currentTab === tabs.sendEmail }]"
-                v-on:click="currentTab = tabs.signIn">
-          Back
+        >SIGN UP
         </button>
       </div>
       <component v-bind:is="currentTab.component"></component>
@@ -24,7 +16,7 @@
         v-if="currentTab===tabs.signUp"
         v-bind:class="[{ active: currentTab === tabs.sendEmail }]"
         v-on:click="currentTab = tabs.sendEmail" id="sendEmail">
-        <span>Resend Confirmation Email</span>
+        Resend Confirmation Email
       </button>
     </div>
   </div>
@@ -34,7 +26,8 @@
 import Header from '@/components/Header.vue';
 import LoginComponent from '../components/LoginComponent.vue';
 import RegistrationComponent from '../components/RegistrationComponent.vue';
-import ConfirmationEmailComponent from '../components/ConfirmationEmailComponent.vue';
+import ConfirmationEmailComponent
+  from '../components/ConfirmationEmailComponent.vue';
 
 
 const tabs = {
@@ -76,16 +69,19 @@ export default {
     box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     -webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
     -moz-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
-    height: 350px;
+    height: 400px;
     width: 70%;
     margin: 20px auto;
     padding: 30px 40px;
+    -webkit-background-clip: no-clip;
+    -moz-background-clip: no-clip;
+    background-color: #ffffff;
   }
 
   /* Small devices (portrait tablets and large phones, 600px and up) */
   @media only screen and (min-width: 600px) {
     #panel {
-      width: 300px;
+      width: 350px;
     }
   }
 
@@ -94,6 +90,7 @@ export default {
     list-style: none;
     margin: 10px;
     width: 98%;
+    width: 100%;
     font-size: 12px;
     font-weight: 300;
     text-align: center;

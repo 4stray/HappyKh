@@ -6,6 +6,7 @@ from stdimage import models as std_models
 from utils import make_upload_image
 
 
+
 class Place(models.Model):
 
     """
