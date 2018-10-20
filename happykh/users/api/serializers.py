@@ -26,15 +26,18 @@ class UserSerializer(serializers.ModelSerializer):
         exclude = ('email', 'password')
 
     def update(self, instance, validated_data):
-        if instance.profile_image:
+        new_image = validated_data.get('profile_image')
+        old_image = instance.profile_image
+        if new_image is not None and old_image:
             # delete old images
             delete_std_images_from_media(
-                instance.profile_image,
+                old_image,
                 User.VARIATIONS_PROFILE_IMAGE
             )
 
         for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+            if attr != 'profile_image' or value is not None:
+                setattr(instance, attr, value)
         instance.save()
 
         return instance
