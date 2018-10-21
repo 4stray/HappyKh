@@ -1,14 +1,15 @@
 <template>
-  <div class="place-body">
-    <div class="place-image">
-      <img v-bind:src=place.logo alt="No picture"
-           class="place-image">
-    </div>
+  <v-flex only-xs12 sm4>
+      <v-card dark hover>
+        <v-img :src="place.logo || require('@/assets/default_place.png')"
+               height="200px">
+        </v-img>
 
-    <div class="place-name">
-      <p>Name: {{ place.name }}</p>
-    </div>
-  </div>
+        <v-card-title primary-title>
+          <h3 class="headline mb-0 text-md-center hide-overflow">{{ place.name }}</h3>
+        </v-card-title>
+      </v-card>
+  </v-flex>
 </template>
 
 <script>
@@ -29,17 +30,4 @@ export default {
 </script>
 
 <style scoped>
-.place-body {
-  width: 40%;
-  height: 250px;
-  border: 1px solid #CCCCCC;
-  background-color: #FFFFFF;
-  box-shadow: 3px 3px 2px grey;
-  margin: 20px;
-  display: inline-block;
-}
-.place-image {
-  width: 100%;
-  height: 200px;
-}
 </style>
