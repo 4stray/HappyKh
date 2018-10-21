@@ -1,5 +1,4 @@
 """Views for app users"""
-# pylint: disable = no-else-return,
 import logging
 from smtplib import SMTPException
 
@@ -60,11 +59,10 @@ class UserLogin(APIView):
                 'token': user_token.key,
                 'user_id': user.id,
             }, status=status.HTTP_200_OK)
-        else:
-            LOGGER.warning('Attempt to login by unregistered user')
-            return Response({
-                'message': "You can't login, you have to register first."
-            }, status=status.HTTP_400_BAD_REQUEST)
+        LOGGER.warning('Attempt to login by unregistered user')
+        return Response({
+            'message': "You can't login, you have to register first."
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogout(APIView):
@@ -126,12 +124,11 @@ class UserRegistration(APIView):
                                             is_active=False)
             if UserActivation.send_email_confirmation(user):
                 return Response(status=status.HTTP_201_CREATED)
-            else:
-                LOGGER.error('Confirmation email has not been delivered')
-                return Response({
-                    'message': 'The mail has not been delivered'
-                               ' due to connection reasons'
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            LOGGER.error('Confirmation email has not been delivered')
+            return Response({
+                'message': 'The mail has not been delivered'
+                           ' due to connection reasons'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserActivation(APIView):
@@ -189,7 +186,7 @@ class UserActivation(APIView):
                 return Response({
                     'message': 'User is already exists and activated'
                 }, status=status.HTTP_400_BAD_REQUEST)
-            elif account_activation_token.check_token(user, token):
+            if account_activation_token.check_token(user, token):
                 user.is_active = True
                 user.save()
 
@@ -197,14 +194,13 @@ class UserActivation(APIView):
                 return Response({
                     'message': "User's account has been activated"
                 }, status=status.HTTP_201_CREATED)
-            else:
-                LOGGER.error(
-                    f'User activation with invalid token,'
-                    f' user_email: {user.email}, token: {token}'
-                )
-                return Response({
-                    'message': 'Invalid token'
-                }, status=status.HTTP_400_BAD_REQUEST)
+            LOGGER.error(
+                f'User activation with invalid token,'
+                f' user_email: {user.email}, token: {token}'
+            )
+            return Response({
+                'message': 'Invalid token'
+            }, status=status.HTTP_400_BAD_REQUEST)
         except (TypeError, ValueError, OverflowError,
                 User.DoesNotExist) as error:
             LOGGER.error(f'Error {error} while user activation')
