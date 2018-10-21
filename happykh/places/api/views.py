@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers import PlaceSerializer
 from ..models import Place
+from users.models import User
+from users.api.serializers import UserSerializer
 
 LOGGER = logging.getLogger('happy_logger')
 
@@ -44,7 +46,8 @@ class PlaceSinglePage(APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    variation = Place.large
+    place_variation = Place.large
+    user_variation = User.thumbnail
 
     def get(self, request, id):
 
@@ -55,11 +58,26 @@ class PlaceSinglePage(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         else:
-            context = {
-                'variation': self.variation,
+            place_context = {
+                'variation': self.place_variation,
                 'domain': get_current_site(request)
             }
-            serializer = PlaceSerializer(single_place, context=context)
-            LOGGER.info(f'Requested place with id: {id}')
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            place_serializer = PlaceSerializer(single_place, context=place_context)
+            try:
+                place_owner = User.objects.get(pk=place_serializer.data.get('user'))
+            except User.DoesNotExist:
+                return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            else:
+                user_context = {
+                    'variation': self.user_variation,
+                    'domain': get_current_site(request)
+                }
+                user_serializer = UserSerializer(place_owner, context=user_context)
+                result = {
+                    "place": place_serializer.data,
+                    "user_name": place_owner.get_full_name(),
+                    "image": user_serializer.data['profile_image']
+                }
+                LOGGER.info(f'Requested place with id: {id}')
+                return Response(result, status=status.HTTP_200_OK)
 
