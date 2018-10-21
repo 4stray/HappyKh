@@ -40,10 +40,14 @@ export default {
   height: 250px;
   border: 1px solid #CCCCCC;
   background-color: #FFFFFF;
-  box-shadow: 3px 3px 2px grey;
   margin: 20px;
   display: inline-block;
 }
+
+.place-body:hover {
+  box-shadow: 3px 3px 2px grey;
+}
+
 .place-image {
   width: 100%;
   height: 200px;

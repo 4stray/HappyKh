@@ -1,15 +1,17 @@
 <template>
   <v-layout justify-space-around row fill-height>
-    <v-flex md6 xs12>
-      <v-layout justify-start column fill-height>
+    <v-flex md6>
+      <v-layout justify-start column>
         <v-card id="main" class="px-5 py-3">
           <img v-if="placeLogo" v-bind:src=placeLogo alt="No image" width="80%"
                id="placeLogo"/>
-          <img v-else src="../assets/default_user.png" alt="No user avatar"/>
-          <h3 class="headline mb-2"> {{placeName}}</h3>
-          <v-label class="">Description</v-label>
-          <p v-if="placeDescription">{{placeDescription}}</p>
-          <p v-else class="text--secondary">Place don't have a description.</p>
+          <img v-else src="../assets/default_user.png" alt="No logo" id="no_logo"/>
+          <v-spacer></v-spacer>
+          <v-label class="d-block" id="labelName">Name</v-label>
+          <h3 class="headline mb-2" id="placeName"> {{placeName}}</h3>
+          <v-label class="" id="labelDescription">Description</v-label>
+          <p v-if="placeDescription" id="placeDescription">{{placeDescription}}</p>
+          <p v-else class="text--secondary" id="no_description">Place don't have a description.</p>
         </v-card>
       </v-layout>
     </v-flex>
