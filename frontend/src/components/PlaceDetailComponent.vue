@@ -57,7 +57,8 @@ export default {
 </script>
 
 <style scoped>
-.material-icons {
-  display: inherit;
+#placeDescription {
+  word-wrap:break-word;
 }
+
 </style>
