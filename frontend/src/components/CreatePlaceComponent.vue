@@ -3,28 +3,44 @@
     <h1>Create your place:</h1>
     <form id="placeForm" enctype="multipart/form-data">
       <input type="text" id="name"
-             v-model="placeName" placeholder="Place name"/>
+             v-model="placeName" placeholder="*Place name"/>
+      <places placeholder="*Place address"
+              @change="onChange"
+              :options="{ type: 'address',
+                          countries: ['UA'],
+                          insideBoundingBox: '50.10, 36.10, 49.879, 36.469',
+                          aroundLatLngViaIP: false}">
+      </places>
       <textarea id="description"
                 v-model="placeDescription" placeholder="Description"></textarea>
       <img v-bind:src=placeLogo id='logo' alt="No place image"/>
       <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
-      <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
+      <button class="btn-save" type="button"
+              v-on:click="save()" :disabled="isDisabledButton">Create Place</button>
     </form>
   </div>
 </template>
 
-<script>
+<script >
 import axios from 'axios';
+import Places from 'vue-places';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
   name: 'createPlaceComponent',
+  components: { Places },
   data() {
     return {
       placeName: '',
+      placeAddress: '',
       placeLogo: '',
       placeDescription: '',
     };
+  },
+  computed: {
+    isDisabledButton() {
+      return !(this.placeName && this.placeAddress);
+    },
   },
   methods: {
     save() {
@@ -32,6 +48,7 @@ export default {
       const formData = new FormData();
       formData.set('user', this.$cookies.get('user_id'));
       formData.set('name', this.placeName);
+      formData.set('address', this.placeAddress);
       formData.set('description', this.placeDescription);
       formData.append('logo', imageFile.files[0]);
       axios.post(
@@ -45,8 +62,8 @@ export default {
       )
         .then(() => {
           this.$awn.success('Your place was successfully created.');
-        }).catch(() => {
-          this.$awn.warning(this.error.message);
+        }).catch((error) => {
+          this.$awn.warning(error.message);
         });
     },
     changeImage() {
@@ -60,11 +77,23 @@ export default {
 
       reader.readAsDataURL(file);
     },
+    onChange(data) {
+        if (Object.keys(data).length !== 0 && data.constructor === Object) {
+        this.placeAddress = {
+          latitude: data.latlng.lat,
+          longitude: data.latlng.lng,
+          address: data.value,
+        };
+        this.placeAddress = JSON.stringify(this.placeAddress);
+      }
+      else
+        this.placeAddress = '';
+    },
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   #createPlaceComponent {
     width: 500px;
     font-family: 'Liberation Sans', sans, sans-serif;
@@ -136,5 +165,8 @@ export default {
     font-family: 'Liberation Sans', sans, sans-serif;
     cursor: pointer;
     background-color: #0ca086;
+    &:disabled {
+      background-color: #d3d3d3;
+    }
   }
 </style>
