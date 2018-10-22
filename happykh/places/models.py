@@ -1,9 +1,11 @@
 """Creation model for place"""
-
+import logging
 from django.db import models
 from users.models import User
 from stdimage import models as std_models
 from utils import make_upload_image
+
+LOGGER = logging.getLogger('happy_logger')
 
 
 class Place(models.Model):
@@ -44,6 +46,17 @@ class Place(models.Model):
         default='',
         variations=VARIATIONS_LOGO,
     )
+
+    @staticmethod
+    def get_place(place_id):
+        try:
+            return Place.objects.get(pk=place_id)
+        except Place.DoesNotExist: #pylint: disable = no-member
+            LOGGER.error(
+                f'Can`t get place because of invalid id,'
+                f' place_id: {place_id}'
+            )
+            return None
 
     def __str__(self):
         return self.name
