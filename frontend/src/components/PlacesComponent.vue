@@ -1,15 +1,16 @@
 <template>
   <div>
-    <div class="create-button-container">
+    <div class="create-place-container">
       <div class="text-xs-right">
         <v-btn class="warning" large
-               :to="{ name: 'createPlace' }">
+               :to="{ name: 'createPlace' }"
+               name="create-place-button">
           Add Place
         </v-btn>
       </div>
     </div>
     <div>
-      <v-container grid-list-xl>
+      <v-container grid-list-xl name="place-container">
         <v-layout row wrap>
           <PlaceComponent v-for="place in allPlaces"
                           v-bind:place="place"
@@ -53,7 +54,7 @@ export default {
 </script>
 
 <style scoped>
-.create-button-container {
+.create-place-container {
   margin: 0 auto;
   padding: 0 auto;
   width: 60%;
