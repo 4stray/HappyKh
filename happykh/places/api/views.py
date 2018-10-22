@@ -27,7 +27,7 @@ class PlacePage(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        data = request.data
+        data = request.data.copy()
         address_data = json.loads(data['address'])
         data['address'] = self.get_address_pk(address_data)
         if not data['address']:
@@ -43,7 +43,6 @@ class PlacePage(APIView):
             serializer.save()
             return Response({'message': 'place was created'},
                             status=status.HTTP_201_CREATED)
-        print(serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
