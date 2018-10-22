@@ -1,4 +1,5 @@
 """Views for app users"""
+import datetime
 import logging
 from smtplib import SMTPException
 
@@ -6,6 +7,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
+from django.utils import timezone
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -14,9 +16,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from utils import is_user_owner
 from happykh.settings import EMAIL_HOST_USER
 from ..backends import UserAuthentication
 from .serializers import LoginSerializer
+from .serializers import EmailSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
 from .tokens import account_activation_token
@@ -78,9 +82,11 @@ class UserLogout(APIView):
         :param request: HttpRequest
         :return: Response({message}, status)
         """
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        Token.objects.get(key=token_key).delete()
 
-        Token.objects.get(key=request.data['user_token']).delete()
         LOGGER.info('User has been logged out')
+
         return Response({
             'message': 'User has been logged out'
         }, status=status.HTTP_201_CREATED)
@@ -208,24 +214,28 @@ class UserActivation(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
-    def send_email_confirmation(user):
+    def send_email_confirmation(user, email=None):
         """
         Sends an email on specified user.email
         :param user: User
+        :param email: target email to send confirmation
         :return: Boolean
         """
+        if email is None:
+            email = user.email
+
         try:
             email_token = account_activation_token.make_token(user)
             user_id = user.pk
             send_mail(
-                f'Confirm {user.email} on HappyKH',
-                f'We just needed to verify that {user.email} '
+                f'Confirm {email} on HappyKH',
+                f'We just needed to verify that {email} '
                 f'is your email address.'
                 f' Just click the link below \n'
                 f'http://127.0.0.1:8080/#/confirm_registration/'
                 f'{user_id}/{email_token}/',
                 EMAIL_HOST_USER,
-                [user.email]
+                [email]
             )
             LOGGER.info('Confirmation mail has been sent')
         except SMTPException:
@@ -251,17 +261,29 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
+        user = UserAuthentication.get_user(id)
 
-        user = UserAuthentication.get_user(self, id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
         }
+
         serializer = UserSerializer(user, context=context)
+
+        response_data = serializer.data
+        enable_editing_profile = is_user_owner(request, id)
+        response_data['enable_editing_profile'] = enable_editing_profile
+
+        LOGGER.info(
+            f'Enable Editing User Profile is set '
+            f'to {enable_editing_profile}'
+        )
         LOGGER.info('Return user profile')
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
         """
@@ -270,20 +292,35 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        user = UserAuthentication.get_user(self, id)
+        if not is_user_owner(request, id):
+            LOGGER.error(
+                "User's data were not updated."
+                "user_id must be equal to token user_id"
+            )
+            return Response({'message': 'Editing not allowed'},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        user = UserAuthentication.get_user(id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+        request_data = request.data.copy()
+        age = request_data.get('age')
+        if age == 'null':
+            request_data['age'] = None
 
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
         }
+
         serializer = UserSerializer(
             user,
-            data=request.data,
+            data=request_data,
             partial=True,
             context=context,
         )
+
         if serializer.is_valid():
             serializer.save(id=id, **serializer.validated_data)
             LOGGER.info('User data updated')
@@ -296,10 +333,58 @@ class UserProfile(APIView):
                         status=status.HTTP_400_BAD_REQUEST)
 
 
+class UserEmail(APIView):
+    """
+    Gets new email for user, changes it if value is valid
+    """
+
+    # pylint: disable = redefined-builtin
+    def patch(self, request, id):
+        """
+        Changes user email
+        :param request: HTTP Request
+        :param id: Integer
+        :return: Response(data)
+        """
+        user = UserAuthentication.get_user(id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = User.objects.get(email=request.data.get('email'))
+
+            LOGGER.warning(f'User with id: {id} tried to change '
+                           f'his email to existing')
+
+            return Response({'message': 'User with such email already exists'},
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        except User.DoesNotExist:
+            serializer = EmailSerializer(user, request.data)
+
+            if serializer.is_valid():
+                valid_mail = serializer.validated_data['email']
+                if UserActivation.send_email_confirmation(user, valid_mail):
+                    serializer.update(user, serializer.validated_data)
+                    # Send confirmation email
+                    LOGGER.info(f'User with id: {id} changed his email')
+                    return Response(status=status.HTTP_200_OK)
+                else:
+                    LOGGER.error('Confirmation email has not been delivered')
+                    return Response({
+                        'message': 'The mail has not been delivered'
+                                   ' due to connection reasons'
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
 class UserPassword(APIView):
     """
     Change user's password
     """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def patch(self, request, id):
         """
@@ -307,7 +392,7 @@ class UserPassword(APIView):
         :param id: integer
         :return: Response(message, status)
         """
-        user = UserAuthentication.get_user(self, id)
+        user = UserAuthentication.get_user(id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -331,3 +416,20 @@ class UserPassword(APIView):
         )
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
+
+
+class TokenValidation(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        try:
+            token = Token.objects.get(key=token_key)
+
+            if (timezone.now() <= token.created
+                    + datetime.timedelta(days=1)):
+                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        except Token.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)

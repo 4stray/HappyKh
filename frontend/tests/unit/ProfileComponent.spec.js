@@ -2,7 +2,6 @@ import Cookies from 'js-cookie';
 import { shallowMount } from '@vue/test-utils';
 import ProfileComponent from '../../src/components/ProfileComponent.vue';
 
-
 const expect = require('chai').expect;
 const should = require('chai').should();
 
@@ -22,14 +21,6 @@ describe('ProfileComponent data()', () => {
     expect(ProfileComponent.data()).to.have.property('userAge');
   });
 
-  it('fields edit disabled initially', () => {
-    expect(ProfileComponent.data().isDisabled).to.be.equal(true);
-  });
-
-  it('has default enableText', () => {
-    expect(ProfileComponent.data().enableText).to.be.equal('Enable editing');
-  });
-
   it('has default userGender', () => {
     expect(ProfileComponent.data()).to.have.property('userGender');
   });
@@ -39,57 +30,58 @@ describe('ProfileComponent data()', () => {
   });
 });
 
-describe('mounted ProfileComponent', () => {
+describe('ProfileComponent for empty profile', () => {
   const wrapper = shallowMount(ProfileComponent, {
     mocks: {
       $cookies: Cookies,
     },
   });
-
-  it('has 4 input fields', () => {
-    expect(wrapper.findAll('input').length).to.be.equal(4);
-  });
-  it('has 1 selection element', () => {
-    expect(wrapper.findAll('select').length).to.be.equal(1);
-  });
-  it('has LastName field with "text" type', () => {
-    expect(wrapper.find('#last_name').attributes()).property('type').to.be.equal('text');
+  wrapper.setData({
+    userFirstName: '',
+    userLastName: '',
+    userAge: 0,
+    userGender: 'M',
+    userImage: '',
   });
 
-  it('has FirstName field with "text" type', () => {
-    expect(wrapper.find('#first_name').attributes()).property('type').to.be.equal('text');
-  });
-
-  it('has Age field with "number" type', () => {
-    expect(wrapper.find('#age').attributes()).property('type').to.be.equal('number');
-  });
-
-  it('contains Image from data() or standard image', () => {
-    if (ProfileComponent.data().userImage) {
-      expect(wrapper.find('#image').attributes())
-        .property('src').to.be.equal(ProfileComponent.data().userImage);
-    } else {
-      expect(wrapper.find('#blank').attributes())
-        .property('src').to.be.equal('/img/blank-profile-picture.f327c582.png');
-    }
+  it('has default userImage', () => {
+    expect(wrapper.find('img').exists()).to.be.equal(true);
   });
 });
 
-describe('ProfileComponent interactions', () => {
+describe('ProfileComponent for profile with data', () => {
   const wrapper = shallowMount(ProfileComponent, {
     mocks: {
       $cookies: Cookies,
     },
   });
-  const btn = wrapper.find('.btn-change');
-  btn.trigger('click');
+  const testUserData = {
+    userFirstName: 'User',
+    userLastName: 'Name',
+    userAge: 18,
+    userGender: 'W',
+    userImage: 'userAvatar.png',
+  };
+  wrapper.setData(testUserData);
 
-  // it('has interaction to enable fields on edit', () => {
-  //   const email = wrapper.find('#first_name');
-  //   expect(email.attributes('disabled')).to.be.equal(undefined);
-  // });
+  it('has userImage', () => {
+    expect(wrapper.find('img').attributes('src')).to.be.equal(testUserData.userImage);
+  });
 
-  it('has interaction to change buttons text', () => {
-    expect(btn.text()).to.be.equal('Disable editing');
+  it('has userAge', () => {
+    expect(wrapper.find('v-label').text()).to.be.equal('Age');
+    expect(wrapper.find('#userAge').text()).to.be.equal(testUserData.userAge.toString());
+  });
+
+  it('has fullName', () => {
+    expect(wrapper.find('h3').text()).to.be.equal(`${testUserData.userFirstName} ${testUserData.userLastName}`);
+  });
+
+  it('has userGender', () => {
+    expect(wrapper.find('#userGender').text()).to.be.equal(testUserData.userGender);
+  });
+
+  it('has edit button', () => {
+    expect(wrapper.contains('v-btn')).to.be.equal(true);
   });
 });

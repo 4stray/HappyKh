@@ -1,6 +1,5 @@
 <template>
   <div class="CreatePlace">
-    <Header/>
     <CreatePlaceComponent/>
   </div>
 </template>

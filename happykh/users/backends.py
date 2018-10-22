@@ -8,6 +8,7 @@ LOGGER = logging.getLogger('happy_logger')
 
 class UserAuthentication:
     """ Performes user authentication """
+
     def authenticate(self, request, user_email=None,
                      user_password=None, user_token=None):
         """
@@ -30,7 +31,8 @@ class UserAuthentication:
             LOGGER.error('User does not exist while authentication')
         return None
 
-    def get_user(self, user_id):
+    @staticmethod
+    def get_user(user_id):
         """
         Return user object by id
         :param user_id: Number

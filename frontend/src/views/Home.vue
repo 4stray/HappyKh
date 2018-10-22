@@ -1,7 +1,6 @@
 <template>
   <div class="home">
-    <Header/>
-    <img alt="Vue logo" src="../assets/logo.png">
+    <img alt="Vue logo" src="../assets/logo_M_min.png">
     <HomeComponent msg="Welcome to HappyKh"/>
   </div>
 </template>
