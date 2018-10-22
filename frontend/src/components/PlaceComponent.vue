@@ -1,6 +1,6 @@
 <template>
   <v-flex only-xs12 sm4>
-      <v-card dark hover>
+      <v-card hover class="grey lighten-4">
         <v-img :src="place.logo || require('@/assets/default_place.png')"
                height="200px">
         </v-img>
