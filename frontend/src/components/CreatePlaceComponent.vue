@@ -62,8 +62,9 @@ export default {
       )
         .then(() => {
           this.$awn.success('Your place was successfully created.');
-        }).catch((error) => {
-          this.$awn.warning(error.message);
+          this.$router.push({ name: 'home' });
+        }).catch(() => {
+          this.$awn.warning(this.error.message);
         });
     },
     changeImage() {

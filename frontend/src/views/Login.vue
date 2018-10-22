@@ -13,7 +13,7 @@
       </div>
       <component v-bind:is="currentTab.component"></component>
       <button
-        v-if="currentTab===tabs.signUp"
+        v-if="currentTab===tabs.signIn"
         v-bind:class="[{ active: currentTab === tabs.sendEmail }]"
         v-on:click="currentTab = tabs.sendEmail" id="sendEmail">
         Resend Confirmation Email
