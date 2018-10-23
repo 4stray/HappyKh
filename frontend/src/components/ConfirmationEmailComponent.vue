@@ -29,7 +29,11 @@ export default {
           this.$awn.success('Please check your mailbox for confirmation email');
         })
         .catch((error) => {
-          this.$awn.warning(error.response.data.message);
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.warning(error.response.data.message);
+          }
         });
 
       this.userEmail = '';
