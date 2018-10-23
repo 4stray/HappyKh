@@ -13,6 +13,10 @@ describe('createPlaceComponent data()', () => {
     expect(createPlaceComponent.data()).to.have.property('placeName');
   });
 
+  it('has default placeAddress', () => {
+    expect(createPlaceComponent.data()).to.have.property('placeDescription');
+  });
+
   it('has default placeDescription', () => {
     expect(createPlaceComponent.data()).to.have.property('placeDescription');
   });
@@ -27,11 +31,15 @@ describe('mounted createPlaceComponent', () => {
     mocks: {
       $cookies: Cookies,
     },
+    stubs: {
+      places: '<div/>',
+    },
   });
 
   it('has 2 input fields', () => {
     expect(wrapper.findAll('input').length).to.be.equal(2);
   });
+
   it('has placeName field with "text" type', () => {
     expect(wrapper.find('#name').attributes('type')).to.be.equal('text');
   });
@@ -44,11 +52,19 @@ describe('mounted createPlaceComponent', () => {
     expect(wrapper.contains('textarea')).to.be.equal(true);
   });
 
+  it('has address autocomplete component', () => {
+    expect(wrapper.contains('#address')).to.be.equal(true);
+  });
+
   it('contains logo from data()', () => {
     expect(wrapper.find('#logo').attributes('src')).to.be.equal(createPlaceComponent.data().placeLogo);
   });
 
   it('check save button text', () => {
     expect(wrapper.find('.btn-save').text()).to.be.equal('Create Place');
+  });
+
+  it('button is not active if conditions are not met', () => {
+    expect(wrapper.find('.btn-save').attributes()).property('disabled').to.be.equal('disabled');
   });
 });

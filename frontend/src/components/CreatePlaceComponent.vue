@@ -4,7 +4,7 @@
     <form id="placeForm" enctype="multipart/form-data">
       <input type="text" id="name"
              v-model="placeName" placeholder="*Place name"/>
-      <places placeholder="*Place address"
+      <places id="address" placeholder="*Place address"
               @change="onChange"
               :options="{ type: 'address',
                           countries: ['UA'],
@@ -79,16 +79,14 @@ export default {
       reader.readAsDataURL(file);
     },
     onChange(data) {
-        if (Object.keys(data).length !== 0 && data.constructor === Object) {
+      if (Object.keys(data).length !== 0 && data.constructor === Object) {
         this.placeAddress = {
           latitude: data.latlng.lat,
           longitude: data.latlng.lng,
           address: data.value,
         };
         this.placeAddress = JSON.stringify(this.placeAddress);
-      }
-      else
-        this.placeAddress = '';
+      } else { this.placeAddress = ''; }
     },
   },
 };
