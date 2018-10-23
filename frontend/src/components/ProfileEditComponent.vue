@@ -45,7 +45,7 @@ export default {
       userImage: '',
       valid: true,
       ageRules: [
-        age => (age >= 10 && age <= 140) || (age === null) || 'Invalid age value',
+        age => (age >= 1 && age <= 140) || (age === null) || 'Invalid age value',
       ],
     };
   },
@@ -74,7 +74,9 @@ export default {
         this.userGender = response.data.gender;
         this.userImage = response.data.profile_image;
       }).catch((error) => {
-        if (error.response.data.message) {
+        if (error.response === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else if (error.response.data.message) {
           this.$awn.warning(error.response.data.message);
         }
       });
@@ -106,7 +108,9 @@ export default {
           this.userImage = response.data.profile_image;
           this.$awn.success('Your profile was successfully updated.');
         }).catch((error) => {
-          if (error.response.data.message) {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
             this.$awn.warning(error.response.data.message);
           }
         });

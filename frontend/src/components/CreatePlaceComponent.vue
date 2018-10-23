@@ -8,7 +8,7 @@
               @change="onChange"
               :options="{ type: 'address',
                           countries: ['UA'],
-                          insideBoundingBox: '50.10, 36.10, 49.879, 36.469',
+                          insideBoundingBox: '50.10, 36.10, 49.879, 36.469', // Kharkiv boundingBox don't change this coords
                           aroundLatLngViaIP: false}">
       </places>
       <textarea id="description"
@@ -63,8 +63,12 @@ export default {
         .then(() => {
           this.$awn.success('Your place was successfully created.');
           this.$router.push({ name: 'home' });
-        }).catch((error) => {
-          this.$awn.warning(error.message);
+        }).catch(() => {
+          if (this.error.message === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.warning(this.error.message);
+          }
         });
     },
     changeImage() {

@@ -1,4 +1,5 @@
 import json
+import logging
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework import status
 from rest_framework.response import Response
@@ -6,8 +7,10 @@ from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from .serializers import AddressSerializer, PlaceSerializer
+from .serializers import PlaceSerializer, AddressSerializer
 from ..models import Place, Address
+
+LOGGER = logging.getLogger('happy_logger')
 
 
 class PlacePage(APIView):
@@ -58,3 +61,28 @@ class PlacePage(APIView):
             else:
                 return False
         return address.pk
+
+
+class PlaceSinglePage(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    place_variation = Place.large
+
+    def get(self, request, place_id):
+        """
+        :param request: HTTP Request
+        :param place_id: place's id
+        :return: place's data, status code
+        """
+        single_place = Place.get_place(place_id)
+
+        if single_place is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        place_context = {
+            'variation': self.place_variation,
+            'domain': get_current_site(request)
+        }
+        place_serializer = PlaceSerializer(single_place, context=place_context)
+        return Response(place_serializer.data, status=status.HTTP_200_OK)
