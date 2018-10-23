@@ -312,6 +312,11 @@ class UserProfile(APIView):
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        request_data = request.data.copy()
+        age = request_data.get('age')
+        if age == 'null':
+            request_data['age'] = None
+
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
@@ -319,7 +324,7 @@ class UserProfile(APIView):
 
         serializer = UserSerializer(
             user,
-            data=request.data,
+            data=request_data,
             partial=True,
             context=context,
         )
