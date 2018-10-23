@@ -45,8 +45,13 @@ export default {
       )
         .then(() => {
           this.$awn.success('Your place was successfully created.');
+          this.$router.push({ name: 'home' });
         }).catch(() => {
-          this.$awn.warning(this.error.message);
+          if (this.error.message === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.warning(this.error.message);
+          }
         });
     },
     changeImage() {

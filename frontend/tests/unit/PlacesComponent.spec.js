@@ -17,16 +17,16 @@ config.mocks.$store = {
 describe('PlacesComponent', () => {
   const wrapper = shallowMount(PlacesComponent, config);
 
-  it('has places container', () => {
-    expect(wrapper.contains('[class="places-container"]')).to.be.equal(true);
+  it('has container for create place button', () => {
+    expect(wrapper.contains('[class="create-place-container"]')).to.be.equal(true);
   });
 
   it('has button for adding place', () => {
-    expect(wrapper.contains('[class="add-place-button"]')).to.be.equal(true);
+    expect(wrapper.contains('[name="create-place-button"]')).to.be.equal(true);
   });
 
   it('has container for place components', () => {
-    expect(wrapper.contains('[class="place-components-container"]'))
+    expect(wrapper.contains('[name="place-container"]'))
       .to.be.equal(true);
   });
 });

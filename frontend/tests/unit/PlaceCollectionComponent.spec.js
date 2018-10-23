@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import PlaceComponent from '../../src/components/PlaceComponent.vue';
+import PlaceComponent from '../../src/components/PlaceCollectionComponent.vue';
 
 
 const expect = require('chai').expect;
@@ -9,7 +9,7 @@ describe('PlaceComponent', () => {
   const wrapper = shallowMount(PlaceComponent);
 
   it('has attribute for place name', () => {
-    expect(wrapper.contains('[class="place-name"]')).to.be.equal(true);
+    expect(wrapper.contains('[name="place-name"]')).to.be.equal(true);
   });
 
   it('has property for place of a type object', () => {
@@ -17,6 +17,6 @@ describe('PlaceComponent', () => {
   });
 
   it('has attribute for place image', () => {
-    expect(wrapper.contains('[class="place-image"]')).to.be.equal(true);
+    expect(wrapper.contains('[name="place-image"]')).to.be.equal(true);
   });
 });
