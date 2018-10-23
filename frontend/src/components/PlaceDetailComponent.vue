@@ -3,15 +3,17 @@
     <v-flex md6>
       <v-layout justify-start column>
         <v-card id="main" class="px-5 py-3">
-          <img v-if="placeLogo" v-bind:src=placeLogo alt="No image" width="80%"
-               id="placeLogo"/>
-          <img v-else src="../assets/default_user.png" alt="No logo" id="no_logo"/>
+          <v-img :src="placeLogo || require('@/assets/default_place.png')"
+                 height="400px"
+                 width="100%"
+                  name="place-image">
+        </v-img>
           <v-spacer></v-spacer>
           <v-label class="d-block" id="labelName">Name</v-label>
           <h3 class="headline mb-2" id="placeName"> {{placeName}}</h3>
           <v-label class="" id="labelDescription">Description</v-label>
           <p v-if="placeDescription" id="placeDescription">{{placeDescription}}</p>
-          <p v-else class="text--secondary" id="no_description">Place don't have a description.</p>
+          <p v-else class="text--secondary" id="no_description">Place has no description.</p>
         </v-card>
       </v-layout>
     </v-flex>
@@ -22,6 +24,7 @@
 import axios from 'axios';
 
 const PlaceAPI = 'http://127.0.0.1:8000/api/places/';
+const alertText = 'A server error has occurred, try again later';
 
 export default {
   name: 'ProfileComponent',
@@ -46,8 +49,14 @@ export default {
         this.placeLogo = response.data.logo;
         this.placeName = response.data.name;
         this.placeDescription = response.data.description;
+        if (this.placeName === '') {
+          this.$awn.alert(alertText);
+        }
       }).catch((error) => {
-        if (error.response.data.message) {
+        if (error.response === undefined || error.response.status !== 200) {
+          this.$awn.alert(alertText);
+          this.$router.go(-1);
+        } else if (error.response.data.message) {
           this.$awn.warning(error.response.data.message);
         }
       });
