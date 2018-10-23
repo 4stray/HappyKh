@@ -21,6 +21,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '+$@f&k@)3t#@#3en0#1tatgb1draxr_34*q_g-@l56utjbkunc'
 
+# SECURITY WARNING: keep salt used in production secret!
+HASHID_FIELD_SALT = 'u-qs3b7+o4rq16p#i18-tt8v20fu#0rydpes&_%z@s2je^m*+5'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -44,13 +47,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'customlogger.apps.CustomloggerConfig',
-    'users',
+    'users.apps.UsersConfig',
     'places.apps.PlacesConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
     'stdimage',
-    'rest_framework_serializer_extensions',
 ]
 
 # Basic Django REST Token setup
@@ -62,10 +64,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
-    'SERIALIZER_EXTENSIONS': {
-        'USE_HASH_IDS': True,
-        'HASH_IDS_SOURCE': 'users.api.serializers.HASH_IDS',
-    }
 }
 
 MIDDLEWARE = [

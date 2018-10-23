@@ -5,11 +5,13 @@ import datetime
 import logging
 from smtplib import SMTPException
 
+import hashids
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
 from django.utils import timezone
+
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -21,16 +23,18 @@ from rest_framework.views import APIView
 # pylint: disable = no-name-in-module, import-error
 from utils import is_user_owner
 from happykh.settings import EMAIL_HOST_USER
-from ..backends import UserAuthentication
-from .serializers import LoginSerializer
+from happykh.settings import HASHID_FIELD_SALT
 from .serializers import EmailSerializer
+from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
-from .serializers import HASH_IDS
 from .tokens import account_activation_token
+from ..backends import UserAuthentication
 from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
+HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
+
 
 class UserLogin(APIView):
     """"
@@ -272,10 +276,7 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        LOGGER.info(f'UserProfile get id {id} before decode')
         user_id = HASH_IDS.decode(id)[0]
-        LOGGER.info(f'UserProfile patch id {id} after decode')
-
         user = UserAuthentication.get_user(user_id)
 
         if user is None:
@@ -287,7 +288,6 @@ class UserProfile(APIView):
         }
 
         serializer = UserSerializer(user, context=context)
-
         response_data = serializer.data
         enable_editing_profile = is_user_owner(request, user_id)
         response_data['enable_editing_profile'] = enable_editing_profile
@@ -307,9 +307,7 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        LOGGER.info(f'UserProfile patch id {id} before decode')
         user_id = HASH_IDS.decode(id)[0]
-        LOGGER.info(f'UserProfile patch id {user_id} after decode')
 
         if not is_user_owner(request, user_id):
             LOGGER.error(
@@ -392,6 +390,7 @@ class UserEmail(APIView):
 
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserPassword(APIView):
     """

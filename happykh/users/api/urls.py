@@ -5,6 +5,7 @@ from . import views
 
 urlpatterns = [  # pylint: disable = invalid-name
     path('users/', include([
+        path('token-validation', views.TokenValidation.as_view()),
         path('login', views.UserLogin.as_view()),
         path('logout', views.UserLogout.as_view()),
         path('registration', views.UserRegistration.as_view()),
@@ -12,7 +13,6 @@ urlpatterns = [  # pylint: disable = invalid-name
              views.UserActivation.as_view()),
         path('activate/send-email/', views.UserActivation.as_view()),
         path('<str:id>', views.UserProfile.as_view()),
-        path('token-validation', views.TokenValidation.as_view()),
         path('<str:id>/data', views.UserProfile.as_view()),
         path('<str:id>/password', views.UserPassword.as_view()),
         path('<str:id>/email', views.UserEmail.as_view()),

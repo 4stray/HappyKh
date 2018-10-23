@@ -3,11 +3,14 @@
 import os
 import uuid
 
+import hashids
 from django.conf import settings
-from django.core.files.uploadedfile import UploadedFile
 from django.core.files.base import ContentFile
-from rest_framework.authtoken.models import Token
+from django.core.files.uploadedfile import UploadedFile
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
+
+HASH_IDS = hashids.Hashids(salt=settings.HASHID_FIELD_SALT)
 
 
 def make_upload_image(filename, path):
@@ -50,6 +53,7 @@ def is_user_owner(request, user_id):
     token_user_id = Token.objects.get(key=token_key).user.id
     return user_id == token_user_id
 
+
 class UploadedImageField(serializers.ImageField):
     """
     Class which converts a base64 string to a file when input and converts image
@@ -77,3 +81,16 @@ class UploadedImageField(serializers.ImageField):
                 image_url = f"{domain}{original_url}"
             return image_url
         return ''
+
+
+class HashIdField(serializers.Field):
+    """
+    Field for id for serializer
+    """
+    def to_representation(self, data):
+        return HASH_IDS.encode(data)
+
+    def to_internal_value(self, data):
+        user_id = HASH_IDS.decode(data)[0]
+        return super(HashIdField, self).to_internal_value(user_id)
+

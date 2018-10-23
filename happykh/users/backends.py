@@ -2,9 +2,30 @@
 # pylint: disable=unused-argument, no-self-use
 import logging
 
+import hashids
+from happykh.settings import HASHID_FIELD_SALT
+from rest_framework import serializers
 from users.models import User
 
 LOGGER = logging.getLogger('happy_logger')
+HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
+
+
+class UserHashedIdField(serializers.Field):
+    """
+    Field for foreign key to user model for serializer
+    """
+
+    def to_representation(self, data):
+        return HASH_IDS.encode(data.pk)
+
+    def to_internal_value(self, data):
+        user_id = HASH_IDS.decode(data)[0]
+        try:
+            user = User.objects.get(pk=user_id)
+            return user
+        except User.DoesNotExist:
+            raise User.DoesNotExist
 
 
 class UserAuthentication:
@@ -28,7 +49,7 @@ class UserAuthentication:
             if user.check_password(user_password):
                 LOGGER.info('User authenticated')
                 return user
-        except User.DoesNotExist: #pylint: disable = no-member
+        except User.DoesNotExist:  # pylint: disable = no-member
             LOGGER.error('User does not exist while authentication')
         return None
 
@@ -41,7 +62,7 @@ class UserAuthentication:
         """
         try:
             return User.objects.get(pk=user_id)
-        except User.DoesNotExist: #pylint: disable = no-member
+        except User.DoesNotExist:  # pylint: disable = no-member
             LOGGER.error(
                 f'Can`t get user profile because of invalid id,'
                 f' user_id: {id}'

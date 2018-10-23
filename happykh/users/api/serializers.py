@@ -7,16 +7,13 @@ from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from rest_framework import exceptions
 from rest_framework import serializers
-from rest_framework_serializer_extensions.fields import HashIdField
 from utils import UploadedImageField
 from utils import delete_std_images_from_media
-import hashids
+from utils import HashIdField
+
 from ..models import User
 
-HASHID_FIELD_SALT = 'u-qs3b7+o4rq16p#i18-tt8v20fu#0rydpes&_%z@s2je^m*+5'
-HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
 LOGGER = logging.getLogger('happy_logger')
-
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
@@ -135,10 +132,11 @@ class EmailSerializer(serializers.ModelSerializer):
     """
     Serializer for email change
     """
+
     class Meta:
         # pylint: disable=too-few-public-methods, missing-docstring
         model = User
-        fields = ('email', )
+        fields = ('email',)
 
     def validate(self, attrs):
         new_email = attrs.get('email')
