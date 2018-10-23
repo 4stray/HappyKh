@@ -10,7 +10,7 @@ class Address(models.Model):
     """Addresses model"""
     latitude = models.DecimalField(max_digits=7, decimal_places=5)
     longitude = models.DecimalField(max_digits=8, decimal_places=5)
-    address = models.CharField(max_length=255)
+    address = models.CharField(max_length=255, blank=False, default=None)
 
 
 class Place(models.Model):
