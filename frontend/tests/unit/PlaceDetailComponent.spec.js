@@ -41,10 +41,10 @@ describe('PlaceDetail for empty place', () => {
   });
 
   it('has default placeLogo', () => {
-    expect(wrapper.find('#no_logo').attributes('src')).to.be.equal('/img/default_user.ce567c5b.png');
+    expect(wrapper.find('v-img').attributes('src')).to.be.equal('/img/default_place.f065b10c.png');
   });
   it('has default placeDescription', () => {
-    expect(wrapper.find('#no_description').text()).to.be.equal('Place don\'t have a description.');
+    expect(wrapper.find('#no_description').text()).to.be.equal('Place has no description.');
   });
 });
 
@@ -64,7 +64,7 @@ describe('PlaceDetail for place with data', () => {
   wrapper.setData(testUserData);
 
   it('has placeLogo', () => {
-    expect(wrapper.find('img').attributes('src')).to.be.equal(testUserData.placeLogo);
+    expect(wrapper.find('v-img').attributes('src')).to.be.equal(testUserData.placeLogo);
   });
 
   it('has placeName', () => {
