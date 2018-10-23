@@ -15,6 +15,7 @@ LOGGER = logging.getLogger('happy_logger')
 
 
 class PlacePage(APIView):
+
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 

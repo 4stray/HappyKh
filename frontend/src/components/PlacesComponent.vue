@@ -56,7 +56,7 @@ export default {
 .add-place-button {
   width: 200px;
   margin-left: auto;
-  margin-right: 0px;
+  margin-right: 0;
 }
 
 .create-place-button {

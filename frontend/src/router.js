@@ -1,18 +1,20 @@
 import Vue from 'vue';
+import axios from 'axios';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import CreatePlace from './views/CreatePlace.vue';
 import Profile from './views/Profile.vue';
+import ProfileSettings from './views/ProfileSettings.vue';
 import store from './store';
 
 const ifAuthenticated = (to, from, next) => {
   if (store.getters.getAuthenticated) {
     next();
-    return;
+  } else {
+    next({ name: 'login' });
   }
-  next('/login');
 };
 
 const router = new Router({
@@ -44,9 +46,40 @@ const router = new Router({
       component: CreatePlace,
       beforeEnter: ifAuthenticated,
     },
+    {
+      path: '/profile/settings',
+      name: 'settings',
+      component: ProfileSettings,
+      beforeEnter: ifAuthenticated,
+    },
   ],
 });
 
+router.beforeEach((to, from, next) => {
+  if (store.getters.getAuthenticated) {
+    const urlTokenValidation =
+      'http://127.0.0.1:8000/api/users/token-validation';
+
+    const headers = {
+      Authorization: `Token ${store.getters.getToken}`,
+    };
+
+    axios.get(
+      urlTokenValidation,
+      {
+        headers,
+      },
+    ).then((response) => {
+      next();
+    }).catch((error) => {
+      store.dispatch('signOut');
+
+      next({ name: 'login' });
+    });
+  } else {
+    next();
+  }
+});
 
 Vue.use(Router);
 

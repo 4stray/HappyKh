@@ -8,7 +8,9 @@ from utils import make_upload_image
 LOGGER = logging.getLogger('happy_logger')
 
 
+
 class Place(models.Model):
+
     """
     Place model for creation new places
     """

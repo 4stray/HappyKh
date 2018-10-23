@@ -2,7 +2,8 @@
   <form id="register" @submit.prevent="register" method="post"
         novalidate>
     <div class="content">
-      <input id="userEmail" type="email" v-model.trim="userEmail" placeholder="EMAIL"/>
+      <input id="userEmail" type="email" v-model.trim="userEmail"
+             placeholder="EMAIL"/>
       <p v-if="errors.email" class="error">{{errors.email}}</p>
       <input id="userPassword" type="password" v-model="userPassword"
              placeholder="PASSWORD"/>
@@ -11,7 +12,8 @@
       <ul v-if="errors.password.length">
         <li v-for="(error, index) in errors.password"
             :key="index" class="error"
-            >{{ error }}</li>
+        >{{ error }}
+        </li>
       </ul>
     </div>
     <input class="btn-submit" type="submit"
@@ -42,9 +44,9 @@ export default {
       return re.test(this.userEmail);
     },
     /**
-       * @description Checks correctness of entered user's fields
-       * @returns {boolean} Result of check
-       */
+     * @description Checks correctness of entered user's fields
+     * @returns {boolean} Result of check
+     */
     isPasswordValid() {
       this.errors = {
         email: '',
@@ -61,7 +63,7 @@ export default {
         this.errors.password.push('* Your password must contain only numbers and alphabetical characters.');
       }
       if (this.userPassword !== this.confirmPassword) {
-        this.errors.password.push("* Your passwords don't match, please try again.");
+        this.errors.password.push('* Your passwords don\'t match, please try again.');
         this.userPassword = '';
         this.confirmPassword = '';
       }
@@ -77,7 +79,8 @@ export default {
         };
         axios.post('http://localhost:8000/api/users/registration', userCredentials)
           .then(() => {
-            this.$awn.success('Successful registration. Please check your mailbox for confirmation email.');
+            this.$awn.success('Successful registration.' +
+              ' Please check your mailbox for confirmation email.');
             this.$router.push({ name: 'home' });
           }).catch((error) => {
             if (error.response.status === 400) {
@@ -100,9 +103,9 @@ export default {
   },
   computed: {
     /**
-       * @description Checks if user filled all fields
-       * @returns {boolean}
-       * */
+     * @description Checks if user filled all fields
+     * @returns {boolean}
+     * */
     isDisabledButton() {
       return !(this.userEmail && this.userPassword && this.confirmPassword);
     },
