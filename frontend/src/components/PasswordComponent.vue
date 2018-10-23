@@ -69,7 +69,9 @@ export default {
       ).then(() => {
         this.$awn.success('Password was successfully changed.');
       }).catch((error) => {
-        if (error.response.data.message) {
+        if (error.response === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else if (error.response.data.message) {
           this.$awn.warning(error.response.data.message);
         }
       });
