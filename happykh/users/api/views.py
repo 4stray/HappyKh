@@ -26,11 +26,11 @@ from .serializers import LoginSerializer
 from .serializers import EmailSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
+from .serializers import HASH_IDS
 from .tokens import account_activation_token
 from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
-
 
 class UserLogin(APIView):
     """"
@@ -61,10 +61,12 @@ class UserLogin(APIView):
         if user.is_active:
             # pylint: disable = unused-variable
             user_token, created = Token.objects.get_or_create(user=user)
+            user_id = HASH_IDS.encode(user.pk)
+
             LOGGER.info('User has been logged in')
             return Response({
                 'token': user_token.key,
-                'user_id': user.id,
+                'user_id': user_id,
             }, status=status.HTTP_200_OK)
         else:
             LOGGER.warning('Attempt to login by unregistered user')
@@ -180,7 +182,7 @@ class UserActivation(APIView):
 
         return Response({'message': msg}, status=status_code)
 
-    def get(self, request, user_id, token):
+    def get(self, request, id, token):
         """
         Processes GET request from user activation page
         :param request: HttpRequest
@@ -190,6 +192,7 @@ class UserActivation(APIView):
         """
         # pylint: disable=unused-argument
         try:
+            user_id = HASH_IDS.decode(id)[0]
             user = User.objects.get(pk=user_id)
             if user.is_active:
                 LOGGER.warning(
@@ -233,7 +236,7 @@ class UserActivation(APIView):
 
         try:
             email_token = account_activation_token.make_token(user)
-            user_id = user.pk
+            user_id = HASH_IDS.encode(user.pk)
             send_mail(
                 f'Confirm {email} on HappyKH',
                 f'We just needed to verify that {email} '
@@ -269,7 +272,11 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        user = UserAuthentication.get_user(id)
+        LOGGER.info(f'UserProfile get id {id} before decode')
+        user_id = HASH_IDS.decode(id)[0]
+        LOGGER.info(f'UserProfile patch id {id} after decode')
+
+        user = UserAuthentication.get_user(user_id)
 
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -282,7 +289,7 @@ class UserProfile(APIView):
         serializer = UserSerializer(user, context=context)
 
         response_data = serializer.data
-        enable_editing_profile = is_user_owner(request, id)
+        enable_editing_profile = is_user_owner(request, user_id)
         response_data['enable_editing_profile'] = enable_editing_profile
 
         LOGGER.info(
@@ -300,7 +307,11 @@ class UserProfile(APIView):
         :param id: Integer
         :return: Response(data, status)
         """
-        if not is_user_owner(request, id):
+        LOGGER.info(f'UserProfile patch id {id} before decode')
+        user_id = HASH_IDS.decode(id)[0]
+        LOGGER.info(f'UserProfile patch id {user_id} after decode')
+
+        if not is_user_owner(request, user_id):
             LOGGER.error(
                 "User's data were not updated."
                 "user_id must be equal to token user_id"
@@ -308,7 +319,7 @@ class UserProfile(APIView):
             return Response({'message': 'Editing not allowed'},
                             status=status.HTTP_403_FORBIDDEN)
 
-        user = UserAuthentication.get_user(id)
+        user = UserAuthentication.get_user(user_id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -325,7 +336,7 @@ class UserProfile(APIView):
         )
 
         if serializer.is_valid():
-            serializer.save(id=id, **serializer.validated_data)
+            serializer.save(id=user_id, **serializer.validated_data)
             LOGGER.info('User data updated')
             return Response(serializer.data, status=status.HTTP_200_OK)
 

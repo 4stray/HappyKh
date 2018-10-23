@@ -44,12 +44,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'customlogger.apps.CustomloggerConfig',
-    'users.apps.UsersConfig',
+    'users',
     'places.apps.PlacesConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
     'stdimage',
+    'rest_framework_serializer_extensions',
 ]
 
 # Basic Django REST Token setup
@@ -61,6 +62,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'SERIALIZER_EXTENSIONS': {
+        'USE_HASH_IDS': True,
+        'HASH_IDS_SOURCE': 'users.api.serializers.HASH_IDS',
+    }
 }
 
 MIDDLEWARE = [
