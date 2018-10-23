@@ -1,16 +1,23 @@
 <template>
-  <div class="places-container">
-      <div class="add-place-button">
-        <router-link class="create-place-button" :to="{ name: 'createPlace' }">
+  <div>
+    <div class="create-place-container">
+      <div class="text-xs-right">
+        <v-btn class="warning" large
+               :to="{ name: 'createPlace' }"
+               name="create-place-button">
           Add Place
-        </router-link>
+        </v-btn>
       </div>
-
-      <div class="place-components-container">
-        <PlaceComponent v-for="place in allPlaces"
-                        v-bind:place="place"
-                        :key="place.id"/>
-      </div>
+    </div>
+    <div>
+      <v-container grid-list-xl name="place-container">
+        <v-layout row wrap>
+          <PlaceComponent v-for="place in allPlaces"
+                          v-bind:place="place"
+                          :key="place.id"/>
+        </v-layout>
+      </v-container>
+    </div>
   </div>
 </template>
 
@@ -51,36 +58,10 @@ export default {
 </script>
 
 <style scoped>
-.places-container {
+.create-place-container {
   margin: 0 auto;
   padding: 0 auto;
   width: 60%;
 }
-
-.add-place-button {
-  width: 200px;
-  margin-left: auto;
-  margin-right: 0;
-}
-
-.create-place-button {
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 14px;
-  margin-top: 5px;
-  background-color: #ffc107;
-  color: #fff;
-  border: none;
-  padding: 10px 25px;
-  text-transform: uppercase;
-  font-family: "Liberation Sans", sans;
-  border-radius: 20px;
-  cursor: pointer;
-}
-
-.create-place-button:hover {
-  background-color: #ffa000;
-}
-
 </style>
 
