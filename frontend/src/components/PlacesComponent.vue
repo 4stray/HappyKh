@@ -12,7 +12,7 @@
     <div>
       <v-container grid-list-xl name="place-container">
         <v-layout row wrap>
-          <PlaceComponent v-for="place in allPlaces"
+          <PlaceCollectionComponent v-for="place in allPlaces"
                           v-bind:place="place"
                           :key="place.id"/>
         </v-layout>
@@ -23,13 +23,13 @@
 
 <script>
 import axios from 'axios';
-import PlaceComponent from './PlaceComponent.vue';
+import PlaceCollectionComponent from './PlaceCollectionComponent.vue';
 
 
 export default {
   name: 'PlacesComponent',
   components: {
-    PlaceComponent,
+    PlaceCollectionComponent,
   },
   data() {
     return {
