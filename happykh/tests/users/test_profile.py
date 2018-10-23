@@ -92,6 +92,21 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertNotEqual(serializer.data, response.data)
         self.assertIn(edited_user, User.objects.all())
 
+        # age == 'null'
+        edited_user = User.objects.get(pk=self.test_user.pk)
+        edited_user.age = None
+        response = self.client.patch(USERS_PROFILE_DATA_URL % edited_user.pk,
+                                     {'age': 'null'})
+
+        serializer_edited_user = UserSerializer(edited_user)
+        expected = serializer_edited_user.data
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected, response.data)
+
+        serializer = UserSerializer(self.test_user)
+        self.assertNotEqual(serializer.data, response.data)
+        self.assertIn(edited_user, User.objects.all())
+
     def test_patch_update_profile_image(self):
         """test update user's profile image"""
         image_file = BytesIO()
