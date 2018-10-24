@@ -15,7 +15,7 @@ class Address(models.Model):
     address = models.CharField(max_length=255, blank=False, default=None)
 
     def __str__(self):
-        return f'{self.address}'
+        return self.address
 
 
 class Place(models.Model):
@@ -34,7 +34,7 @@ class Place(models.Model):
         medium: (300, 200, True),
     }
 
-    def _make_upload_logo(serl, filename):
+    def _make_upload_logo(self, filename):
         """
         Function which creates path for place's logo.
         Should be used as base-function for function in parameter upload_to of
