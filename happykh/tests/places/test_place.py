@@ -1,10 +1,12 @@
-from rest_framework.test import APITestCase
+import hashids
 from rest_framework import status
-from tests.utils import BaseTestCase
-from places.models import Place
-from places.api.serializers import PlaceSerializer
-from users.models import User
 from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
+from places.api.serializers import PlaceSerializer
+from places.models import Place
+from happykh.settings import HASHID_FIELD_SALT
+from tests.utils import BaseTestCase
+from users.models import User
 
 PLACE_URL = '/api/places/'
 SINGLE_PLACE_URL = '/api/places/%d'
@@ -31,12 +33,14 @@ CORRECT_USER_DATA = {
     'is_active': True
 }
 
+HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
 
 class TestPlacePage(BaseTestCase, APITestCase):
 
     def setUp(self):
         """Create user and place objects"""
         self.user = User.objects.create_user(**CORRECT_USER_DATA)
+        self.hashed_user_id = HASH_IDS.encode(self.user.pk)
         self.place = Place.objects.create(user=self.user, **TEST_PLACE_DATA)
         self.places = Place.objects.all()
         user_token = Token.objects.create(user=self.user)
@@ -51,7 +55,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
 
     def test_post(self):
         data = TEST_PLACE_DATA_POST
-        data['user'] = self.user.pk
+        data['user'] = self.hashed_user_id
         response = self.client.post(PLACE_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 

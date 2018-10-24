@@ -1,6 +1,7 @@
 """Views for app users"""
 # pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
 # pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
+# pylint: disable = redefined-builtin
 import datetime
 import logging
 from smtplib import SMTPException
@@ -190,14 +191,13 @@ class UserActivation(APIView):
         """
         Processes GET request from user activation page
         :param request: HttpRequest
-        :param user_id: Integer
+        :param id: String
         :param token: String
         :return: Response({message}, status)
         """
         # pylint: disable=unused-argument
         try:
-            user_id = HASH_IDS.decode(id)[0]
-            user = User.objects.get(pk=user_id)
+            user = UserAuthentication.get_user(id)
             if user.is_active:
                 LOGGER.warning(
                     f'Activate already activated user, user_id: {user.pk}'
@@ -266,18 +266,16 @@ class UserProfile(APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    # pylint: disable = redefined-builtin
     variation = User.medium
 
     def get(self, request, id):
         """
         Return user's data.
         :param request: HTTP request
-        :param id: Integer
+        :param id: String
         :return: Response(data, status)
         """
-        user_id = HASH_IDS.decode(id)[0]
-        user = UserAuthentication.get_user(user_id)
+        user = UserAuthentication.get_user(id)
 
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -289,6 +287,8 @@ class UserProfile(APIView):
 
         serializer = UserSerializer(user, context=context)
         response_data = serializer.data
+
+        user_id = HASH_IDS.decode(id)[0]
         enable_editing_profile = is_user_owner(request, user_id)
         response_data['enable_editing_profile'] = enable_editing_profile
 
@@ -304,7 +304,7 @@ class UserProfile(APIView):
         """
         Update user's data
         :param request: HTTP request
-        :param id: Integer
+        :param id: String
         :return: Response(data, status)
         """
         user_id = HASH_IDS.decode(id)[0]
@@ -317,7 +317,7 @@ class UserProfile(APIView):
             return Response({'message': 'Editing not allowed'},
                             status=status.HTTP_403_FORBIDDEN)
 
-        user = UserAuthentication.get_user(user_id)
+        user = UserAuthentication.get_user(id)
         if user is None:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -355,12 +355,11 @@ class UserEmail(APIView):
     Gets new email for user, changes it if value is valid
     """
 
-    # pylint: disable = redefined-builtin
     def patch(self, request, id):
         """
         Changes user email
         :param request: HTTP Request
-        :param id: Integer
+        :param id: String
         :return: Response(data)
         """
         user = UserAuthentication.get_user(id)
@@ -370,7 +369,7 @@ class UserEmail(APIView):
         try:
             user = User.objects.get(email=request.data.get('email'))
 
-            LOGGER.warning(f'User with id: {id} tried to change '
+            LOGGER.warning(f'User with id: {user.pk} tried to change '
                            f'his email to existing')
 
             return Response({'message': 'User with such email already exists'},
@@ -407,7 +406,7 @@ class UserPassword(APIView):
     def patch(self, request, id):
         """
         :param request: HTTP request
-        :param id: integer
+        :param id: String
         :return: Response(message, status)
         """
         user = UserAuthentication.get_user(id)
