@@ -1,7 +1,9 @@
 <template>
   <v-toolbar>
     <v-btn :to="{ name: 'home'}" flat exact>Home</v-btn>
-    <v-btn v-if="isAuthenticated" :to="{ name: 'profile'}" flat exact>Profile
+    <v-btn v-if="isAuthenticated"
+           :to="{ name: 'profile', params: { id: this.$cookies.get('user_id') } }"
+           flat exact>Profile
     </v-btn>
     <v-btn v-if="!isAuthenticated" :to="{ name: 'login'}" flat exact>Login
     </v-btn>
