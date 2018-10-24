@@ -2,7 +2,6 @@
 # pylint: disable = useless-super-delegation
 from unittest import TestCase
 
-
 class BaseTestCase(TestCase):
     """Setup class for unittests"""
     def setUp(self):
