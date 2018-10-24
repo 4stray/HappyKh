@@ -8,7 +8,8 @@
               @change="onChange"
               :options="{ type: 'address',
                           countries: ['UA'],
-                          insideBoundingBox: '50.10, 36.10, 49.879, 36.469', // Kharkiv boundingBox don't change this coords
+                          // Kharkiv boundingBox don't change this coords
+                          insideBoundingBox: '50.10, 36.10, 49.879, 36.469',
                           aroundLatLngViaIP: false}">
       </places>
       <textarea id="description"

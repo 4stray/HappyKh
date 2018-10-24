@@ -14,6 +14,9 @@ class Address(models.Model):
     longitude = models.DecimalField(max_digits=8, decimal_places=5)
     address = models.CharField(max_length=255, blank=False, default=None)
 
+    def __str__(self):
+        return f'{self.address}'
+
 
 class Place(models.Model):
 

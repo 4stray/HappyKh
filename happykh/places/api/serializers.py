@@ -10,6 +10,7 @@ class PlaceSerializer(serializers.ModelSerializer):
     """Full ModelSerializer for model Place"""
 
     logo = UploadedImageField(max_length=None, )
+    address = serializers.StringRelatedField(many=False)
 
     class Meta:
         model = Place
