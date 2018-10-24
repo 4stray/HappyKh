@@ -6,6 +6,12 @@ import axios from 'axios';
 Vue.use(Vuex);
 const state = {
   Authenticated: window.$cookies.get('token'),
+  selectedPlace: {
+    id: 0,
+    name: '',
+    description: '',
+    logo: '',
+  },
 };
 
 const getters = {
@@ -14,6 +20,9 @@ const getters = {
   },
   getToken: state => {
     return state.Authenticated;
+  },
+  getSelectedPlace: state => {
+    return state.selectedPlace;
   },
 };
 
@@ -47,6 +56,9 @@ const mutations = {
   },
   setAuthenticated(state, isAuthenticated) {
     state.Authenticated = isAuthenticated;
+  },
+  setSelectedPlace(state, newSelectedPlace) {
+    state.selectedPlace = newSelectedPlace;
   },
 };
 
