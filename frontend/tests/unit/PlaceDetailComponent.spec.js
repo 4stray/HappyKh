@@ -38,6 +38,7 @@ describe('PlaceDetail for empty place', () => {
     placeLogo: '',
     placeName: '',
     placeDescription: '',
+    placeAddress: '',
   });
 
   it('has default placeLogo', () => {
@@ -60,6 +61,7 @@ describe('PlaceDetail for place with data', () => {
     placeLogo: 'logo.png',
     placeName: 'name',
     placeDescription: 'description',
+    placeAddress: 'some address'
   };
   wrapper.setData(testUserData);
 
@@ -75,5 +77,10 @@ describe('PlaceDetail for place with data', () => {
   it('has placeDescription', () => {
     expect(wrapper.find('#labelDescription').text()).to.be.equal('Description');
     expect(wrapper.find('#placeDescription').text()).to.be.equal(testUserData.placeDescription);
+  });
+
+  it('has placeAddress', () => {
+    expect(wrapper.find('#labelAddress').text()).to.be.equal('Address');
+    expect(wrapper.find('#placeAddress').text()).to.be.equal(testUserData.placeAddress);
   });
 });
