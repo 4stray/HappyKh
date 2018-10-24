@@ -6,7 +6,7 @@
           <v-img :src="placeLogo || require('@/assets/default_place.png')"
                  height="400px"
                  width="100%"
-                  name="place-image">
+                 name="place-image">
         </v-img>
           <v-spacer></v-spacer>
           <v-label class="d-block" id="labelName">Name</v-label>
@@ -14,6 +14,8 @@
           <v-label class="" id="labelDescription">Description</v-label>
           <p v-if="placeDescription" id="placeDescription">{{placeDescription}}</p>
           <p v-else class="text--secondary" id="no_description">Place has no description.</p>
+          <v-label class="d-block" id="labelAddress">Address</v-label>
+          <h3 class="title mb-2" id="placeAddress"> {{placeAddress}}</h3>
         </v-card>
       </v-layout>
     </v-flex>
@@ -33,6 +35,7 @@ export default {
       placeLogo: '',
       placeName: '',
       placeDescription: '',
+      placeAddress: '',
     };
   },
   created() {
@@ -48,6 +51,7 @@ export default {
       ).then((response) => {
         this.placeLogo = response.data.logo;
         this.placeName = response.data.name;
+        this.placeAddress = response.data.address;
         this.placeDescription = response.data.description;
         if (this.placeName === '') {
           this.$awn.alert(alertText);
@@ -69,5 +73,4 @@ export default {
 #placeDescription {
   word-wrap:break-word;
 }
-
 </style>
