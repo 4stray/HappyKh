@@ -21,9 +21,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '+$@f&k@)3t#@#3en0#1tatgb1draxr_34*q_g-@l56utjbkunc'
 
-# SECURITY WARNING: keep salt used in production secret!
-HASHID_FIELD_SALT = 'u-qs3b7+o4rq16p#i18-tt8v20fu#0rydpes&_%z@s2je^m*+5'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -209,3 +206,6 @@ SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+
+# Salt for hashid
+HASHID_FIELD_SALT = os.environ.get('HASHID_FIELD_SALT')
