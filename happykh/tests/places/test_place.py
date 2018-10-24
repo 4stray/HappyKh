@@ -7,6 +7,8 @@ from places.api.serializers import PlaceSerializer
 from users.models import User
 
 PLACE_URL = '/api/places/'
+SINGLE_PLACE_URL = '/api/places/%d'
+
 TEST_PLACE_DATA = {
     'name': 'test name',
     'description': 'test description',
@@ -52,3 +54,12 @@ class TestPlacePage(BaseTestCase, APITestCase):
         data['user'] = self.user.pk
         response = self.client.post(PLACE_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+    def test_get_single_place(self):
+        """Gets single place data"""
+        response = self.client.get(SINGLE_PLACE_URL % self.place.pk)
+        serializer = PlaceSerializer(self.place)
+        expected = serializer.data
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertDictEqual(expected, response.data)
