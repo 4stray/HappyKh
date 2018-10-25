@@ -36,10 +36,10 @@ export default {
     };
   },
   created() {
-    this.fetchUserCredentials();
+    this.fetchPlaceData();
   },
   methods: {
-    fetchUserCredentials() {
+    fetchPlaceData() {
       axios.get(
         `${PlaceAPI + this.$route.params.id}`,
         {
