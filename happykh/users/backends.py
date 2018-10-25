@@ -2,13 +2,11 @@
 # pylint: disable=unused-argument, no-self-use, no-member
 import logging
 
-import hashids
 from rest_framework import serializers
-from happykh.settings import HASHID_FIELD_SALT
+from happykh.settings import HASH_IDS
 from users.models import User
 
 LOGGER = logging.getLogger('happy_logger')
-HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
 
 
 class UserHashedIdField(serializers.Field):

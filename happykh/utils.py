@@ -3,14 +3,12 @@
 import os
 import uuid
 
-import hashids
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import UploadedFile
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-
-HASH_IDS = hashids.Hashids(salt=settings.HASHID_FIELD_SALT)
+from happykh.settings import HASH_IDS
 
 
 def make_upload_image(filename, path):
@@ -48,9 +46,10 @@ def delete_std_images_from_media(std_image_file, variations):
             os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
-def is_user_owner(request, user_id):
+def is_user_owner(request, id):
     token_key = request.META['HTTP_AUTHORIZATION'][6:]
     token_user_id = Token.objects.get(key=token_key).user.id
+    user_id = HASH_IDS.decode(id)[0]
     return user_id == token_user_id
 
 

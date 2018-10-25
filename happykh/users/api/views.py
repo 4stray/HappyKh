@@ -6,7 +6,6 @@ import datetime
 import logging
 from smtplib import SMTPException
 
-import hashids
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
@@ -24,7 +23,7 @@ from rest_framework.views import APIView
 # pylint: disable = no-name-in-module, import-error
 from utils import is_user_owner
 from happykh.settings import EMAIL_HOST_USER
-from happykh.settings import HASHID_FIELD_SALT
+from happykh.settings import HASH_IDS
 from .serializers import EmailSerializer
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
@@ -34,7 +33,6 @@ from ..backends import UserAuthentication
 from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
-HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
 
 
 class UserLogin(APIView):
@@ -288,8 +286,7 @@ class UserProfile(APIView):
         serializer = UserSerializer(user, context=context)
         response_data = serializer.data
 
-        user_id = HASH_IDS.decode(id)[0]
-        enable_editing_profile = is_user_owner(request, user_id)
+        enable_editing_profile = is_user_owner(request, id)
         response_data['enable_editing_profile'] = enable_editing_profile
 
         LOGGER.info(
@@ -307,9 +304,8 @@ class UserProfile(APIView):
         :param id: String
         :return: Response(data, status)
         """
-        user_id = HASH_IDS.decode(id)[0]
 
-        if not is_user_owner(request, user_id):
+        if not is_user_owner(request, id):
             LOGGER.error(
                 "User's data were not updated."
                 "user_id must be equal to token user_id"
@@ -337,7 +333,7 @@ class UserProfile(APIView):
             partial=True,
             context=context,
         )
-
+        user_id = HASH_IDS.decode(id)[0]
         if serializer.is_valid():
             serializer.save(id=user_id, **serializer.validated_data)
             LOGGER.info('User data updated')
