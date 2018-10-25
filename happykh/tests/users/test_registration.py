@@ -1,11 +1,9 @@
 """Test users api views"""
-import hashids
 from rest_framework import status
 from rest_framework.test import APITestCase
 from tests.utils import BaseTestCase
 from users.api.tokens import account_activation_token
 from users.models import User
-from happykh.settings import HASHID_FIELD_SALT
 
 TEST_USER_DATA = {
     'user_email': 'test@mail.com',
@@ -13,14 +11,10 @@ TEST_USER_DATA = {
 }
 
 REGISTRATION_URL = '/api/users/registration'
-HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
 
 
 class RegistrationViewTestCase(BaseTestCase, APITestCase):
     """Test user api registration view /api/users/registration/"""
-
-    def setUp(self):
-        pass
 
     def test_create_deactivated_user(self):
         """test new user creation"""
@@ -42,7 +36,7 @@ class RegistrationViewTestCase(BaseTestCase, APITestCase):
                                         password=data['user_password'],
                                         is_active=False)
         email_token = account_activation_token.make_token(user)
-        user_id = HASH_IDS.encode(user.id)
+        user_id = self.HASH_IDS.encode(user.id)
         response = self.client.get(
             f'/api/users/activate/{user_id}/{email_token}/'
         )

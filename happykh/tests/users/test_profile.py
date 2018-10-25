@@ -2,7 +2,6 @@
 import os
 from io import BytesIO
 
-import hashids
 from PIL import Image
 # pylint: disable = no-member
 from django.core.files.uploadedfile import UploadedFile
@@ -10,14 +9,12 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
-from happykh.settings import HASHID_FIELD_SALT
 from users.api.serializers import UserSerializer, EmailSerializer
 from users.models import User
 
 from utils import delete_std_images_from_media
 from ..utils import BaseTestCase
 
-HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
 
 USERS_PROFILE_URL = '/api/users/%s'
 USERS_PROFILE_DATA_URL = '/api/users/%s/data'
@@ -41,8 +38,9 @@ class TestUserProfile(BaseTestCase, APITestCase):
 
     def setUp(self):
         """Create test user for testing"""
+        super().setUp()
         self.test_user = User.objects.create_user(**CORRECT_DATA)
-        self.hashed_user_id = HASH_IDS.encode(self.test_user.pk)
+        self.hashed_user_id = self.HASH_IDS.encode(self.test_user.pk)
         user_token = Token.objects.create(user=self.test_user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
         self.password = {
