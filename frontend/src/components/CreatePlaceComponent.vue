@@ -88,7 +88,7 @@ export default {
         this.placeAddress = {
           latitude: data.latlng.lat,
           longitude: data.latlng.lng,
-          address: data.value,
+          address: data.name,
         };
         this.placeAddress = JSON.stringify(this.placeAddress);
       } else { this.placeAddress = ''; }
