@@ -90,10 +90,10 @@ class HashIdField(serializers.Field):
     """
     Field for id for serializer
     """
+
     def to_representation(self, data):
         return HASH_IDS.encode(data)
 
     def to_internal_value(self, data):
         user_id = HASH_IDS.decode(data)[0]
         return super(HashIdField, self).to_internal_value(user_id)
-
