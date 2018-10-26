@@ -36,9 +36,15 @@ class Place(models.Model):
         :return: path to image or None if filename is empty
         """
 
-        return make_upload_image(filename, 'place/logo')
+        return make_upload_image(
+            model_name='Place',
+            attr_name='logo',
+            instance_id=self.id,
+            original_filename=filename
+        )
+        # return make_upload_image(filename, 'place/logo')
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     logo = std_models.StdImageField(

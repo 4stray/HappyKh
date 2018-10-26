@@ -90,7 +90,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         :return: path to image or None if filename is empty
         """
 
-        return make_upload_image(filename, 'user/profile_image')
+        return make_upload_image(
+            model_name='User',
+            attr_name='profile_image',
+            instance_id=self.id,
+            original_filename=filename
+        )
 
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=30, blank=True)
