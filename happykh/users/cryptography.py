@@ -1,5 +1,5 @@
 from Crypto.Cipher import DES
-import os
+from happykh.settings import ENCODING_DES_KEY
 
 
 def pad(text):
@@ -14,8 +14,7 @@ def encode(encoding_text):
     :param encoding_text: String
     :return:
     """
-    key = os.environ.get('EMAIL_ENCODING_KEY')
-    des = DES.new(key.encode(), DES.MODE_ECB)
+    des = DES.new(ENCODING_DES_KEY.encode(), DES.MODE_ECB)
 
     padded_text = pad(encoding_text.encode())
     encoded_text = des.encrypt(padded_text)
@@ -30,8 +29,7 @@ def decode(decoding_hex):
     :param decoding_hex:
     :return:
     """
-    key = os.environ.get('EMAIL_ENCODING_KEY')
-    des = DES.new(key.encode(), DES.MODE_ECB)
+    des = DES.new(ENCODING_DES_KEY.encode(), DES.MODE_ECB)
 
     decoding_bytes = bytes.fromhex(decoding_hex)
     decoded_bytes = des.decrypt(decoding_bytes)

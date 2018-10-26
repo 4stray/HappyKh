@@ -206,3 +206,7 @@ SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+
+#DES Key
+
+ENCODING_DES_KEY = os.environ.get('EMAIL_ENCODING_KEY')
