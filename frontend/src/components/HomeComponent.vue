@@ -1,7 +1,7 @@
 <template>
   <div class="HomeComponent">
+    <img alt="Vue logo" src="../assets/logo_M_min.png">
     <h1>{{ msg }}</h1>
-    <PlacesComponent v-if="isAuthenticated"/>
   </div>
 </template>
 
