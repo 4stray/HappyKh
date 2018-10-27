@@ -35,9 +35,7 @@ class PlacePage(APIView):
         }
         serializer = PlaceSerializer(data=request.data, context=context)
         if serializer.is_valid():
-            new_place = Place.objects.create()
-            serializer.update(instance=new_place,
-                              validated_data=serializer.validated_data)
+            serializer.save()
             return Response({'message': 'place was created'},
                             status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
