@@ -78,7 +78,7 @@ class AddressTestCase(BaseTestCase):
         self.assertEqual(type(error.exception), IntegrityError)
 
     def test_creation_without_address_string(self):
-        self.assertIsInstance(Address.objects.create(
-                                latitude=self.address_info['latitude'],
-                                longitude=self.address_info['longitude']),
-                              Address)
+        with self.assertRaises(IntegrityError) as error:
+            Address.objects.create(latitude=self.address_info['latitude'],
+                                   longitude=self.address_info['longitude'])
+        self.assertEqual(type(error.exception), IntegrityError)
