@@ -7,13 +7,13 @@
 
 <script>
 export default {
-  name: "GoBackComponent",
+  name: 'GoBackComponent',
   methods: {
     routeBack(event) {
       this.$router.go(-1);
-    }
+    },
   },
-}
+};
 </script>
 
 <style scoped>

@@ -16,5 +16,5 @@ describe('GoBackComponent', () => {
       expect(wrapper.find('v-btn').find('v-icon')
         .text()).to.be.equal('arrow_back');
     });
-  })
+  });
 });
