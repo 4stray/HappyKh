@@ -10,8 +10,8 @@ LOGGER = logging.getLogger('happy_logger')
 
 class Address(models.Model):
     """Addresses model"""
-    latitude = models.DecimalField(max_digits=7, decimal_places=5)
-    longitude = models.DecimalField(max_digits=8, decimal_places=5)
+    latitude = models.DecimalField(max_digits=17, decimal_places=15)
+    longitude = models.DecimalField(max_digits=18, decimal_places=15)
     address = models.CharField(max_length=255, blank=False, default=None)
 
     def __str__(self):
