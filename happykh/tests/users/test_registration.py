@@ -16,9 +16,6 @@ REGISTRATION_URL = '/api/users/registration'
 class RegistrationViewTestCase(BaseTestCase, APITestCase):
     """Test user api registration view /api/users/registration/"""
 
-    def setUp(self):
-        pass
-
     def test_create_deactivated_user(self):
         """test new user creation"""
         data = TEST_USER_DATA.copy()
@@ -39,9 +36,9 @@ class RegistrationViewTestCase(BaseTestCase, APITestCase):
                                         password=data['user_password'],
                                         is_active=False)
         email_token = account_activation_token.make_token(user)
-
+        user_id = self.HASH_IDS.encode(user.id)
         response = self.client.get(
-            f'/api/users/activate/{user.id}/{email_token}/'
+            f'/api/users/activate/{user_id}/{email_token}/'
         )
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)

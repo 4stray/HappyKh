@@ -1,7 +1,7 @@
 """Serializers for model Place"""
 
 from rest_framework import serializers
-
+from users.backends import UserHashedIdField
 from utils import UploadedImageField
 from places.models import Place, Address
 
@@ -16,7 +16,8 @@ class AddressSerializer(serializers.ModelSerializer):
 class PlaceSerializer(serializers.ModelSerializer):
     """Full ModelSerializer for model Place"""
 
-    logo = UploadedImageField(max_length=None)
+    user = UserHashedIdField()
+    logo = UploadedImageField(max_length=None, )
 
     class Meta:
         model = Place

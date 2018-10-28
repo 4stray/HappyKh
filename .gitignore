@@ -95,6 +95,8 @@ env.bak/
 venv.bak/
 env_happykh
 happykh/sendgrid.env
+happykh/hashid.env
+
 
 # Spyder project settings
 .spyderproject

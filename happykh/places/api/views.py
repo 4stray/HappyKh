@@ -1,11 +1,13 @@
 import json
 import logging
+
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
 
 from .serializers import PlaceSerializer, AddressSerializer
 from ..models import Place, Address
@@ -14,7 +16,6 @@ LOGGER = logging.getLogger('happy_logger')
 
 
 class PlacePage(APIView):
-
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
