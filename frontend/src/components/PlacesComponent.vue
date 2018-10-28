@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="create-place-container">
+      <v-text-field  placeholder="Search" v-model="searchValue"></v-text-field>
       <div class="text-xs-right">
         <v-btn class="warning" large
                :to="{ name: 'createPlace' }"
@@ -12,7 +13,7 @@
     <div>
       <v-container grid-list-xl name="place-container">
         <v-layout row wrap>
-          <PlaceCollectionComponent v-for="place in allPlaces"
+          <PlaceCollectionComponent v-for="place in filteredPlaces"
                           v-bind:place="place"
                           :key="place.id"/>
         </v-layout>
@@ -23,6 +24,7 @@
 
 <script>
 import axios from 'axios';
+import filter from 'lodash/filter';
 import PlaceCollectionComponent from './PlaceCollectionComponent.vue';
 
 
@@ -31,9 +33,17 @@ export default {
   components: {
     PlaceCollectionComponent,
   },
+  computed: {
+    filteredPlaces() {
+        return filter(this.allPlaces, (item) => {
+            return (item.name.indexOf(this.searchValue) !== -1);
+        });
+    }
+  },
   data() {
     return {
       allPlaces: [],
+      searchValue: "",
     };
   },
   created() {
@@ -62,6 +72,7 @@ export default {
   margin: 0 auto;
   padding: 0 auto;
   width: 60%;
+  display: flex;
 }
 </style>
 
