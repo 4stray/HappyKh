@@ -25,7 +25,11 @@
 import axios from 'axios';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
-const GENDER_CHOICES = { M: 'Man', W: 'Woman' };
+const GENDER_CHOICES = {
+  M: 'Man',
+  W: 'Woman',
+  O: 'Other'
+};
 
 export default {
   name: 'ProfileComponent',

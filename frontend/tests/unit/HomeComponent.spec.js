@@ -1,6 +1,5 @@
 import { shallowMount, mount, config } from '@vue/test-utils';
 import HomeComponent from '@/components/HomeComponent.vue';
-import PlacesComponent from '@/components/PlacesComponent.vue';
 
 const expect = require('chai').expect;
 const should = require('chai').should();
@@ -18,9 +17,5 @@ describe('HomeComponent', () => {
   const wrapper = mount(HomeComponent, config);
   it('has property msg', () => {
     expect(HomeComponent.props).to.have.key('msg');
-  });
-
-  it('has PlacesComponent', () => {
-    expect(wrapper.contains(PlacesComponent)).to.be.equal(true);
   });
 });
