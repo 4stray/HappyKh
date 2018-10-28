@@ -7,9 +7,9 @@
 
 <script>
 // @ is an alias to /src
+import GoBackComponent from '@/components/GoBackComponent.vue';
 import Header from '../components/Header.vue';
 import CreatePlaceComponent from '../components/CreatePlaceComponent.vue';
-import GoBackComponent from '@/components/GoBackComponent.vue';
 
 export default {
   name: 'CreatePlace',
