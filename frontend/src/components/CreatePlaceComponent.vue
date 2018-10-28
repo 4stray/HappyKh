@@ -4,44 +4,63 @@
     <form id="placeForm" enctype="multipart/form-data">
       <input type="text" id="name"
              v-model="placeName" placeholder="*Place name"/>
-      <places id="address" placeholder="*Place address"
-              @change="onChange"
-              :options="{ type: 'address',
-                          countries: ['UA'],
-                          // Kharkiv boundingBox don't change this coords
-                          insideBoundingBox: '50.10, 36.10, 49.879, 36.469',
-                          aroundLatLngViaIP: false}">
-      </places>
+      <input id="placeAddress" placeholder="*Place address" type="text">
       <textarea id="description"
                 v-model="placeDescription" placeholder="Description"></textarea>
       <img v-bind:src=placeLogo id='logo' alt="No place image"/>
-      <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
+      <input type="file" id="logoInput" v-on:change="changeImage()"
+             accept="image/*"/>
       <button class="btn-save" type="button"
-              v-on:click="save()" :disabled="isDisabledButton">Create Place</button>
+              v-on:click="save()" :disabled="isDisabledButton">Create Place
+      </button>
     </form>
   </div>
 </template>
 
 <script >
 import axios from 'axios';
-import Places from 'vue-places';
+import GoogleMapsLoader from 'google-maps';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
   name: 'createPlaceComponent',
-  components: { Places },
   data() {
     return {
       placeName: '',
       placeAddress: '',
       placeLogo: '',
       placeDescription: '',
+      autocomplete: null,
     };
   },
   computed: {
     isDisabledButton() {
       return !(this.placeName && this.placeAddress);
     },
+  },
+  mounted() {
+    // TODO enter google maps api key;
+    GoogleMapsLoader.KEY = '';
+    GoogleMapsLoader.VERSION = '3.33';
+    GoogleMapsLoader.LIBRARIES = ['places'];
+    GoogleMapsLoader.LANGUAGE = 'en';
+    GoogleMapsLoader.REGION = 'UA';
+    GoogleMapsLoader.load((google) => {
+      this.autocomplete = new google.maps.places.Autocomplete(
+        (document.getElementById('placeAddress')),
+        { types: ['address'], strictBounds: true },
+      );
+      const geolocation = {
+        lat: 50,
+        lng: 36,
+      };
+      const circle = new google.maps.Circle({
+        center: geolocation,
+        radius: 20000,
+      });
+      this.autocomplete.setBounds(circle.getBounds());
+      this.autocomplete.addListener('place_changed', this.onChange);
+    });
   },
   methods: {
     save() {
@@ -83,12 +102,14 @@ export default {
 
       reader.readAsDataURL(file);
     },
-    onChange(data) {
-      if (Object.keys(data).length !== 0 && data.constructor === Object) {
+    onChange() {
+      if (Object.keys(this.autocomplete.getPlace()).length > 1) {
         this.placeAddress = {
-          latitude: data.latlng.lat,
-          longitude: data.latlng.lng,
-          address: data.name,
+          latitude:
+            this.autocomplete.getPlace().geometry.location.toJSON().lat,
+          longitude:
+            this.autocomplete.getPlace().geometry.location.toJSON().lng,
+          address: this.autocomplete.getPlace().formatted_address,
         };
         this.placeAddress = JSON.stringify(this.placeAddress);
       } else { this.placeAddress = ''; }

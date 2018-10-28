@@ -37,7 +37,7 @@ describe('mounted createPlaceComponent', () => {
   });
 
   it('has 2 input fields', () => {
-    expect(wrapper.findAll('input').length).to.be.equal(2);
+    expect(wrapper.findAll('input').length).to.be.equal(3);
   });
 
   it('has placeName field with "text" type', () => {
@@ -53,7 +53,7 @@ describe('mounted createPlaceComponent', () => {
   });
 
   it('has address autocomplete component', () => {
-    expect(wrapper.contains('#address')).to.be.equal(true);
+    expect(wrapper.contains('#placeAddress')).to.be.equal(true);
   });
 
   it('contains logo from data()', () => {

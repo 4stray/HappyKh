@@ -61,7 +61,7 @@ describe('PlaceDetail for place with data', () => {
     placeLogo: 'logo.png',
     placeName: 'name',
     placeDescription: 'description',
-    placeAddress: 'some address'
+    placeAddress: 'some address',
   };
   wrapper.setData(testUserData);
 
