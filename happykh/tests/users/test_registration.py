@@ -7,7 +7,8 @@ from users.models import User
 
 TEST_USER_DATA = {
     'user_email': 'test@mail.com',
-    'user_password': 'testpassword'
+    'user_password': 'testpassword',
+    'first_name': 'User'
 }
 
 REGISTRATION_URL = '/api/users/registration'
