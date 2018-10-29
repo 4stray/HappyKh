@@ -44,9 +44,11 @@ class PlacePage(APIView):
 
         serializer = PlaceSerializer(data=data, context=context)
         if serializer.is_valid():
-            serializer.save()
+            pk =serializer.save()
+            LOGGER.info(f'Created place #{pk}')
             return Response({'message': 'place was created'},
                             status=status.HTTP_201_CREATED)
+        LOGGER.error(f'Serializer errors: {serializer.errors}')
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
@@ -60,6 +62,7 @@ class PlacePage(APIView):
             if address_serializer.is_valid():
                 return address_serializer.save().pk
             else:
+                LOGGER.error(f'Serializer errors: {address_serializer.errors}')
                 return False
         return address.pk
 
@@ -79,6 +82,7 @@ class PlaceSinglePage(APIView):
         single_place = Place.get_place(place_id)
 
         if single_place is None:
+            LOGGER.warning(f'Place #{place_id} not found')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         place_context = {
