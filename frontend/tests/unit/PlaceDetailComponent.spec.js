@@ -68,12 +68,10 @@ describe('PlaceDetail for place with data', () => {
   });
 
   it('has placeName', () => {
-    expect(wrapper.find('#labelName').text()).to.be.equal('Name');
     expect(wrapper.find('#placeName').text()).to.be.equal(testUserData.placeName);
   });
 
   it('has placeDescription', () => {
-    expect(wrapper.find('#labelDescription').text()).to.be.equal('Description');
     expect(wrapper.find('#placeDescription').text()).to.be.equal(testUserData.placeDescription);
   });
 });

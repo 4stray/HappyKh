@@ -1,7 +1,11 @@
 import Cookies from 'js-cookie';
-import { shallowMount } from '@vue/test-utils';
+import VueRouter from 'vue-router';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ProfileComponent from '../../src/components/ProfileComponent.vue';
 
+const localVue = createLocalVue();
+localVue.use(VueRouter);
+const router = new VueRouter();
 const expect = require('chai').expect;
 const should = require('chai').should();
 
@@ -32,6 +36,8 @@ describe('ProfileComponent data()', () => {
 
 describe('ProfileComponent for empty profile', () => {
   const wrapper = shallowMount(ProfileComponent, {
+    localVue,
+    router,
     mocks: {
       $cookies: Cookies,
     },
@@ -51,6 +57,8 @@ describe('ProfileComponent for empty profile', () => {
 
 describe('ProfileComponent for profile with data', () => {
   const wrapper = shallowMount(ProfileComponent, {
+    localVue,
+    router,
     mocks: {
       $cookies: Cookies,
     },
@@ -61,6 +69,7 @@ describe('ProfileComponent for profile with data', () => {
     userAge: 18,
     userGender: 'W',
     userImage: 'userAvatar.png',
+    enableEditingProfile: true,
   };
   wrapper.setData(testUserData);
 
@@ -69,7 +78,6 @@ describe('ProfileComponent for profile with data', () => {
   });
 
   it('has userAge', () => {
-    expect(wrapper.find('v-label').text()).to.be.equal('Age');
     expect(wrapper.find('#userAge').text()).to.be.equal(testUserData.userAge.toString());
   });
 

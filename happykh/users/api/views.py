@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
 from django.utils import timezone
+
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -18,12 +19,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from utils import is_user_owner
 from happykh.settings import EMAIL_HOST_USER
-from ..backends import UserAuthentication
-from .serializers import LoginSerializer
+from happykh.settings import HASH_IDS
 from .serializers import EmailSerializer
+from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
 from .tokens import account_activation_token
+from ..backends import UserAuthentication
 from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
@@ -58,10 +60,12 @@ class UserLogin(APIView):
         if user.is_active:
             # pylint: disable = unused-variable
             user_token, created = Token.objects.get_or_create(user=user)
+            user_id = HASH_IDS.encode(user.pk)
+
             LOGGER.info('User has been logged in')
             return Response({
                 'token': user_token.key,
-                'user_id': user.id,
+                'user_id': user_id,
             }, status=status.HTTP_200_OK)
         LOGGER.warning('Attempt to login by unregistered user')
         return Response({
@@ -175,16 +179,16 @@ class UserActivation(APIView):
 
         return Response({'message': msg}, status=status_code)
 
-    def get(self, request, user_id, token):
+    def get(self, request, id, token):
         """
         Processes GET request from user activation page
         :param request: HttpRequest
-        :param user_id: Integer
+        :param id: String
         :param token: String
         :return: Response({message}, status)
         """
         try:
-            user = User.objects.get(pk=user_id)
+            user = UserAuthentication.get_user(id)
             if user.is_active:
                 LOGGER.warning(
                     f'Activate already activated user, user_id: {user.pk}'
@@ -226,7 +230,7 @@ class UserActivation(APIView):
 
         try:
             email_token = account_activation_token.make_token(user)
-            user_id = user.pk
+            user_id = HASH_IDS.encode(user.pk)
             send_mail(
                 f'Confirm {email} on HappyKH',
                 f'We just needed to verify that {email} '
@@ -258,7 +262,7 @@ class UserProfile(APIView):
         """
         Return user's data.
         :param request: HTTP request
-        :param id: Integer
+        :param id: String
         :return: Response(data, status)
         """
         user = UserAuthentication.get_user(id)
@@ -272,8 +276,8 @@ class UserProfile(APIView):
         }
 
         serializer = UserSerializer(user, context=context)
-
         response_data = serializer.data
+
         enable_editing_profile = is_user_owner(request, id)
         response_data['enable_editing_profile'] = enable_editing_profile
 
@@ -289,9 +293,10 @@ class UserProfile(APIView):
         """
         Update user's data
         :param request: HTTP request
-        :param id: Integer
+        :param id: String
         :return: Response(data, status)
         """
+
         if not is_user_owner(request, id):
             LOGGER.error(
                 "User's data were not updated."
@@ -320,9 +325,9 @@ class UserProfile(APIView):
             partial=True,
             context=context,
         )
-
+        user_id = HASH_IDS.decode(id)[0]
         if serializer.is_valid():
-            serializer.save(id=id, **serializer.validated_data)
+            serializer.save(id=user_id, **serializer.validated_data)
             LOGGER.info('User data updated')
             return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -338,12 +343,11 @@ class UserEmail(APIView):
     Gets new email for user, changes it if value is valid
     """
 
-    # pylint: disable = redefined-builtin
     def patch(self, request, id):
         """
         Changes user email
         :param request: HTTP Request
-        :param id: Integer
+        :param id: String
         :return: Response(data)
         """
         user = UserAuthentication.get_user(id)
@@ -353,7 +357,7 @@ class UserEmail(APIView):
         try:
             user = User.objects.get(email=request.data.get('email'))
 
-            LOGGER.warning(f'User with id: {id} tried to change '
+            LOGGER.warning(f'User with id: {user.pk} tried to change '
                            f'his email to existing')
 
             return Response({'message': 'User with such email already exists'},
@@ -379,6 +383,7 @@ class UserEmail(APIView):
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserPassword(APIView):
     """
     Change user's password
@@ -389,7 +394,7 @@ class UserPassword(APIView):
     def patch(self, request, id):
         """
         :param request: HTTP request
-        :param id: integer
+        :param id: String
         :return: Response(message, status)
         """
         user = UserAuthentication.get_user(id)
