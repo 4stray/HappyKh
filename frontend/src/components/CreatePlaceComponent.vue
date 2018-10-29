@@ -39,7 +39,6 @@ export default {
     },
   },
   mounted() {
-    console.log(process.env.VUE_APP_GOOGLE_API);
     GoogleMapsLoader.KEY = process.env.VUE_APP_GOOGLE_API;
     GoogleMapsLoader.VERSION = '3.33';
     GoogleMapsLoader.LIBRARIES = ['places'];
