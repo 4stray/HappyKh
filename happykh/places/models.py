@@ -51,9 +51,13 @@ class Place(models.Model):
 
     @staticmethod
     def get_place(place_id):
+        """
+        :param  place_id: place id
+        :return: instance of Place or None
+        """
         try:
             return Place.objects.get(pk=place_id)
-        except Place.DoesNotExist: #pylint: disable = no-member
+        except Place.DoesNotExist:
             LOGGER.error(
                 f'Can`t get place because of invalid id,'
                 f' place_id: {place_id}'

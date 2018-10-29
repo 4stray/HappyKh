@@ -373,12 +373,11 @@ class UserEmail(APIView):
                     # Send confirmation email
                     LOGGER.info(f'User with id: {id} changed his email')
                     return Response(status=status.HTTP_200_OK)
-                else:
-                    LOGGER.error('Confirmation email has not been delivered')
-                    return Response({
-                        'message': 'The mail has not been delivered'
-                                   ' due to connection reasons'
-                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                LOGGER.error('Confirmation email has not been delivered')
+                return Response({
+                    'message': 'The mail has not been delivered'
+                               ' due to connection reasons'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
@@ -424,10 +423,17 @@ class UserPassword(APIView):
 
 
 class TokenValidation(APIView):
+    """
+    Token validation
+    """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
+        """
+        :param request: HTTP request
+        :return: Response(status)
+        """
         token_key = request.META['HTTP_AUTHORIZATION'][6:]
         try:
             token = Token.objects.get(key=token_key)
