@@ -69,6 +69,7 @@ describe('ProfileComponent for profile with data', () => {
     userAge: 18,
     userGender: 'W',
     userImage: 'userAvatar.png',
+    enableEditingProfile: true,
   };
   wrapper.setData(testUserData);
 
@@ -77,7 +78,6 @@ describe('ProfileComponent for profile with data', () => {
   });
 
   it('has userAge', () => {
-    expect(wrapper.find('v-label').text()).to.be.equal('Age');
     expect(wrapper.find('#userAge').text()).to.be.equal(testUserData.userAge.toString());
   });
 

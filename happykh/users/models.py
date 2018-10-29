@@ -63,10 +63,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     """"
     Customized user model with email as username and additional fields
     """
-    man, woman = 'M', 'W'
+    man, woman, other = 'M', 'W', 'O'
     GENDER_CHOICES = (
         (woman, 'woman'),
-        (man, 'man')
+        (man, 'man'),
+        (other, 'other'),
     )
 
     large = 'large'

@@ -9,9 +9,7 @@
                   name="place-image">
         </v-img>
           <v-spacer></v-spacer>
-          <v-label class="d-block" id="labelName">Name</v-label>
           <h3 class="headline mb-2" id="placeName"> {{placeName}}</h3>
-          <v-label class="" id="labelDescription">Description</v-label>
           <p v-if="placeDescription" id="placeDescription">{{placeDescription}}</p>
           <p v-else class="text--secondary" id="no_description">Place has no description.</p>
         </v-card>

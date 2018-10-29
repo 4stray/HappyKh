@@ -1,5 +1,6 @@
 <template>
   <v-layout align-start justify-center row fill-height>
+    <GoBackComponent/>
     <v-flex md4>
       <v-list class="mx-4 v-card">
         <v-list-tile
@@ -23,6 +24,7 @@
 import PasswordComponent from '@/components/PasswordComponent.vue';
 import ChangeEmailComponent from '@/components/ChangeEmailComponent.vue';
 import ProfileEditComponent from '@/components/ProfileEditComponent.vue';
+import GoBackComponent from '@/components/GoBackComponent.vue';
 
 export default {
   name: 'ProfileSettings',
@@ -30,6 +32,8 @@ export default {
     PasswordComponent,
     ChangeEmailComponent,
     ProfileEditComponent,
+    GoBackComponent,
+
   },
   data() {
     return {
