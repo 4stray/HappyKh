@@ -51,16 +51,16 @@ export default {
           this.$cookies.set('token', response.data.token);
           this.$store.commit('setAuthenticated', response.data.token);
           this.$cookies.set('user_id', response.data.user_id);
-          this.$router.push({name: 'home'});
+          this.$router.push({ name: 'home' });
         }).catch((error) => {
-        if (error.response === undefined) {
-          this.$awn.alert('A server error has occurred, try again later');
-        } else if (error.response.data.message) {
-          this.$awn.warning(error.response.data.message);
-        }
-        this.$cookies.remove('token');
-        this.$cookies.remove('user_id');
-      });
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
+          this.$cookies.remove('token');
+          this.$cookies.remove('user_id');
+        });
       this.$refs.form.reset();
     },
   },

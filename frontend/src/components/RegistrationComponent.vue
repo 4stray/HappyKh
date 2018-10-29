@@ -79,22 +79,22 @@ export default {
         .then(() => {
           this.$awn.success('Successful registration.' +
             ' Please check your mailbox for confirmation email.');
-          this.$router.push({name: 'home'});
+          this.$router.push({ name: 'home' });
         }).catch((error) => {
-        if (error.response === undefined) {
-          this.$awn.alert('A server error has occurred, try again later');
-        } else if (error.response.status === 400) {
-          this.$awn.alert(error.response.data.message);
-        } else if (error.response.status === 500 && error.response.data.message) {
-          this.$awn.info(error.response.data.message);
-        }
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.status === 400) {
+            this.$awn.alert(error.response.data.message);
+          } else if (error.response.status === 500 && error.response.data.message) {
+            this.$awn.info(error.response.data.message);
+          }
 
-        if (this.$cookies) {
-          this.$cookies.remove('token');
-          this.$cookies.remove('user_id');
-        }
-        this.$refs.form.reset();
-      });
+          if (this.$cookies) {
+            this.$cookies.remove('token');
+            this.$cookies.remove('user_id');
+          }
+          this.$refs.form.reset();
+        });
     },
   },
 };
