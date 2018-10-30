@@ -1,20 +1,28 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo_M_min.png">
-    <HomeComponent msg="Welcome to HappyKh"/>
+    <PlacesComponent v-if="isAuthenticated"/>
+    <HomeComponent v-else msg="Welcome to HappyKh"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HomeComponent from '@/components/HomeComponent.vue';
 import Header from '@/components/Header.vue';
+import HomeComponent from '@/components/HomeComponent.vue';
+import PlacesComponent from '@/components/PlacesComponent.vue';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'home',
   components: {
     Header,
     HomeComponent,
+    PlacesComponent,
+  },
+  computed: {
+    ...mapGetters({
+      isAuthenticated: 'getAuthenticated',
+    }),
   },
 };
 </script>

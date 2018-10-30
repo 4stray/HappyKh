@@ -1,19 +1,25 @@
 <template>
-  <form id="login" method="post" @submit.prevent="login" novalidate>
+  <v-form ref="form" @submit.prevent="login" v-model="valid">
     <div class="content">
-      <input type="email" name="userEmail" v-model.trim="userEmail"
-             placeholder="EMAIL"/>
-      <input type="password" name="userPassword" v-model="userPassword"
-             placeholder="PASSWORD"/>
+      <v-text-field v-model="userEmail"
+                    name="userEmail"
+                    :rules="emailRules"
+                    label="Email"></v-text-field>
+      <v-text-field type="password"
+                    v-model="userPassword"
+                    name="userPassword"
+                    label="Password"
+                    :rules="passwordRules"></v-text-field>
     </div>
-    <input class="btn-submit" type="submit" :disabled="isDisabledButton"
-           value="LOGIN"/>
-  </form>
+    <input class="btn-submit" type="submit" :disabled="!valid" value="LOGIN"/>
+  </v-form>
 </template>
 
 <script>
+
 import axios from 'axios';
 
+const UserAPI = 'http://127.0.0.1:8000/api/users';
 
 export default {
   name: 'LoginComponent',
@@ -21,11 +27,21 @@ export default {
     return {
       userEmail: '',
       userPassword: '',
+      valid: false,
+      passwordRules: [
+        value => Boolean(value) || 'This field is required.',
+        value => (value && value.length >= 8)
+          || 'Your password must be at least 8 characters.',
+      ],
+      emailRules: [
+        v => Boolean(v) || 'E-mail is required',
+        v => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(v)
+          || 'E-mail must be valid',
+      ],
     };
   },
   methods: {
     login() {
-      const UserAPI = 'http://127.0.0.1:8000/api/users';
       const userCredentials = {
         user_email: this.userEmail,
         user_password: this.userPassword,
@@ -37,31 +53,20 @@ export default {
           this.$cookies.set('user_id', response.data.user_id);
           this.$router.push({ name: 'home' });
         }).catch((error) => {
-          if (error.response.data.message) {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
             this.$awn.warning(error.response.data.message);
           }
           this.$cookies.remove('token');
           this.$cookies.remove('user_id');
         });
-      this.userEmail = '';
-      this.userPassword = '';
-    },
-    isEmailValid() {
-      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-      return re.test(this.userEmail);
-    },
-  },
-  computed: {
-    /**
-       * @description Checks if user filled all fields
-       * @returns {boolean}
-       * */
-    isDisabledButton() {
-      return !(this.isEmailValid() && this.userPassword);
+      this.$refs.form.reset();
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
+
 </style>

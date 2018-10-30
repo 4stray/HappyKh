@@ -8,7 +8,8 @@ from users.cryptography import encode
 
 TEST_USER_DATA = {
     'user_email': 'test@mail.com',
-    'user_password': 'testpassword'
+    'user_password': 'testpassword',
+    'first_name': 'User'
 }
 
 REGISTRATION_URL = '/api/users/registration'
@@ -16,9 +17,6 @@ REGISTRATION_URL = '/api/users/registration'
 
 class RegistrationViewTestCase(BaseTestCase, APITestCase):
     """Test user api registration view /api/users/registration/"""
-
-    def setUp(self):
-        pass
 
     def test_create_deactivated_user(self):
         """test new user creation"""
@@ -40,6 +38,7 @@ class RegistrationViewTestCase(BaseTestCase, APITestCase):
                                         password=data['user_password'],
                                         is_active=False)
         email_token = account_activation_token.make_token(user)
+
         crypted_email = encode(user.email)
         response = self.client.get(
             f'/api/users/activate/{crypted_email}/{email_token}/'

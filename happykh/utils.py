@@ -4,10 +4,11 @@ import os
 import uuid
 
 from django.conf import settings
-from django.core.files.uploadedfile import UploadedFile
 from django.core.files.base import ContentFile
-from rest_framework.authtoken.models import Token
+from django.core.files.uploadedfile import UploadedFile
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
+from happykh.settings import HASH_IDS
 
 
 def make_upload_image(filename, path):
@@ -45,10 +46,12 @@ def delete_std_images_from_media(std_image_file, variations):
             os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
-def is_user_owner(request, user_id):
+def is_user_owner(request, id):
     token_key = request.META['HTTP_AUTHORIZATION'][6:]
     token_user_id = Token.objects.get(key=token_key).user.id
+    user_id = HASH_IDS.decode(id)[0]
     return user_id == token_user_id
+
 
 class UploadedImageField(serializers.ImageField):
     """
@@ -77,3 +80,16 @@ class UploadedImageField(serializers.ImageField):
                 image_url = f"{domain}{original_url}"
             return image_url
         return ''
+
+
+class HashIdField(serializers.Field):
+    """
+    Field for id for serializer
+    """
+    def to_representation(self, data):
+        return HASH_IDS.encode(data)
+
+    def to_internal_value(self, data):
+        user_id = HASH_IDS.decode(data)[0]
+        return super(HashIdField, self).to_internal_value(user_id)
+

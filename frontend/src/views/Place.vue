@@ -1,23 +1,23 @@
 <template>
   <div>
     <GoBackComponent/>
-    <ProfileComponent/>
+    <PlaceDetailComponent />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import ProfileComponent from '@/components/ProfileComponent.vue';
+import axios from 'axios';
+import Header from '@/components/Header.vue';
+import PlaceDetailComponent from '@/components/PlaceDetailComponent.vue';
 import GoBackComponent from '@/components/GoBackComponent.vue';
 
 export default {
   name: 'Profile',
   components: {
-    ProfileComponent,
+    Header,
+    PlaceDetailComponent,
     GoBackComponent,
   },
 };
 </script>
-<style scoped>
-
-</style>
