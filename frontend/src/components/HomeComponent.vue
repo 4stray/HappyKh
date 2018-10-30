@@ -9,13 +9,13 @@
 
             <span class="subheading">
               In order to join the HappyKh and get access to
-              its full function set you have to sign up first
+              its full function set you have to join us first
             </span>
 
             <v-divider class="my-3"></v-divider>
 
             <v-btn class="mx-0" color="info" large :to="{name: 'login'}">
-              Sign Up
+              Join <Us></Us>
             </v-btn>
           </v-flex>
         </v-layout>
