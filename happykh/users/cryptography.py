@@ -29,6 +29,6 @@ def decode(decoding_hex):
     decoding_bytes = bytes.fromhex(decoding_hex)
     decoded_bytes = des.decrypt(decoding_bytes)
     decoded_text = decoded_bytes.decode()
-    cleared_text = str(decoded_text).replace(" ", "")
+    cleared_text = str(decoded_text).rstrip()
 
     return cleared_text
