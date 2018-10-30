@@ -1,31 +1,35 @@
 <template>
-  <v-layout v-if="isEmptyProfile()" justify-space-around row fill-height>
-    <v-card id="default" class="px-5 py-3 fill-height">
-      <img src="../assets/default_user.png" alt="user avatar"/>
-      <h3 class="headline mb-0 mb-5">
-        Your profile is empty. You can edit it.
-      </h3>
-      <v-btn :to="{name: 'settings'}" class="justify-self-end">Edit</v-btn>
-    </v-card>
-  </v-layout>
-  <v-layout v-else justify-space-around row fill-height>
-    <v-flex md4 xs12>
-      <img v-if="userImage" v-bind:src=userImage alt="No image" width="80%"
-           id="userImage"/>
-      <img v-else src="../assets/default_user.png" alt="No user avatar"/>
-    </v-flex>
-    <v-flex md6 xs12>
-      <v-layout justify-start column fill-height>
-        <v-card id="main" class="px-5 py-3">
-          <v-btn :to="{name: 'settings'}"
-                 fab dark absolute bottom right color="green">
-            <v-icon>edit</v-icon>
-          </v-btn>
-          <h3 class="headline mb-2"> {{fullName}}</h3>
-          <v-label v-if="userAge" class="">Age</v-label>
-          <p id="userAge" v-if="userAge">{{userAge}}</p>
-          <p id="userGender" class="text--secondary">{{userGender}}</p>
+  <v-layout column>
+    <v-flex xs12>
+      <v-layout v-if="isEmptyProfile()" justify-space-around row fill-height>
+        <v-card id="default" class="px-5 py-3 fill-height">
+          <img src="../assets/default_user.png" alt="user avatar"/>
+          <h3 class="headline mb-0 mb-5">
+            Your profile is empty. You can edit it.
+          </h3>
+          <v-btn :to="{name: 'settings'}" class="justify-self-end">Edit</v-btn>
         </v-card>
+      </v-layout>
+      <v-layout v-else justify-space-around row fill-height>
+        <v-flex md4 xs12>
+          <img v-if="userImage" v-bind:src=userImage alt="No image" width="80%"
+               id="userImage"/>
+          <img v-else src="../assets/default_user.png" alt="No user avatar"/>
+        </v-flex>
+        <v-flex md6 xs12>
+          <v-layout justify-start column fill-height>
+            <v-card id="main" class="px-5 py-3">
+              <v-btn :to="{name: 'settings'}"
+                     fab dark absolute bottom right color="green">
+                <v-icon>edit</v-icon>
+              </v-btn>
+              <h3 class="headline mb-2"> {{fullName}}</h3>
+              <v-label v-if="userAge" class="">Age</v-label>
+              <p id="userAge" v-if="userAge">{{userAge}}</p>
+              <p id="userGender" class="text--secondary">{{userGender}}</p>
+            </v-card>
+          </v-layout>
+        </v-flex>
       </v-layout>
     </v-flex>
   </v-layout>

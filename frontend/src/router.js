@@ -8,7 +8,6 @@ import CreatePlace from './views/CreatePlace.vue';
 import PlaceDetail from './views/Place.vue';
 import Profile from './views/Profile.vue';
 import ProfileSettings from './views/ProfileSettings.vue';
-import Places from './views/Places.vue'
 import store from './store';
 
 const ifAuthenticated = (to, from, next) => {
@@ -49,11 +48,6 @@ const router = new Router({
       beforeEnter: ifAuthenticated,
     },
     {
-      path: '/places',
-      name: 'places',
-      component: Places,
-      beforeEnter: ifAuthenticated,
-    },{
       path: '/places/:id',
       name: 'placeDetail',
       component: PlaceDetail,

@@ -8,6 +8,8 @@
     <v-btn v-if="!isAuthenticated" :to="{ name: 'login'}" flat exact>Login
     </v-btn>
     <v-spacer></v-spacer>
+    <img v-if="isAuthenticated" height="35px" alt="HappyKh" src="../assets/label.png">
+    <v-spacer></v-spacer>
     <v-btn
       v-if="isAuthenticated"
       v-on:click.native="signOut()"
@@ -38,5 +40,4 @@ export default {
 };
 </script>
 <style scoped lang="scss">
-
 </style>

@@ -35,15 +35,13 @@ export default {
   },
   computed: {
     filteredPlaces() {
-        return filter(this.allPlaces, (item) => {
-            return (item.name.indexOf(this.searchValue) !== -1);
-        });
-    }
+      return filter(this.allPlaces, item => (item.name.indexOf(this.searchValue) !== -1));
+    },
   },
   data() {
     return {
       allPlaces: [],
-      searchValue: "",
+      searchValue: '',
     };
   },
   created() {
