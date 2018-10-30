@@ -55,7 +55,7 @@ class PlacePage(APIView):
 
         serializer = PlaceSerializer(data=data, context=context)
         if serializer.is_valid():
-            pk =serializer.save()
+            pk = serializer.save()
             LOGGER.info(f'Created place #{pk}')
             return Response({'message': 'place was created'},
                             status=status.HTTP_201_CREATED)
