@@ -16,12 +16,18 @@ LOGGER = logging.getLogger('happy_logger')
 
 
 class PlacePage(APIView):
+    """List places or create a new one"""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     variation = Place.medium
 
     def get(self, request):
+        """
+        List all places
+        :param request: HTTP Request
+        :return: list of all places
+        """
         places = Place.objects.all()
         context = {
             'variation': self.variation,
@@ -31,6 +37,11 @@ class PlacePage(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
+        """
+        Create new place
+        :param request: HTTP Request
+        :return: message, status_code
+        """
         data = request.data.copy()
         address_data = json.loads(data['address'])
         data['address'] = self.get_address_pk(address_data)
@@ -53,6 +64,11 @@ class PlacePage(APIView):
 
     @staticmethod
     def get_address_pk(data):
+        """
+        Return pk of existing or just created address
+        :param data: dict consists of latitude, longitude, address string
+        :return: int address primary key
+        """
         try:
             address = Address.objects.get(address=data['address'],
                                           latitude=data['latitude'],
@@ -68,6 +84,7 @@ class PlacePage(APIView):
 
 
 class PlaceSinglePage(APIView):
+    """Dislpay and modify existing place"""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
