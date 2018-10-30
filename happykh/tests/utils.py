@@ -1,8 +1,8 @@
 """Setup module for tests"""
 # pylint: disable = useless-super-delegation
 import os
-import hashids
 from unittest import TestCase
+import hashids
 
 class BaseTestCase(TestCase):
     """Setup class for unittests"""

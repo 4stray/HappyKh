@@ -7,19 +7,9 @@ from rest_framework import status
 from users.models import User
 from utils import delete_std_images_from_media
 from ..utils import BaseTestCase
+from .test_profile import CORRECT_DATA
 
 USERS_TEST_TOKEN_VALIDATION_URL = '/api/users/token-validation'
-
-CORRECT_DATA = {
-    'email': 'test@mail.com',
-    'password': 'testpassword1',
-    'age': 20,
-    'gender': 'M',
-    'first_name': 'firstName',
-    'last_name': 'lastName',
-    'is_active': True,
-    'profile_image': '',
-}
 
 
 class TestTokenValidation(BaseTestCase, APITestCase):

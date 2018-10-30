@@ -81,7 +81,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's age"""
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = 41
-        response = self.client.patch(USERS_PROFILE_DATA_URL % self.hashed_user_id,
+        response = self.client.patch(USERS_PROFILE_DATA_URL
+                                     % self.hashed_user_id,
                                      {'age': edited_user.age})
 
         serializer_edited_user = UserSerializer(edited_user)
@@ -96,7 +97,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         # age == 'null'
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = None
-        response = self.client.patch(USERS_PROFILE_DATA_URL % self.hashed_user_id,
+        response = self.client.patch(USERS_PROFILE_DATA_URL
+                                     % self.hashed_user_id,
                                      {'age': 'null'})
 
         serializer_edited_user = UserSerializer(edited_user)
@@ -130,7 +132,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's age with invalid value"""
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = -41
-        response = self.client.patch(USERS_PROFILE_DATA_URL % self.hashed_user_id,
+        response = self.client.patch(USERS_PROFILE_DATA_URL
+                                     % self.hashed_user_id,
                                      {'age': edited_user.age})
         serializer_edited_user = UserSerializer(edited_user)
         expected = serializer_edited_user.data["age"]
