@@ -1,7 +1,7 @@
 <template>
   <v-card class="v-card pa-5 mb-5">
     <v-card-title primary-title>
-      <h3 class="headline mb-0">Edit your profile:</h3>
+      <h3 class="headline mb-0">Edit your profile</h3>
     </v-card-title>
     <v-form ref="form" v-model="valid" @submit.prevent="save"
             enctype="multipart/form-data">

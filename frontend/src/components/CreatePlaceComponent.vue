@@ -6,7 +6,10 @@
              v-model="placeName" placeholder="Place name"/>
       <textarea id="description"
                 v-model="placeDescription" placeholder="Description"></textarea>
-      <img v-bind:src=placeLogo id='logo' alt="No place image"/>
+      <div>
+        <img v-if="placeLogo" v-bind:src=placeLogo id='logo' alt="Place image"/>
+        <img v-else src="../assets/default_place.png" id='no_logo' alt="Default place image"/>
+      </div>
       <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
       <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
     </form>

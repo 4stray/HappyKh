@@ -9,8 +9,9 @@
                   name="place-image">
         </v-img>
           <v-spacer></v-spacer>
-          <h3 class="headline mb-2" id="placeName"> {{placeName}}</h3>
-          <p v-if="placeDescription" id="placeDescription">{{placeDescription}}</p>
+          <h3 class="headline mb-2 font-weight-bold" id="placeName">{{placeName}}</h3>
+          <v-label id="placeDescriptionLabel">Description</v-label>
+          <p class="body-2" v-if="placeDescription" id="placeDescription">{{placeDescription}}</p>
           <p v-else class="text--secondary" id="no_description">Place has no description.</p>
         </v-card>
       </v-layout>
@@ -26,7 +27,7 @@ const alertText = 'A server error has occurred, try again later';
 
 export default {
   name: 'ProfileComponent',
-  data() {
+    data() {
     return {
       placeLogo: '',
       placeName: '',

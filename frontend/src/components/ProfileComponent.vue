@@ -12,10 +12,10 @@
                  fab dark absolute bottom right color="green">
             <v-icon>edit</v-icon>
           </v-btn>
-          <h3 class="headline mb-2 font-weight-bold"> {{fullName}}</h3>
-          <v-label id="userAge">Age</v-label>
+          <h3 class="headline mb-2 font-weight-bold">{{fullName}}</h3>
+          <v-label id="userAgeLabel">Age</v-label>
           <p id="userAge" v-if="userAge">{{userAge}}</p>
-          <v-label id="userGender">Gender</v-label>
+          <v-label id="userGenderLabel">Gender</v-label>
           <p id="userGender">{{userGender}}</p>
         </v-card>
       </v-layout>
