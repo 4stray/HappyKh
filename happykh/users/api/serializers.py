@@ -133,7 +133,6 @@ class EmailSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = ('email',)
 
