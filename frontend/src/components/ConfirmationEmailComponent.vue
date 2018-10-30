@@ -1,12 +1,13 @@
 <template>
-  <form id="confirmationEmail" method="post" @submit.prevent="sendEmail" novalidate>
+  <v-form id="confirmationEmail" method="post" @submit.prevent="sendEmail"
+        novalidate>
     <div class="content">
-      <input type="email" name="userEmail" v-model.trim="userEmail"
-             placeholder="EMAIL"/>
+      <v-text-field type="email" name="userEmail" v-model.trim="userEmail"
+                    label="Email"></v-text-field>
     </div>
     <input class="btn-submit" type="submit" :disabled="isDisabledButton"
            value="SEND EMAIL"/>
-  </form>
+  </v-form>
 </template>
 
 <script>
@@ -17,6 +18,7 @@ export default {
   data() {
     return {
       userEmail: '',
+
     };
   },
   methods: {
@@ -28,7 +30,11 @@ export default {
           this.$awn.success('Please check your mailbox for confirmation email');
         })
         .catch((error) => {
-          this.$awn.warning(error.response.data.message);
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.warning(error.response.data.message);
+          }
         });
 
       this.userEmail = '';
@@ -40,9 +46,9 @@ export default {
   },
   computed: {
     /**
-       * @description Checks if user filled all fields
-       * @returns {boolean}
-       * */
+     * @description Checks if user filled all fields
+     * @returns {boolean}
+     * */
     isDisabledButton() {
       return !(this.isEmailValid());
     },

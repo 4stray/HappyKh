@@ -1,12 +1,17 @@
 """Views for app users"""
 # pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
 # pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
+# pylint: disable = redefined-builtin
+import datetime
 import logging
 from smtplib import SMTPException
 
+from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
+from django.utils import timezone
+
 from rest_framework import exceptions
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -15,12 +20,16 @@ from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-#pylint: disable = no-name-in-module, import-error
+# pylint: disable = no-name-in-module, import-error
+from utils import is_user_owner
 from happykh.settings import EMAIL_HOST_USER
+from happykh.settings import HASH_IDS
+from .serializers import EmailSerializer
 from .serializers import LoginSerializer
 from .serializers import PasswordSerializer
 from .serializers import UserSerializer
 from .tokens import account_activation_token
+from ..backends import UserAuthentication
 from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
@@ -53,12 +62,14 @@ class UserLogin(APIView):
 
         user = serializer.validated_data['user']
         if user.is_active:
-            #pylint: disable = unused-variable
+            # pylint: disable = unused-variable
             user_token, created = Token.objects.get_or_create(user=user)
+            user_id = HASH_IDS.encode(user.pk)
+
             LOGGER.info('User has been logged in')
             return Response({
                 'token': user_token.key,
-                'user_id': user.id,
+                'user_id': user_id,
             }, status=status.HTTP_200_OK)
         else:
             LOGGER.warning('Attempt to login by unregistered user')
@@ -80,9 +91,11 @@ class UserLogout(APIView):
         :param request: HttpRequest
         :return: Response({message}, status)
         """
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        Token.objects.get(key=token_key).delete()
 
-        Token.objects.get(key=request.data['user_token']).delete()
         LOGGER.info('User has been logged out')
+
         return Response({
             'message': 'User has been logged out'
         }, status=status.HTTP_201_CREATED)
@@ -100,7 +113,7 @@ class UserRegistration(APIView):
         """
         user_email = request.data['user_email']
         user_password = request.data['user_password']
-
+        user_first_name = request.data['first_name']
         try:
             validate_email(user_email)
         except ValidationError as error:
@@ -123,12 +136,12 @@ class UserRegistration(APIView):
         except User.DoesNotExist:
             user = User.objects.create_user(email=user_email,
                                             password=user_password,
+                                            first_name=user_first_name,
                                             is_active=False)
             if UserActivation.send_email_confirmation(user):
                 return Response(status=status.HTTP_201_CREATED)
             else:
                 LOGGER.error('Confirmation email has not been delivered')
-                user.delete()
                 return Response({
                     'message': 'The mail has not been delivered'
                                ' due to connection reasons'
@@ -173,17 +186,17 @@ class UserActivation(APIView):
 
         return Response({'message': msg}, status=status_code)
 
-    def get(self, request, user_id, token):
+    def get(self, request, id, token):
         """
         Processes GET request from user activation page
         :param request: HttpRequest
-        :param user_id: Integer
+        :param id: String
         :param token: String
         :return: Response({message}, status)
         """
         # pylint: disable=unused-argument
         try:
-            user = User.objects.get(pk=user_id)
+            user = UserAuthentication.get_user(id)
             if user.is_active:
                 LOGGER.warning(
                     f'Activate already activated user, user_id: {user.pk}'
@@ -214,24 +227,28 @@ class UserActivation(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
     @staticmethod
-    def send_email_confirmation(user):
+    def send_email_confirmation(user, email=None):
         """
         Sends an email on specified user.email
         :param user: User
+        :param email: target email to send confirmation
         :return: Boolean
         """
+        if email is None:
+            email = user.email
+
         try:
             email_token = account_activation_token.make_token(user)
-            user_id = user.pk
+            user_id = HASH_IDS.encode(user.pk)
             send_mail(
-                f'Confirm {user.email} on HappyKH',
-                f'We just needed to verify that {user.email} '
+                f'Confirm {email} on HappyKH',
+                f'We just needed to verify that {email} '
                 f'is your email address.'
                 f' Just click the link below \n'
                 f'http://127.0.0.1:8080/#/confirm_registration/'
                 f'{user_id}/{email_token}/',
                 EMAIL_HOST_USER,
-                [user.email]
+                [email]
             )
             LOGGER.info('Confirmation mail has been sent')
         except SMTPException:
@@ -247,79 +264,186 @@ class UserProfile(APIView):
     """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    # pylint: disable = redefined-builtin
+
+    variation = User.medium
 
     def get(self, request, id):
         """
         Return user's data.
         :param request: HTTP request
-        :param id: Integer
+        :param id: String
         :return: Response(data, status)
         """
-        try:
-            user = User.objects.get(pk=id)
-            serializer = UserSerializer(user)
-            LOGGER.info('Return user profile')
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except User.DoesNotExist:
-            LOGGER.error(
-                f'Can`t get user profile because of invalid id,'
-                f' user_id: {id}'
-            )
-            return Response({'message': 'No user with such id.'},
-                            status=status.HTTP_400_BAD_REQUEST)
+        user = UserAuthentication.get_user(id)
+
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        context = {
+            'variation': self.variation,
+            'domain': get_current_site(request)
+        }
+
+        serializer = UserSerializer(user, context=context)
+        response_data = serializer.data
+
+        enable_editing_profile = is_user_owner(request, id)
+        response_data['enable_editing_profile'] = enable_editing_profile
+
+        LOGGER.info(
+            f'Enable Editing User Profile is set '
+            f'to {enable_editing_profile}'
+        )
+        LOGGER.info('Return user profile')
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
     def patch(self, request, id):
         """
         Update user's data
         :param request: HTTP request
-        :param id: Integer
+        :param id: String
         :return: Response(data, status)
         """
-        user = None
-        try:
-            user = User.objects.get(pk=id)
-        except User.DoesNotExist:
+
+        if not is_user_owner(request, id):
             LOGGER.error(
-                'Can`t get user profile because of invalid id,'
-                ' user_id: {user.pk}'
+                "User's data were not updated."
+                "user_id must be equal to token user_id"
             )
-            return Response({'message': 'No user with such id.'},
+            return Response({'message': 'Editing not allowed'},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        user = UserAuthentication.get_user(id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        request_data = request.data.copy()
+        age = request_data.get('age')
+        if age == 'null':
+            request_data['age'] = None
+
+        context = {
+            'variation': self.variation,
+            'domain': get_current_site(request)
+        }
+
+        serializer = UserSerializer(
+            user,
+            data=request_data,
+            partial=True,
+            context=context,
+        )
+        user_id = HASH_IDS.decode(id)[0]
+        if serializer.is_valid():
+            serializer.save(id=user_id, **serializer.validated_data)
+            LOGGER.info('User data updated')
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        LOGGER.error(
+            f'Serializer error {serializer.errors} while changing data'
+        )
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserEmail(APIView):
+    """
+    Gets new email for user, changes it if value is valid
+    """
+
+    def patch(self, request, id):
+        """
+        Changes user email
+        :param request: HTTP Request
+        :param id: String
+        :return: Response(data)
+        """
+        user = UserAuthentication.get_user(id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            user = User.objects.get(email=request.data.get('email'))
+
+            LOGGER.warning(f'User with id: {user.pk} tried to change '
+                           f'his email to existing')
+
+            return Response({'message': 'User with such email already exists'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        if 'old_password' in self.request.data:
-            # Change password
-
-            serializer = PasswordSerializer(data=request.data)
+        except User.DoesNotExist:
+            serializer = EmailSerializer(user, request.data)
 
             if serializer.is_valid():
-                if not user.check_password(
-                        serializer.data.get('old_password')):
-                    LOGGER.error(
-                        'Received wrong old password while changing password'
-                    )
-                    return Response({'message': 'Wrong password.'},
-                                    status=status.HTTP_400_BAD_REQUEST)
+                valid_mail = serializer.validated_data['email']
+                if UserActivation.send_email_confirmation(user, valid_mail):
+                    serializer.update(user, serializer.validated_data)
+                    # Send confirmation email
+                    LOGGER.info(f'User with id: {id} changed his email')
+                    return Response(status=status.HTTP_200_OK)
+                else:
+                    LOGGER.error('Confirmation email has not been delivered')
+                    return Response({
+                        'message': 'The mail has not been delivered'
+                                   ' due to connection reasons'
+                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-                serializer.update(user, serializer.data)
-                LOGGER.info('Updated user password')
-                return Response({'message': 'Password was updated.'},
-                                status=status.HTTP_200_OK)
-
-            LOGGER.critical(
-                f'Serializer error {serializer.errors} while changing password'
-            )
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
-        else:
-            # Update data
-            serializer = UserSerializer(user, data=request.data, partial=True)
 
-            if serializer.is_valid():
-                serializer.save(id=id, **serializer.validated_data)
-                LOGGER.info('User data updated')
-                return Response(serializer.data, status=status.HTTP_200_OK)
+class UserPassword(APIView):
+    """
+    Change user's password
+    """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+    def patch(self, request, id):
+        """
+        :param request: HTTP request
+        :param id: String
+        :return: Response(message, status)
+        """
+        user = UserAuthentication.get_user(id)
+        if user is None:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = PasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            if not user.check_password(
+                    serializer.data.get('old_password')):
+                LOGGER.error(
+                    'Received wrong old password while changing password'
+                )
+                return Response({'message': 'Wrong password.'},
+                                status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.update(user, serializer.data)
+            LOGGER.info('Updated user password')
+            return Response({'message': 'Password was updated.'},
+                            status=status.HTTP_200_OK)
+
+        LOGGER.error(
+            f'Serializer error {serializer.errors} while changing password'
+        )
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+
+class TokenValidation(APIView):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request):
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        try:
+            token = Token.objects.get(key=token_key)
+
+            if (timezone.now() <= token.created
+                    + datetime.timedelta(days=1)):
+                return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+        except Token.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)

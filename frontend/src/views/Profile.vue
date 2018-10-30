@@ -1,23 +1,23 @@
 <template>
-  <div class="Profile">
-    <Header/>
+  <div>
+    <GoBackComponent/>
     <ProfileComponent/>
-    <PasswordComponent/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import Header from '@/components/Header.vue';
 import ProfileComponent from '@/components/ProfileComponent.vue';
-import PasswordComponent from '@/components/PasswordComponent.vue';
+import GoBackComponent from '@/components/GoBackComponent.vue';
 
 export default {
   name: 'Profile',
   components: {
-    Header,
     ProfileComponent,
-    PasswordComponent,
+    GoBackComponent,
   },
 };
 </script>
+<style scoped>
+
+</style>
