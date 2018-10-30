@@ -8,9 +8,7 @@ from utils import make_upload_image
 LOGGER = logging.getLogger('happy_logger')
 
 
-
 class Place(models.Model):
-
     """
     Place model for creation new places
     """
@@ -53,7 +51,7 @@ class Place(models.Model):
     def get_place(place_id):
         try:
             return Place.objects.get(pk=place_id)
-        except Place.DoesNotExist: #pylint: disable = no-member
+        except Place.DoesNotExist:  # pylint: disable = no-member
             LOGGER.error(
                 f'Can`t get place because of invalid id,'
                 f' place_id: {place_id}'

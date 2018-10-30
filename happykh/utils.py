@@ -35,15 +35,16 @@ def delete_std_images_from_media(std_image_file, variations):
                         std_image_file
     :return: None
     """
-    path = std_image_file.path.split('media/')[-1]
-    os.remove(
-        os.path.join(settings.MEDIA_ROOT, path))
-    for variant in variations:
-        extension = path.split('.')[-1]
-        filename = path.split('.')[0]
-        path_to_variant_file = f'{filename}.{variant}.{extension}'
+    if os.path.isfile(std_image_file.path):
+        path = std_image_file.path.split('media/')[-1]
         os.remove(
-            os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
+            os.path.join(settings.MEDIA_ROOT, path))
+        for variant in variations:
+            extension = path.split('.')[-1]
+            filename = path.split('.')[-2]
+            path_to_variant_file = f'{filename}.{variant}.{extension}'
+            os.remove(
+                os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
 def is_user_owner(request, id):
@@ -86,10 +87,10 @@ class HashIdField(serializers.Field):
     """
     Field for id for serializer
     """
+
     def to_representation(self, data):
         return HASH_IDS.encode(data)
 
     def to_internal_value(self, data):
         user_id = HASH_IDS.decode(data)[0]
         return super(HashIdField, self).to_internal_value(user_id)
-
