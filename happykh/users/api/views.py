@@ -108,7 +108,7 @@ class UserRegistration(APIView):
         """
         user_email = request.data['user_email']
         user_password = request.data['user_password']
-
+        user_first_name = request.data['first_name']
         try:
             validate_email(user_email)
         except ValidationError as error:
@@ -131,6 +131,7 @@ class UserRegistration(APIView):
         except User.DoesNotExist:
             user = User.objects.create_user(email=user_email,
                                             password=user_password,
+                                            first_name=user_first_name,
                                             is_active=False)
             if UserActivation.send_email_confirmation(user):
                 return Response(status=status.HTTP_201_CREATED)
