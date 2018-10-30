@@ -27,7 +27,7 @@ const alertText = 'A server error has occurred, try again later';
 
 export default {
   name: 'ProfileComponent',
-    data() {
+  data() {
     return {
       placeLogo: '',
       placeName: '',
