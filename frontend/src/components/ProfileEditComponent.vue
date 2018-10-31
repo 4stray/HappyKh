@@ -25,7 +25,7 @@
              id="imageInput"
              v-on:change="changeImage()"
              accept="image/*"/>
-      <v-btn class="success" type="submit" block>Save</v-btn>
+      <v-btn class="success mt-3" type="submit" block>Save</v-btn>
     </v-form>
   </v-card>
 </template>

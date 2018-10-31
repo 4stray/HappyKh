@@ -30,8 +30,10 @@ describe('mounted createPlaceComponent', () => {
   });
 
   it('has 2 input fields', () => {
-    expect(wrapper.findAll('input').length).to.be.equal(2);
+    expect(wrapper.findAll('v-text-field').length).to.be.equal(1);
+    expect(wrapper.findAll('v-textarea').length).to.be.equal(1);
   });
+
   it('has placeName field with "text" type', () => {
     expect(wrapper.find('#name').attributes('type')).to.be.equal('text');
   });
@@ -41,7 +43,7 @@ describe('mounted createPlaceComponent', () => {
   });
 
   it('has placeDescription textarea', () => {
-    expect(wrapper.contains('textarea')).to.be.equal(true);
+    expect(wrapper.contains('v-textarea')).to.be.equal(true);
   });
 
   it('contains default logo initially', () => {
@@ -49,7 +51,7 @@ describe('mounted createPlaceComponent', () => {
   });
 
   it('check save button text', () => {
-    expect(wrapper.find('.btn-save').text()).to.be.equal('Create Place');
+    expect(wrapper.find('v-btn').text()).to.be.equal('Create Place');
   });
 
   it('contains logo with equal src to data()', () => {
