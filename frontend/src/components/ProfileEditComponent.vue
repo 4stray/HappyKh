@@ -19,8 +19,10 @@
         <v-radio label="Man" color="primary" value="M"></v-radio>
         <v-radio label="Other" color="primary" value="O"></v-radio>
       </v-radio-group>
-      <img v-if="userImage" v-bind:src=userImage alt="No image"/>
-      <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
+      <div>
+          <img v-if="userImage" v-bind:src=userImage alt="No image"/>
+          <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
+      </div>
       <input type="file"
              id="imageInput"
              v-on:change="changeImage()"

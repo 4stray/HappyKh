@@ -13,10 +13,12 @@
                       v-model="placeDescription"
                       label="Description"
           ></v-textarea>
-          <img v-if="placeLogo" v-bind:src=placeLogo id='logo'
-               alt="Place image"/>
-          <img v-else src="../assets/default_place.png" id='default_logo'
-               alt="Default place image"/>
+          <div>
+              <img v-if="placeLogo" v-bind:src=placeLogo id='logo'
+                   alt="Place image"/>
+              <img v-else src="../assets/default_place.png" id='default_logo'
+                   alt="Default place image"/>
+          </div>
           <input type="file" id="logoInput" v-on:change="changeImage()"
                  accept="image/*"/>
           <v-btn class="success mt-3" type="submit" block>Create Place
