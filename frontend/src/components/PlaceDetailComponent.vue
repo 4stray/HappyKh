@@ -10,7 +10,6 @@
         </v-img>
           <v-spacer></v-spacer>
           <h3 class="headline my-3 font-weight-bold" id="placeName">{{placeName}}</h3>
-          <v-label id="placeDescriptionLabel">Description</v-label>
           <p class="body-2" v-if="placeDescription" id="placeDescription">{{placeDescription}}</p>
           <p v-else class="text--secondary" id="no_description">Place has no description.</p>
         </v-card>
