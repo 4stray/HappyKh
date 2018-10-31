@@ -46,7 +46,7 @@ export default {
       userImage: '',
       valid: true,
       ageRules: [
-        age => (age >= 1 && age <= 140) || (age === null) || 'Invalid age value',
+        age => (age >= 1 && age <= 140) || !age || 'Invalid age value',
       ],
     };
   },

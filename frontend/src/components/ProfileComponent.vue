@@ -13,7 +13,7 @@
             <v-icon>edit</v-icon>
           </v-btn>
           <h3 class="headline mb-2 font-weight-bold">{{fullName}}</h3>
-          <v-label id="userAgeLabel">Age</v-label>
+          <v-label v-if="userAge" id="userAgeLabel">Age</v-label>
           <p id="userAge" v-if="userAge">{{userAge}}</p>
           <v-label id="userGenderLabel">Gender</v-label>
           <p id="userGender">{{userGender}}</p>
