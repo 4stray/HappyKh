@@ -11,13 +11,12 @@ from rest_framework.authtoken.models import Token
 from happykh.settings import HASH_IDS
 
 
-def make_upload_image(model_name, attr_name, instance_id, original_filename):
+def make_media_file_path(model_name, attr_name, original_filename):
     """
     Function which creates path for user's file in media folder using uuid.
 
     :param model_name: class of instance
     :param attr_name: attribute for which image is saved
-    :param instance_id: id of the instance
     :param original_filename: original filename of the image, ex. 'image.jpg'
     :return: path from MEDIA_ROOT to file or None if filename is empty
     """
@@ -25,8 +24,7 @@ def make_upload_image(model_name, attr_name, instance_id, original_filename):
         ext = original_filename.split('.')[-1]
         filename = uuid.uuid4()
         full_filename = "%s.%s" % (filename, ext)
-        return f'{model_name}/{attr_name}/{model_name}_id_{instance_id}/' \
-               f'{filename}/{full_filename}'
+        return f'{model_name}/{attr_name}/{filename}/{full_filename}'
     return None
 
 

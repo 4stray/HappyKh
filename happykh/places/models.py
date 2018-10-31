@@ -3,7 +3,7 @@ import logging
 from django.db import models
 from users.models import User
 from stdimage import models as std_models
-from utils import make_upload_image
+from utils import make_media_file_path
 
 LOGGER = logging.getLogger('happy_logger')
 
@@ -34,10 +34,9 @@ class Place(models.Model):
         :return: path to image or None if filename is empty
         """
 
-        return make_upload_image(
+        return make_media_file_path(
             model_name='Place',
             attr_name='logo',
-            instance_id=self.id,
             original_filename=filename
         )
 
