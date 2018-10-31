@@ -28,83 +28,53 @@ describe('RegistrationComponent data', () => {
   it('has default confirmPassword', () => {
     expect(data).to.have.property('confirmPassword', '');
   });
-
-  it('has defalut errors', () => {
-    expect(data).to.have.deep.property('errors', {
-      email: '',
-      password: [],
-    });
-  });
 });
 
 
-describe('RegistrationComponent contains the corrcet values', () => {
+describe('RegistrationComponent contains the correct values', () => {
   const wrapper = shallowMount(RegistrationComponent);
+
 
   it('is a vue instance', () => {
     expect(wrapper.isVueInstance()).to.be.equal(true);
   });
 
   it('contains userEmail input field', () => {
-    expect(wrapper
-      .find('#userEmail')
-      .attributes())
-      .property('type')
-      .to.be.equal('email');
+    expect(wrapper.contains('#userEmail')).to.be.equal(true);
   });
 
   it('contains userEmail placeholder suitable field attribute', () => {
-    expect(wrapper
-      .find('#userEmail')
-      .attributes())
-      .property('placeholder')
-      .to.be.equal('EMAIL');
+    expect(wrapper.find('#userEmail').attributes('type')).to.be.equal('email');
+  });
+
+  it('contains userName input field', () => {
+    expect(wrapper.contains('#userName')).to.be.equal(true);
   });
 
   it('contains userPassword input field', () => {
-    expect(wrapper
-      .find('#userPassword')
-      .attributes())
-      .property('type')
-      .to.be.equal('password');
+    expect(wrapper.contains('#userPassword')).to.be.equal(true);
   });
 
   it('contains userPassword placeholder suitable field attribute', () => {
-    expect(wrapper
-      .find('#userPassword')
-      .attributes())
-      .property('placeholder')
-      .to.be.equal('PASSWORD');
-  });
-
-  it('contains userPassword input field', () => {
-    expect(wrapper
-      .find('#confirmPassword')
-      .attributes())
-      .property('type')
+    expect(wrapper.find('#userPassword').attributes('type'))
       .to.be.equal('password');
   });
 
+  it('contains confirmationPassword input field', () => {
+    expect(wrapper.contains('#confirmationPassword')).to.be.equal(true);
+  });
+
   it('contains userPassword placeholder suitable field attribute', () => {
-    expect(wrapper
-      .find('#confirmPassword')
-      .attributes())
-      .property('placeholder')
-      .to.be.equal('CONFIRM PASSWORD');
+    expect(wrapper.find('#confirmationPassword').attributes('type'))
+      .to.be.equal('password');
   });
 
   it('contains button for submitting user credentials', () => {
-    expect(wrapper
-      .find('.btn-submit')
-      .attributes())
-      .property('type')
-      .to.be.equal('submit');
+    expect(wrapper.contains('.btn-submit')).to.be.equal(true);
   });
 
   it('contains button with certain value', () => {
-    expect(wrapper
-      .find('.btn-submit')
-      .attributes())
+    expect(wrapper.find('.btn-submit').attributes())
       .property('value')
       .to.be.equal('REGISTER');
   });

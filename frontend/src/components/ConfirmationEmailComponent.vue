@@ -1,13 +1,13 @@
 <template>
-  <form id="confirmationEmail" method="post" @submit.prevent="sendEmail"
+  <v-form id="confirmationEmail" method="post" @submit.prevent="sendEmail"
         novalidate>
     <div class="content">
-      <input type="email" name="userEmail" v-model.trim="userEmail"
-             placeholder="EMAIL"/>
+      <v-text-field type="email" name="userEmail" v-model.trim="userEmail"
+                    label="Email"></v-text-field>
     </div>
     <input class="btn-submit" type="submit" :disabled="isDisabledButton"
            value="SEND EMAIL"/>
-  </form>
+  </v-form>
 </template>
 
 <script>
@@ -18,6 +18,7 @@ export default {
   data() {
     return {
       userEmail: '',
+
     };
   },
   methods: {
