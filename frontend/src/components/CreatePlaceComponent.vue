@@ -3,18 +3,23 @@
     <h1>Create your place:</h1>
     <form id="placeForm" enctype="multipart/form-data">
       <input type="text" id="name"
-             v-model="placeName" placeholder="Place name"/>
+             v-model="placeName" placeholder="*Place name"/>
+      <input id="placeAddress" placeholder="*Place address" type="text">
       <textarea id="description"
                 v-model="placeDescription" placeholder="Description"></textarea>
       <img v-bind:src=placeLogo id='logo' alt="No place image"/>
-      <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
-      <button class="btn-save" type="button" v-on:click="save()">Create Place</button>
+      <input type="file" id="logoInput" v-on:change="changeImage()"
+             accept="image/*"/>
+      <button class="btn-save" type="button"
+              v-on:click="save()" :disabled="isDisabledButton">Create Place
+      </button>
     </form>
   </div>
 </template>
 
-<script>
+<script >
 import axios from 'axios';
+import GoogleMapsLoader from 'google-maps';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
@@ -22,9 +27,39 @@ export default {
   data() {
     return {
       placeName: '',
+      placeAddress: '',
       placeLogo: '',
       placeDescription: '',
+      autocomplete: null,
     };
+  },
+  computed: {
+    isDisabledButton() {
+      return !(this.placeName && this.placeAddress);
+    },
+  },
+  mounted() {
+    GoogleMapsLoader.KEY = process.env.VUE_APP_GOOGLE_API;
+    GoogleMapsLoader.VERSION = '3.33';
+    GoogleMapsLoader.LIBRARIES = ['places'];
+    GoogleMapsLoader.LANGUAGE = 'en';
+    GoogleMapsLoader.REGION = 'UA';
+    GoogleMapsLoader.load((google) => {
+      this.autocomplete = new google.maps.places.Autocomplete(
+        (document.getElementById('placeAddress')),
+        { types: ['address'], strictBounds: true },
+      );
+      const geolocation = {
+        lat: 50,
+        lng: 36,
+      };
+      const circle = new google.maps.Circle({
+        center: geolocation,
+        radius: 20000,
+      });
+      this.autocomplete.setBounds(circle.getBounds());
+      this.autocomplete.addListener('place_changed', this.onChange);
+    });
   },
   methods: {
     save() {
@@ -32,6 +67,7 @@ export default {
       const formData = new FormData();
       formData.set('user', this.$cookies.get('user_id'));
       formData.set('name', this.placeName);
+      formData.set('address', this.placeAddress);
       formData.set('description', this.placeDescription);
       formData.append('logo', imageFile.files[0]);
       axios.post(
@@ -65,11 +101,23 @@ export default {
 
       reader.readAsDataURL(file);
     },
+    onChange() {
+      if (Object.keys(this.autocomplete.getPlace()).length > 1) {
+        this.placeAddress = {
+          latitude:
+            this.autocomplete.getPlace().geometry.location.toJSON().lat,
+          longitude:
+            this.autocomplete.getPlace().geometry.location.toJSON().lng,
+          address: this.autocomplete.getPlace().formatted_address,
+        };
+        this.placeAddress = JSON.stringify(this.placeAddress);
+      } else { this.placeAddress = ''; }
+    },
   },
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
   #createPlaceComponent {
     width: 500px;
     font-family: 'Liberation Sans', sans, sans-serif;
@@ -141,5 +189,8 @@ export default {
     font-family: 'Liberation Sans', sans, sans-serif;
     cursor: pointer;
     background-color: #0ca086;
+    &:disabled {
+      background-color: #d3d3d3;
+    }
   }
 </style>
