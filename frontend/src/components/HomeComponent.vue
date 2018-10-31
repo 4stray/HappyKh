@@ -15,7 +15,7 @@
             <v-divider class="my-3"></v-divider>
 
             <v-btn class="mx-0" color="info" large :to="{name: 'login'}">
-              Join <Us></Us>
+              Join Us
             </v-btn>
           </v-flex>
         </v-layout>
