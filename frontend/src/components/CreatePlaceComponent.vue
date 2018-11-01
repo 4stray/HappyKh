@@ -31,6 +31,7 @@
 
 <script>
 import axios from 'axios';
+import GoogleMapsLoader from 'google-maps';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
@@ -38,9 +39,39 @@ export default {
   data() {
     return {
       placeName: '',
+      placeAddress: '',
       placeLogo: '',
       placeDescription: '',
+      autocomplete: null,
     };
+  },
+  computed: {
+    isDisabledButton() {
+      return !(this.placeName && this.placeAddress);
+    },
+  },
+  mounted() {
+    GoogleMapsLoader.KEY = process.env.VUE_APP_GOOGLE_API;
+    GoogleMapsLoader.VERSION = '3.33';
+    GoogleMapsLoader.LIBRARIES = ['places'];
+    GoogleMapsLoader.LANGUAGE = 'en';
+    GoogleMapsLoader.REGION = 'UA';
+    GoogleMapsLoader.load((google) => {
+      this.autocomplete = new google.maps.places.Autocomplete(
+        (document.getElementById('placeAddress')),
+        { types: ['address'], strictBounds: true },
+      );
+      const geolocation = {
+        lat: 50,
+        lng: 36,
+      };
+      const circle = new google.maps.Circle({
+        center: geolocation,
+        radius: 20000,
+      });
+      this.autocomplete.setBounds(circle.getBounds());
+      this.autocomplete.addListener('place_changed', this.onChange);
+    });
   },
   methods: {
     save() {
@@ -48,6 +79,7 @@ export default {
       const formData = new FormData();
       formData.set('user', this.$cookies.get('user_id'));
       formData.set('name', this.placeName);
+      formData.set('address', this.placeAddress);
       formData.set('description', this.placeDescription);
       formData.append('logo', imageFile.files[0]);
       axios.post(
@@ -79,6 +111,18 @@ export default {
       }, false);
 
       reader.readAsDataURL(file);
+    },
+    onChange() {
+      if (Object.keys(this.autocomplete.getPlace()).length > 1) {
+        this.placeAddress = {
+          latitude:
+            this.autocomplete.getPlace().geometry.location.toJSON().lat,
+          longitude:
+            this.autocomplete.getPlace().geometry.location.toJSON().lng,
+          address: this.autocomplete.getPlace().formatted_address,
+        };
+        this.placeAddress = JSON.stringify(this.placeAddress);
+      } else { this.placeAddress = ''; }
     },
   },
 };

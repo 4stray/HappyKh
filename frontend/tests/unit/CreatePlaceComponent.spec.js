@@ -13,6 +13,10 @@ describe('createPlaceComponent data()', () => {
     expect(createPlaceComponent.data()).to.have.property('placeName');
   });
 
+  it('has default placeAddress', () => {
+    expect(createPlaceComponent.data()).to.have.property('placeDescription');
+  });
+
   it('has default placeDescription', () => {
     expect(createPlaceComponent.data()).to.have.property('placeDescription');
   });
@@ -26,6 +30,9 @@ describe('mounted createPlaceComponent', () => {
   const wrapper = shallowMount(createPlaceComponent, {
     mocks: {
       $cookies: Cookies,
+    },
+    stubs: {
+      places: '<div/>',
     },
   });
 
@@ -48,6 +55,12 @@ describe('mounted createPlaceComponent', () => {
 
   it('contains default logo initially', () => {
     expect(wrapper.find('#default_logo').exists()).to.be.equal(true);
+  it('has address autocomplete component', () => {
+    expect(wrapper.contains('#placeAddress')).to.be.equal(true);
+  });
+
+  it('contains logo from data()', () => {
+    expect(wrapper.find('#logo').attributes('src')).to.be.equal(createPlaceComponent.data().placeLogo);
   });
 
   it('check save button text', () => {
@@ -58,5 +71,9 @@ describe('mounted createPlaceComponent', () => {
     const newTestPlace = { placeLogo: 'imaginationImage.png' };
     wrapper.setData(newTestPlace);
     expect(wrapper.find('#logo').attributes('src')).to.be.equal(newTestPlace.placeLogo);
+  });
+
+  it('button is not active if conditions are not met', () => {
+    expect(wrapper.find('.btn-save').attributes()).property('disabled').to.be.equal('disabled');
   });
 });
