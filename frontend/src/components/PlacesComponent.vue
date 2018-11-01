@@ -2,8 +2,14 @@
   <div>
     <div class="create-place-container">
       <div class="text-xs-right">
+         <v-select
+            :items="Object.keys(order_by)"
+            box
+            label="Order by"
+          ></v-select>
         <v-btn class="info" large
                :to="{ name: 'createPlace' }"
+               :change="orderChanged"
                name="create-place-button">
           Add Place
         </v-btn>
@@ -34,10 +40,16 @@ export default {
   data() {
     return {
       allPlaces: [],
+      order_by: {
+        name: 'name',
+        date: 'created'
+      },
+      current_order: 'name',
     };
   },
   created() {
-    const allPlacesUrl = 'http://localhost:8000/api/places/';
+    const allPlacesUrl = 'http://localhost:8000/api/places/?order_by=' +
+        this.current_order;
     const apiConfig = {
       headers: {
         Authorization: `Token ${this.$store.getters.getToken}`,
@@ -53,6 +65,11 @@ export default {
         this.$awn.alert(error);
       }
     });
+  },
+  methods:{
+    orderChanged(key){
+      this.current_order = key;
+    }
   },
 };
 </script>
