@@ -1,6 +1,7 @@
 import Cookies from 'js-cookie';
 import { shallowMount } from '@vue/test-utils';
-import createPlaceComponent from '../../src/components/CreatePlaceComponent.vue';
+import createPlaceComponent
+  from '../../src/components/CreatePlaceComponent.vue';
 
 
 const expect = require('chai').expect;
@@ -36,8 +37,8 @@ describe('mounted createPlaceComponent', () => {
     },
   });
 
-  it('has 2 input fields', () => {
-    expect(wrapper.findAll('v-text-field').length).to.be.equal(1);
+  it('has 3 input fields', () => {
+    expect(wrapper.findAll('v-text-field').length).to.be.equal(2);
     expect(wrapper.findAll('v-textarea').length).to.be.equal(1);
   });
 
@@ -55,12 +56,17 @@ describe('mounted createPlaceComponent', () => {
 
   it('contains default logo initially', () => {
     expect(wrapper.find('#default_logo').exists()).to.be.equal(true);
+  });
+
   it('has address autocomplete component', () => {
     expect(wrapper.contains('#placeAddress')).to.be.equal(true);
   });
 
   it('contains logo from data()', () => {
-    expect(wrapper.find('#logo').attributes('src')).to.be.equal(createPlaceComponent.data().placeLogo);
+    wrapper.setData({
+      placeLogo: 'place.img',
+    });
+    expect(wrapper.find('#logo').attributes('src')).to.be.equal(wrapper.vm.placeLogo);
   });
 
   it('check save button text', () => {
@@ -71,9 +77,5 @@ describe('mounted createPlaceComponent', () => {
     const newTestPlace = { placeLogo: 'imaginationImage.png' };
     wrapper.setData(newTestPlace);
     expect(wrapper.find('#logo').attributes('src')).to.be.equal(newTestPlace.placeLogo);
-  });
-
-  it('button is not active if conditions are not met', () => {
-    expect(wrapper.find('.btn-save').attributes()).property('disabled').to.be.equal('disabled');
   });
 });

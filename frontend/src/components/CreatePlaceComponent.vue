@@ -9,6 +9,8 @@
                         v-model="placeName"
                         label="Place name"
           ></v-text-field>
+          <v-text-field id="placeAddress" label="Place address" type="text">
+          </v-text-field>
           <v-textarea id="description"
                       v-model="placeDescription"
                       label="Description"
