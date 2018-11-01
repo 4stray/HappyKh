@@ -8,7 +8,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
 from .serializers import PlaceSerializer, AddressSerializer
 from ..models import Place, Address
 
@@ -28,7 +27,8 @@ class PlacePage(APIView):
         :param request: HTTP Request
         :return: list of all places
         """
-        places = Place.objects.all()
+        print(request.query_params)
+        places = Place.objects.all().order_by(f"{request.query_params['order_by']}")
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
