@@ -27,11 +27,6 @@ class PlaceSerializer(serializers.ModelSerializer):
         model = Place
         fields = '__all__'
 
-    def create(self, validated_data):
-        new_place = Place.objects.create()
-        self.update(instance=new_place, validated_data=validated_data)
-        return new_place
-
     def to_representation(self, instance):
         """Represent `address` as string """
         ret = super().to_representation(instance)

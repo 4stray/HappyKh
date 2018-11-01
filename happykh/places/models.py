@@ -49,8 +49,8 @@ class Place(models.Model):
             original_filename=filename
         )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     logo = std_models.StdImageField(
