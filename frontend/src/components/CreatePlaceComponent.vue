@@ -9,7 +9,8 @@
                         v-model="placeName"
                         label="Place name"
           ></v-text-field>
-          <v-text-field id="placeAddress" label="Place address" type="text">
+          <v-text-field id="placeAddress" label="Place Address"
+                        v-model="formatted_address" type="text">
           </v-text-field>
           <v-textarea id="description"
                       v-model="placeDescription"
@@ -42,6 +43,7 @@ export default {
     return {
       placeName: '',
       placeAddress: '',
+      formatted_address: '',
       placeLogo: '',
       placeDescription: '',
       autocomplete: null,
@@ -63,6 +65,7 @@ export default {
         (document.getElementById('placeAddress')),
         { types: ['address'], strictBounds: true },
       );
+      document.getElementById('placeAddress').placeholder = '';
       const geolocation = {
         lat: 50,
         lng: 36,
@@ -115,13 +118,15 @@ export default {
       reader.readAsDataURL(file);
     },
     onChange() {
-      if (Object.keys(this.autocomplete.getPlace()).length > 1) {
+      const place = this.autocomplete.getPlace();
+      if (Object.keys(place).length > 1) {
+        this.formatted_address = place.formatted_address;
         this.placeAddress = {
           latitude:
-            this.autocomplete.getPlace().geometry.location.toJSON().lat,
+            place.geometry.location.toJSON().lat.toFixed(10),
           longitude:
-            this.autocomplete.getPlace().geometry.location.toJSON().lng,
-          address: this.autocomplete.getPlace().formatted_address,
+            place.geometry.location.toJSON().lng.toFixed(10),
+          address: place.formatted_address,
         };
         this.placeAddress = JSON.stringify(this.placeAddress);
       } else { this.placeAddress = ''; }
