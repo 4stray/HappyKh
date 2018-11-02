@@ -8,13 +8,17 @@ from places.models import Place, Address
 
 class AddressSerializer(serializers.ModelSerializer):
     """Full ModelSerializer for model Address"""
+
     class Meta:
         model = Address
         fields = '__all__'
 
 
 class PlaceSerializer(serializers.ModelSerializer):
-    """Full ModelSerializer for model Place"""
+    """
+    Full ModelSerializer for model Place.
+    All data should be passed with the same keys as attributes in the model!
+    """
 
     user = UserHashedIdField()
     logo = UploadedImageField(max_length=None, )
