@@ -102,13 +102,14 @@ export default {
       reader.readAsDataURL(file);
     },
     onChange() {
-      if (Object.keys(this.autocomplete.getPlace()).length > 1) {
+      const place = this.autocomplete.getPlace();
+      if (Object.keys(place).length > 1) {
         this.placeAddress = {
           latitude:
-            this.autocomplete.getPlace().geometry.location.toJSON().lat,
+            place.geometry.location.toJSON().lat.toFixed(10),
           longitude:
-            this.autocomplete.getPlace().geometry.location.toJSON().lng,
-          address: this.autocomplete.getPlace().formatted_address,
+            place.geometry.location.toJSON().lng.toFixed(10),
+          address: place.formatted_address,
         };
         this.placeAddress = JSON.stringify(this.placeAddress);
       } else { this.placeAddress = ''; }
