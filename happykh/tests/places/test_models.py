@@ -1,5 +1,6 @@
 """Tests for models of places app"""
 import pytest
+
 from django.db.utils import IntegrityError
 from places.models import Place, Address
 from users.models import User
