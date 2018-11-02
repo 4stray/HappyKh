@@ -68,7 +68,7 @@ $primaryColor: #0ca086;
   box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
   -webkit-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
   -moz-box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.4);
-  height: 420px;
+  height: 450px;
   width: 70%;
   margin: 20px auto;
   padding: 30px 15px;
@@ -145,13 +145,8 @@ $primaryColor: #0ca086;
   }
 }
 
-.v-text-field {
-  padding-top: 5px;
-  margin-top: 5px;
-}
-
 .content {
-  height: 250px;
+  height: 270px;
   flex: 1 1 auto;
 }
 </style>

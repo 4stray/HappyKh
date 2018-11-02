@@ -18,4 +18,3 @@ class PlaceAdmin(admin.ModelAdmin):
     list_display = ('address',)
     search_fields = ['address']
     ordering = ('address',)
-
