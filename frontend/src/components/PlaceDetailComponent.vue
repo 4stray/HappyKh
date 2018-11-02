@@ -11,7 +11,7 @@
           <v-spacer></v-spacer>
           <h3 class="headline mb-2 font-weight-bold"
             id="placeName"> {{placeName}}</h3>
-          <p v-if="placeDescription" class="subheading"
+          <p v-if="placeDescription" class="subheading text-xs-justify"
             id="placeDescription">{{placeDescription}}</p>
           <p v-else class="text--secondary" id="no_description">Place has no description.</p>
           <v-label class="d-block" id="labelAddress">Address</v-label>

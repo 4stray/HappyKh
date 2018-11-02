@@ -7,7 +7,9 @@
                name="place-image">
         </v-img>
         <v-card-title primary-title name="place-name">
-          <h3 class="headline mb-0 text-md-center hide-overflow">{{ place.name }}</h3>
+          <h3 class="headline mb-0 text-md-center one-line-place-name">
+            {{ place.name }}
+          </h3>
         </v-card-title>
       </v-card>
   </v-flex>
@@ -31,7 +33,6 @@ export default {
   },
   methods: {
     changeSelectedPlace(event) {
-      debugger;
       this.$store.commit('setSelectedPlace', this.place);
       this.$router.push({
         name: 'editPlace',
@@ -50,4 +51,10 @@ export default {
 </script>
 
 <style scoped>
+.one-line-place-name {
+  clear: both;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+}
 </style>

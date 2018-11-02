@@ -18,13 +18,12 @@ import axios from 'axios';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
-  name: 'EditPlaceComponent',
+  name: 'PlaceEditComponent',
   props: {
     place: '',
   },
   created() {
     const storeSelectedPlace = this.$store.getters.getSelectedPlace;
-
 
     if (storeSelectedPlace.id === this.$route.params.placeId) {
       this.place = this.$store.getters.getSelectedPlace;

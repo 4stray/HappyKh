@@ -1,16 +1,16 @@
 <template>
   <div id="EditPlace">
-    <EditPlaceComponent/>
+    <PlaceEditComponent/>
   </div>
 </template>
 
 <script>
-import EditPlaceComponent from '../components/EditPlaceComponent.vue';
+import PlaceEditComponent from '../components/PlaceEditComponent.vue';
 
 export default {
   name: 'EditPlace',
   components: {
-    EditPlaceComponent,
+    PlaceEditComponent,
   },
 };
 </script>
