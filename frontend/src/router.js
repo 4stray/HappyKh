@@ -6,6 +6,7 @@ import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import CreatePlace from './views/CreatePlace.vue';
 import EditPlace from './views/EditPlace.vue';
+import PlaceDetail from './views/Place.vue';
 import Profile from './views/Profile.vue';
 import ProfileSettings from './views/ProfileSettings.vue';
 import store from './store';
@@ -36,7 +37,7 @@ const router = new Router({
       component: ConfirmRegistration,
     },
     {
-      path: '/profile',
+      path: '/profile/:id',
       name: 'profile',
       component: Profile,
       beforeEnter: ifAuthenticated,
@@ -51,6 +52,12 @@ const router = new Router({
       path: '/places/edit/:placeId',
       name: 'editPlace',
       component: EditPlace,
+      beforeEnter: ifAuthenticated,
+    },
+    {
+      path: '/places/:id',
+      name: 'placeDetail',
+      component: PlaceDetail,
       beforeEnter: ifAuthenticated,
     },
     {

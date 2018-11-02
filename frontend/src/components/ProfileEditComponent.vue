@@ -16,7 +16,8 @@
                     :rules="ageRules"></v-text-field>
       <v-radio-group v-model="userGender" label="Gender">
         <v-radio label="Woman" color="primary" value="W"></v-radio>
-        <v-radio label="Male" color="primary" value="M"></v-radio>
+        <v-radio label="Man" color="primary" value="M"></v-radio>
+        <v-radio label="Other" color="primary" value="O"></v-radio>
       </v-radio-group>
       <img v-if="userImage" v-bind:src=userImage alt="No image"/>
       <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
@@ -50,10 +51,10 @@ export default {
     };
   },
   created() {
-    this.fetchformData();
+    this.fetchFormData();
   },
   methods: {
-    fetchformData() {
+    fetchFormData() {
       axios.get(
         UserAPI + this.$cookies.get('user_id'),
         {
@@ -74,7 +75,9 @@ export default {
         this.userGender = response.data.gender;
         this.userImage = response.data.profile_image;
       }).catch((error) => {
-        if (error.response.data.message) {
+        if (error.response === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else if (error.response.data.message) {
           this.$awn.warning(error.response.data.message);
         }
       });
@@ -106,7 +109,9 @@ export default {
           this.userImage = response.data.profile_image;
           this.$awn.success('Your profile was successfully updated.');
         }).catch((error) => {
-          if (error.response.data.message) {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
             this.$awn.warning(error.response.data.message);
           }
         });

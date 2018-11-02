@@ -4,24 +4,27 @@ import os
 import uuid
 
 from django.conf import settings
-from django.core.files.uploadedfile import UploadedFile
 from django.core.files.base import ContentFile
-from rest_framework.authtoken.models import Token
+from django.core.files.uploadedfile import UploadedFile
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
+from happykh.settings import HASH_IDS
 
 
-def make_upload_image(filename, path):
+def make_media_file_path(model_name, attr_name, original_filename):
     """
     Function which creates path for user's file in media folder using uuid.
 
-    :param filename: name of the user's file, ex. 'image.png'
-    :param path: where to save file in media folder, ex. 'model/attr'
-    :return: path to file or None if filename is empty
+    :param model_name: class of instance
+    :param attr_name: attribute for which image is saved
+    :param original_filename: original filename of the image, ex. 'image.jpg'
+    :return: path from MEDIA_ROOT to file or None if filename is empty
     """
-    if filename:
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (uuid.uuid4(), ext)
-        return f'{path}/{filename[0]}/{filename[2]}/{filename}'
+    if original_filename:
+        ext = original_filename.split('.')[-1]
+        filename = uuid.uuid4()
+        full_filename = "%s.%s" % (filename, ext)
+        return f'{model_name}/{attr_name}/{filename}/{full_filename}'
     return None
 
 
@@ -45,10 +48,12 @@ def delete_std_images_from_media(std_image_file, variations):
             os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
-def is_user_owner(request, user_id):
+def is_user_owner(request, id):
     token_key = request.META['HTTP_AUTHORIZATION'][6:]
     token_user_id = Token.objects.get(key=token_key).user.id
+    user_id = HASH_IDS.decode(id)[0]
     return user_id == token_user_id
+
 
 class UploadedImageField(serializers.ImageField):
     """
@@ -77,3 +82,16 @@ class UploadedImageField(serializers.ImageField):
                 image_url = f"{domain}{original_url}"
             return image_url
         return ''
+
+
+class HashIdField(serializers.Field):
+    """
+    Field for id for serializer
+    """
+
+    def to_representation(self, data):
+        return HASH_IDS.encode(data)
+
+    def to_internal_value(self, data):
+        user_id = HASH_IDS.decode(data)[0]
+        return super(HashIdField, self).to_internal_value(user_id)

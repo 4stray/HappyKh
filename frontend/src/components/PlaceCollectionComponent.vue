@@ -1,13 +1,11 @@
 <template>
-  <v-flex only-xs12 sm4>
-      <v-card hover
-              class="grey lighten-4"
+  <v-flex only-xs12 sm4 v-on:click="detail">
+      <v-card hover class="grey lighten-4"
               v-on:click.native="changeSelectedPlace">
         <v-img :src="place.logo || require('@/assets/default_place.png')"
                height="200px"
                name="place-image">
         </v-img>
-
         <v-card-title primary-title name="place-name">
           <h3 class="headline mb-0 text-md-center hide-overflow">{{ place.name }}</h3>
         </v-card-title>
@@ -17,16 +15,16 @@
 
 <script>
 export default {
-  name: 'PlaceComponent',
+  name: 'PlaceCollectionComponent',
   props: {
     place: {
       type: Object,
       default() {
         return {
-          id: '',
           name: '',
           logo: '',
           description: '',
+          id: '',
         };
       },
     },
@@ -34,7 +32,6 @@ export default {
   methods: {
     changeSelectedPlace(event) {
       debugger;
-
       this.$store.commit('setSelectedPlace', this.place);
       this.$router.push({
         name: 'editPlace',
@@ -42,8 +39,13 @@ export default {
           placeId: this.place.id,
         },
       });
-    }
-  }
+    },
+    detail() {
+      this.$router.push({
+        name: 'placeDetail', params: { id: this.place.id },
+      });
+    },
+  },
 };
 </script>
 

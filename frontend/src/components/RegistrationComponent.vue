@@ -1,117 +1,105 @@
 <template>
-  <form id="register" @submit.prevent="register" method="post"
-        novalidate>
+  <v-form ref="form" @submit.prevent="register" v-model="valid">
     <div class="content">
-      <input id="userEmail" type="email" v-model.trim="userEmail"
-             placeholder="EMAIL"/>
-      <p v-if="errors.email" class="error">{{errors.email}}</p>
-      <input id="userPassword" type="password" v-model="userPassword"
-             placeholder="PASSWORD"/>
-      <input id="confirmPassword" type="password" v-model="confirmPassword"
-             placeholder="CONFIRM PASSWORD"/>
-      <ul v-if="errors.password.length">
-        <li v-for="(error, index) in errors.password"
-            :key="index" class="error"
-        >{{ error }}
-        </li>
-      </ul>
+      <v-text-field id="userEmail"
+                    type="email"
+                    v-model.trim="userEmail"
+                    :rules="emailRules"
+                    label="Email"></v-text-field>
+      <v-text-field id="userName"
+                    type="text"
+                    v-model="userFirstName"
+                    label="First name"
+                    :rules="userNameRules"></v-text-field>
+      <v-text-field id="userPassword"
+                    type="password"
+                    v-model="userPassword"
+                    label="Password"
+                    :rules="passwordRules"></v-text-field>
+      <v-text-field id="confirmationPassword"
+                    type="password"
+                    v-model="confirmationPassword"
+                    :rules="passwordRules"
+                    label="Confirm your password"></v-text-field>
     </div>
-    <input class="btn-submit" type="submit"
-           :disabled="isDisabledButton"
+    <input class="btn-submit" type="submit" :disabled="!valid"
            value="REGISTER"/>
-  </form>
+  </v-form>
 </template>
 
 <script>
 import axios from 'axios';
+
+const UserAPI = 'http://localhost:8000/api/users';
 
 export default {
   name: 'RegistrationComponent',
   data() {
     return {
       userEmail: '',
+      userFirstName: '',
       userPassword: '',
       confirmPassword: '',
-      errors: {
-        email: '',
-        password: [],
-      },
+      valid: false,
+      userNameRules: [
+        value => Boolean(value) || 'This field is required.',
+      ],
+      passwordRules: [
+        value => Boolean(value) || 'This field is required.',
+        value => (value && value.length >= 8)
+          || 'Your password must be at least 8 characters.',
+        value => /^[0-9a-zA-Z]+$/.test(value)
+          || 'Your password must contain only numbers ' +
+          'and alphabetical characters.',
+      ],
+      emailRules: [
+        v => Boolean(v) || 'E-mail is required',
+        v => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(v)
+          || 'E-mail must be valid',
+      ],
     };
   },
   methods: {
-    isEmailValid() {
-      const re = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-      return re.test(this.userEmail);
-    },
-    /**
-     * @description Checks correctness of entered user's fields
-     * @returns {boolean} Result of check
-     */
-    isPasswordValid() {
-      this.errors = {
-        email: '',
-        password: [],
-      };
-      if (!this.isEmailValid()) {
-        this.errors.email = '* Please enter valid email address.';
-      }
-      if (this.userPassword.length < 8) {
-        this.errors.password.push('* Your password must be at least 8 characters.');
-      }
-      const alphaNumeric = /^[0-9a-zA-Z]+$/;
-      if (!this.userPassword.match(alphaNumeric)) {
-        this.errors.password.push('* Your password must contain only numbers and alphabetical characters.');
-      }
-      if (this.userPassword !== this.confirmPassword) {
-        this.errors.password.push('* Your passwords don\'t match, please try again.');
-        this.userPassword = '';
-        this.confirmPassword = '';
-      }
-      return Boolean(this.errors.email || this.errors.password.length);
-    },
     register() {
-      if (this.isPasswordValid()) {
-        this.$awn.warning('Please correct your mistakes.');
-      } else {
-        const userCredentials = {
-          user_email: this.userEmail,
-          user_password: this.userPassword,
-        };
-        axios.post('http://localhost:8000/api/users/registration', userCredentials)
-          .then(() => {
-            this.$awn.success('Successful registration.' +
-              ' Please check your mailbox for confirmation email.');
-            this.$router.push({ name: 'home' });
-          }).catch((error) => {
-            if (error.response.status === 400) {
-              this.$awn.alert(error.response.data.message);
-            } else if (error.response.status === 500 && error.response.data.message) {
-              this.$awn.info(error.response.data.message);
-            } else {
-              this.$awn.warning('Server error');
-            }
-            if (this.$cookies) {
-              this.$cookies.remove('token');
-              this.$cookies.remove('user_id');
-              // if the request fails, remove any possible user token if possible
-            }
-            this.userPassword = '';
-            this.confirmPassword = '';
-          });
+      if (!this.$refs.form.validate()) {
+        this.$refs.form.reset();
+        return;
+      } else if (this.userPassword !== this.confirmationPassword) {
+        this.$awn.warning('Passwords don\'t match');
+        this.$refs.form.reset();
+        return;
       }
-    },
-  },
-  computed: {
-    /**
-     * @description Checks if user filled all fields
-     * @returns {boolean}
-     * */
-    isDisabledButton() {
-      return !(this.userEmail && this.userPassword && this.confirmPassword);
+      const userCredentials = {
+        user_email: this.userEmail,
+        user_password: this.userPassword,
+        first_name: this.userFirstName,
+      };
+
+      axios.post(`${UserAPI}/registration`, userCredentials)
+        .then(() => {
+          this.$awn.success('Successful registration.' +
+            ' Please check your mailbox for confirmation email.');
+          this.$router.push({ name: 'home' });
+        }).catch((error) => {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.status === 400) {
+            this.$awn.alert(error.response.data.message);
+          } else if (error.response.status === 500 && error.response.data.message) {
+            this.$awn.info(error.response.data.message);
+          }
+
+          if (this.$cookies) {
+            this.$cookies.remove('token');
+            this.$cookies.remove('user_id');
+          }
+          this.$refs.form.reset();
+        });
     },
   },
 };
 </script>
 
 <style scoped lang="scss">
+
 </style>

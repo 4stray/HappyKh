@@ -25,7 +25,6 @@ export default {
   created() {
     const storeSelectedPlace = this.$store.getters.getSelectedPlace;
 
-    debugger;
 
     if (storeSelectedPlace.id === this.$route.params.placeId) {
       this.place = this.$store.getters.getSelectedPlace;
