@@ -11,18 +11,20 @@ from rest_framework.authtoken.models import Token
 from happykh.settings import HASH_IDS
 
 
-def make_upload_image(filename, path):
+def make_media_file_path(model_name, attr_name, original_filename):
     """
     Function which creates path for user's file in media folder using uuid.
 
-    :param filename: name of the user's file, ex. 'image.png'
-    :param path: where to save file in media folder, ex. 'model/attr'
-    :return: path to file or None if filename is empty
+    :param model_name: class of instance
+    :param attr_name: attribute for which image is saved
+    :param original_filename: original filename of the image, ex. 'image.jpg'
+    :return: path from MEDIA_ROOT to file or None if filename is empty
     """
-    if filename:
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (uuid.uuid4(), ext)
-        return f'{path}/{filename[0]}/{filename[2]}/{filename}'
+    if original_filename:
+        ext = original_filename.split('.')[-1]
+        filename = uuid.uuid4()
+        full_filename = "%s.%s" % (filename, ext)
+        return f'{model_name}/{attr_name}/{filename}/{full_filename}'
     return None
 
 
@@ -86,10 +88,10 @@ class HashIdField(serializers.Field):
     """
     Field for id for serializer
     """
+
     def to_representation(self, data):
         return HASH_IDS.encode(data)
 
     def to_internal_value(self, data):
         user_id = HASH_IDS.decode(data)[0]
         return super(HashIdField, self).to_internal_value(user_id)
-

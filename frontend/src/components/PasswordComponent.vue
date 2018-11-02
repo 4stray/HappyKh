@@ -38,7 +38,7 @@ export default {
       newPassword: '',
       confirmationPassword: '',
       passwordRules: [
-        value => !!value || 'This field is required.',
+        value => Boolean(value) || 'This field is required.',
         value => (value && value.length >= 8)
           || 'Your password must be at least 8 characters.',
         value => /^[0-9a-zA-Z]+$/.test(value)
