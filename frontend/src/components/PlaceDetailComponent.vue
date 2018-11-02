@@ -6,14 +6,16 @@
           <v-img :src="placeLogo || require('@/assets/default_place.png')"
                  height="400px"
                  width="100%"
-                  name="place-image">
+                 name="place-image">
         </v-img>
           <v-spacer></v-spacer>
-          <v-label class="d-block" id="labelName">Name</v-label>
-          <h3 class="headline mb-2" id="placeName"> {{placeName}}</h3>
-          <v-label class="" id="labelDescription">Description</v-label>
-          <p v-if="placeDescription" id="placeDescription">{{placeDescription}}</p>
+          <h3 class="headline mb-2 font-weight-bold"
+            id="placeName"> {{placeName}}</h3>
+          <p v-if="placeDescription" class="subheading"
+            id="placeDescription">{{placeDescription}}</p>
           <p v-else class="text--secondary" id="no_description">Place has no description.</p>
+          <v-label class="d-block" id="labelAddress">Address</v-label>
+          <h3 class="subheading" id="placeAddress"> {{placeAddress}}</h3>
         </v-card>
       </v-layout>
     </v-flex>
@@ -33,13 +35,14 @@ export default {
       placeLogo: '',
       placeName: '',
       placeDescription: '',
+      placeAddress: '',
     };
   },
   created() {
-    this.fetchUserCredentials();
+    this.fetchPlaceData();
   },
   methods: {
-    fetchUserCredentials() {
+    fetchPlaceData() {
       axios.get(
         `${PlaceAPI + this.$route.params.id}`,
         {
@@ -48,6 +51,7 @@ export default {
       ).then((response) => {
         this.placeLogo = response.data.logo;
         this.placeName = response.data.name;
+        this.placeAddress = response.data.address;
         this.placeDescription = response.data.description;
         if (this.placeName === '') {
           this.$awn.alert(alertText);
@@ -69,5 +73,4 @@ export default {
 #placeDescription {
   word-wrap:break-word;
 }
-
 </style>

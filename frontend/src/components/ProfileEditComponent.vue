@@ -1,7 +1,7 @@
 <template>
   <v-card class="v-card pa-5 mb-5">
     <v-card-title primary-title>
-      <h3 class="headline mb-0">Edit your profile:</h3>
+      <h3 class="headline mb-0">Edit your profile</h3>
     </v-card-title>
     <v-form ref="form" v-model="valid" @submit.prevent="save"
             enctype="multipart/form-data">
@@ -16,15 +16,18 @@
                     :rules="ageRules"></v-text-field>
       <v-radio-group v-model="userGender" label="Gender">
         <v-radio label="Woman" color="primary" value="W"></v-radio>
-        <v-radio label="Male" color="primary" value="M"></v-radio>
+        <v-radio label="Man" color="primary" value="M"></v-radio>
+        <v-radio label="Other" color="primary" value="O"></v-radio>
       </v-radio-group>
-      <img v-if="userImage" v-bind:src=userImage alt="No image"/>
-      <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
+      <div>
+          <img v-if="userImage" v-bind:src=userImage alt="No image"/>
+          <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
+      </div>
       <input type="file"
              id="imageInput"
              v-on:change="changeImage()"
              accept="image/*"/>
-      <v-btn class="success" type="submit" block>Save</v-btn>
+      <v-btn class="success mt-3" type="submit" block>Save</v-btn>
     </v-form>
   </v-card>
 </template>
@@ -45,15 +48,15 @@ export default {
       userImage: '',
       valid: true,
       ageRules: [
-        age => (age >= 1 && age <= 140) || (age === null) || 'Invalid age value',
+        age => (age >= 1 && age <= 140) || !age || 'Invalid age value',
       ],
     };
   },
   created() {
-    this.fetchformData();
+    this.fetchFormData();
   },
   methods: {
-    fetchformData() {
+    fetchFormData() {
       axios.get(
         UserAPI + this.$cookies.get('user_id'),
         {
