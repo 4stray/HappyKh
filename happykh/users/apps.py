@@ -7,4 +7,5 @@ class UsersConfig(AppConfig):
     name = 'users'
 
     def ready(self):
+    # pylint: disable = unused-variable
         import users.signals

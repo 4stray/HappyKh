@@ -12,7 +12,7 @@ class PlaceAdmin(admin.ModelAdmin):
 
 
 @admin.register(Address)
-class PlaceAdmin(admin.ModelAdmin):
+class AddressAdmin(admin.ModelAdmin):
     """"Class for displaying custom adress model on admin site"""
     fields = ['address', 'latitude', 'longitude']
     list_display = ('address',)
