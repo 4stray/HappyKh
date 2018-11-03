@@ -1,6 +1,6 @@
 """"Customized Admin"""
 from django.contrib import admin
-from .models import Place, Address
+from .models import Place, Address, CommentPlace
 
 
 @admin.register(Place)
@@ -19,3 +19,10 @@ class PlaceAdmin(admin.ModelAdmin):
     search_fields = ['address']
     ordering = ('address',)
 
+
+@admin.register(CommentPlace)
+class CommentPlaceAdmin(admin.ModelAdmin):
+    """"Class for displaying custom CommnetPlace model on admin site"""
+    fields = ['creator', 'creation_time', 'text', 'place']
+    list_display = ('creator', 'creation_time', 'text', 'place')
+    ordering = ('-creation_time',)

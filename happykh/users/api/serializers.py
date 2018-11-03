@@ -15,6 +15,7 @@ from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
 
+
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
     id = HashIdField()

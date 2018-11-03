@@ -4,6 +4,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from django.utils import timezone
 from stdimage import models as std_models
 from utils import make_upload_image
 
@@ -125,3 +126,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         Returns the short name for the user. (only first_name)
         """
         return self.first_name
+
+
+class CommentAbstract(models.Model):
+    """
+    Abstract class of comments which contains all fields except of
+    foreign key to model for which this comment was created.
+    """
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    creation_time = models.DateTimeField(default=timezone.now)
+    text = models.CharField(max_length=500)
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return self.creator

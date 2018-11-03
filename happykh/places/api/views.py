@@ -2,15 +2,16 @@ import json
 import logging
 
 from django.contrib.sites.shortcuts import get_current_site
+from happykh.settings import HASH_IDS
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-
-from .serializers import PlaceSerializer, AddressSerializer
-from ..models import Place, Address
+from .serializers import PlaceSerializer, AddressSerializer, \
+    CommentPlaceSerializer
+from ..models import Place, Address, CommentPlace
 
 LOGGER = logging.getLogger('happy_logger')
 
@@ -84,7 +85,7 @@ class PlacePage(APIView):
 
 
 class PlaceSinglePage(APIView):
-    """Dislpay and modify existing place"""
+    """Display and modify existing place"""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -108,3 +109,52 @@ class PlaceSinglePage(APIView):
         }
         place_serializer = PlaceSerializer(single_place, context=place_context)
         return Response(place_serializer.data, status=status.HTTP_200_OK)
+
+
+class CommentsAPI(APIView):
+    """Get comments for a place or create new one for place"""
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, place_id):
+        """
+        :param request: HTTP Request
+        :param place_id: id of place for which comment was written
+        :return: Response with data of comment and it's creator or
+                 Response with error status
+        """
+        place = Place.get_place(place_id)
+
+        if place is None:
+            LOGGER.warning(f'Place #{place_id} not found')
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        comment_context = {'domain': get_current_site(request), }
+        comments = CommentPlace.objects.filter(place=place_id)
+        comment_serializer = CommentPlaceSerializer(comments,
+                                                    context=comment_context,
+                                                    many=True, )
+
+        return Response(comment_serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, place_id):
+        """
+        :param request: HTTP Request
+        :param place_id: id of place for which comment was written
+        :return: Response with status
+        """
+        place = Place.get_place(place_id)
+
+        if place is None:
+            LOGGER.warning(f'Place #{place_id} not found')
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        data = request.data.copy()
+        data['creator'] = HASH_IDS.decode(data['creator'])[0]
+        data['place'] = place_id
+        comment_serializer = CommentPlaceSerializer(data=data, )
+        if comment_serializer.is_valid():
+            comment_serializer.save()
+            return Response(status=status.HTTP_200_OK)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -1,7 +1,7 @@
 """Creation model for place and addresses"""
 import logging
 from django.db import models
-from users.models import User
+from users.models import User, CommentAbstract
 from stdimage import models as std_models
 from utils import make_upload_image
 
@@ -19,7 +19,6 @@ class Address(models.Model):
 
 
 class Place(models.Model):
-
     """
     Place model for creation new places
     """
@@ -62,7 +61,7 @@ class Place(models.Model):
     def get_place(place_id):
         try:
             return Place.objects.get(pk=place_id)
-        except Place.DoesNotExist: #pylint: disable = no-member
+        except Place.DoesNotExist:  # pylint: disable = no-member
             LOGGER.error(
                 f'Can`t get place because of invalid id,'
                 f' place_id: {place_id}'
@@ -71,3 +70,11 @@ class Place(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CommentPlace(CommentAbstract):
+    """
+    Class which adds ForeignKey to the Place for which
+    standard comment was created.
+    """
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)
