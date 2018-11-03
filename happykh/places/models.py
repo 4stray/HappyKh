@@ -1,16 +1,24 @@
-"""Creation model for place"""
+"""Creation model for place and addresses"""
 import logging
 from django.db import models
 from stdimage import models as std_models
 from users.models import User
-from utils import make_upload_image
+from utils import make_media_file_path
 
 LOGGER = logging.getLogger('happy_logger')
 
 
+class Address(models.Model):
+    """Addresses model"""
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    address = models.CharField(max_length=255, blank=False, default=None)
+
+    def __str__(self):
+        return self.address
+
 
 class Place(models.Model):
-
     """
     Place model for creation new places
     """
@@ -31,14 +39,18 @@ class Place(models.Model):
         Should be used as base-function for function in parameter upload_to of
         ImageField.
 
-        :param self: instance of Place
         :param filename: name of the user's file, ex. 'image.png'
         :return: path to image or None if filename is empty
         """
 
-        return make_upload_image(filename, 'place/logo')
+        return make_media_file_path(
+            model_name='Place',
+            attr_name='logo',
+            original_filename=filename
+        )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    address = models.ForeignKey(Address, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     logo = std_models.StdImageField(

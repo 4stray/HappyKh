@@ -9,7 +9,7 @@ urlpatterns = [
         path('login', views.UserLogin.as_view()),
         path('logout', views.UserLogout.as_view()),
         path('registration', views.UserRegistration.as_view()),
-        path('activate/<str:id>/<slug:token>/',
+        path('activate/<str:email_crypt>/<slug:token>/',
              views.UserActivation.as_view()),
         path('activate/send-email/', views.UserActivation.as_view()),
         path('<str:id>', views.UserProfile.as_view()),

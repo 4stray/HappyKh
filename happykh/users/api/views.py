@@ -27,6 +27,7 @@ from .serializers import UserSerializer
 from .tokens import account_activation_token
 from ..backends import UserAuthentication
 from ..models import User
+from ..cryptography import decode, encode
 
 LOGGER = logging.getLogger('happy_logger')
 
@@ -180,16 +181,17 @@ class UserActivation(APIView):
 
         return Response({'message': msg}, status=status_code)
 
-    def get(self, request, id, token):
+    def get(self, request, email_crypt, token):
         """
         Processes GET request from user activation page
         :param request: HttpRequest
-        :param id: String
+        :param email_crypt: String
         :param token: String
         :return: Response({message}, status)
         """
         try:
-            user = UserAuthentication.get_user(id)
+            email = decode(email_crypt)
+            user = User.objects.get(email=email)
             if user.is_active:
                 LOGGER.warning(
                     f'Activate already activated user, user_id: {user.pk}'
@@ -231,14 +233,14 @@ class UserActivation(APIView):
 
         try:
             email_token = account_activation_token.make_token(user)
-            user_id = HASH_IDS.encode(user.pk)
+            email_crypt = encode(email)
             send_mail(
                 f'Confirm {email} on HappyKH',
                 f'We just needed to verify that {email} '
                 f'is your email address.'
                 f' Just click the link below \n'
                 f'http://127.0.0.1:8080/#/confirm_registration/'
-                f'{user_id}/{email_token}/',
+                f'{email_crypt}/{email_token}/',
                 EMAIL_HOST_USER,
                 [email]
             )

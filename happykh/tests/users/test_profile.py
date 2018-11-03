@@ -14,7 +14,6 @@ from users.models import User
 from utils import delete_std_images_from_media
 from ..utils import BaseTestCase
 
-
 USERS_PROFILE_URL = '/api/users/%s'
 USERS_PROFILE_DATA_URL = '/api/users/%s/data'
 USERS_PROFILE_EMAIL_URL = '/api/users/%s/email'
@@ -81,9 +80,10 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's age"""
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = 41
-        response = self.client.patch(USERS_PROFILE_DATA_URL
-                                     % self.hashed_user_id,
-                                     {'age': edited_user.age})
+        response = self.client.patch(
+            USERS_PROFILE_DATA_URL % self.hashed_user_id,
+            {'age': edited_user.age}
+        )
 
         serializer_edited_user = UserSerializer(edited_user)
         expected = serializer_edited_user.data
@@ -97,9 +97,10 @@ class TestUserProfile(BaseTestCase, APITestCase):
         # age == 'null'
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = None
-        response = self.client.patch(USERS_PROFILE_DATA_URL
-                                     % self.hashed_user_id,
-                                     {'age': 'null'})
+        response = self.client.patch(
+            USERS_PROFILE_DATA_URL % self.hashed_user_id,
+            {'age': 'null'}
+        )
 
         serializer_edited_user = UserSerializer(edited_user)
         expected = serializer_edited_user.data
@@ -132,9 +133,10 @@ class TestUserProfile(BaseTestCase, APITestCase):
         """test update user's age with invalid value"""
         edited_user = User.objects.get(pk=self.test_user.pk)
         edited_user.age = -41
-        response = self.client.patch(USERS_PROFILE_DATA_URL
-                                     % self.hashed_user_id,
-                                     {'age': edited_user.age})
+        response = self.client.patch(
+            USERS_PROFILE_DATA_URL % self.hashed_user_id,
+            {'age': edited_user.age}
+        )
         serializer_edited_user = UserSerializer(edited_user)
         expected = serializer_edited_user.data["age"]
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
@@ -170,7 +172,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         invalid_password['new_password'] = ''
         response = self.client.patch(
             USERS_PROFILE_PASSWORD_URL % self.hashed_user_id,
-            invalid_password)
+            invalid_password
+        )
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertFalse(
             self.test_user.check_password(invalid_password['new_password'])
@@ -181,7 +184,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         edited_email = 'valid@mail.com'
         response = self.client.patch(
             USERS_PROFILE_EMAIL_URL % self.hashed_user_id,
-            {'email': edited_email})
+            {'email': edited_email}
+        )
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
@@ -194,7 +198,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         serializer = EmailSerializer(self.test_user, invalid_email)
         response = self.client.patch(
             USERS_PROFILE_EMAIL_URL % self.hashed_user_id,
-            {'email': invalid_email})
+            {'email': invalid_email}
+        )
 
         self.assertFalse(serializer.is_valid())
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
@@ -205,7 +210,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         User.objects.create_user(email=testing_email, password="password2")
         response = self.client.patch(
             USERS_PROFILE_EMAIL_URL % self.hashed_user_id,
-            {'email': testing_email})
+            {'email': testing_email}
+        )
 
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
