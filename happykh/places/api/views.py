@@ -141,7 +141,7 @@ class CommentsAPI(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         all_comments = CommentPlace.objects.filter(place=place_id)
-        if all_comments is None:
+        if all_comments is None or not all_comments:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
         try:

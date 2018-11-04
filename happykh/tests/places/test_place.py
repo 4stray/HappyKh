@@ -156,6 +156,10 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
+        CommentPlace.objects.all().delete()
+        response = self.client.get(get_url)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+
     def test_post(self):
         data = self.comment_info
         data['creator'] = self.hashed_user_id

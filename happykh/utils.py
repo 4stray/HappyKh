@@ -1,28 +1,30 @@
 """Functions and classes which are used in different apps"""
-
 import os
 import uuid
 
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import UploadedFile
+from happykh.settings import HASH_IDS, MEDIA_DIR
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
-from happykh.settings import HASH_IDS
+from stdimage.models import StdImageFieldFile
 
 
-def make_upload_image(filename, path):
+def make_media_file_path(model_name, attr_name, original_filename):
     """
     Function which creates path for user's file in media folder using uuid.
 
-    :param filename: name of the user's file, ex. 'image.png'
-    :param path: where to save file in media folder, ex. 'model/attr'
-    :return: path to file or None if filename is empty
+    :param model_name: class of instance
+    :param attr_name: attribute for which image is saved
+    :param original_filename: original filename of the image, ex. 'image.jpg'
+    :return: path from MEDIA_ROOT to file or None if filename is empty
     """
-    if filename:
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (uuid.uuid4(), ext)
-        return f'{path}/{filename[0]}/{filename[2]}/{filename}'
+    if original_filename:
+        ext = original_filename.split('.')[-1]
+        filename = uuid.uuid4()
+        full_filename = "%s.%s" % (filename, ext)
+        return f'{model_name}/{attr_name}/{filename}/{full_filename}'
     return None
 
 
@@ -35,15 +37,18 @@ def delete_std_images_from_media(std_image_file, variations):
                         std_image_file
     :return: None
     """
-    path = std_image_file.path.split('media/')[-1]
-    os.remove(
-        os.path.join(settings.MEDIA_ROOT, path))
-    for variant in variations:
-        extension = path.split('.')[-1]
-        filename = path.split('.')[0]
-        path_to_variant_file = f'{filename}.{variant}.{extension}'
+    if std_image_file and \
+            isinstance(std_image_file, StdImageFieldFile) and \
+            os.path.isfile(std_image_file.path):
+        path = std_image_file.path.split(MEDIA_DIR+'/')[-1]
         os.remove(
-            os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
+            os.path.join(settings.MEDIA_ROOT, path))
+        for variant in variations:
+            extension = path.split('.')[-1]
+            filename = path.split('.')[-2]
+            path_to_variant_file = f'{filename}.{variant}.{extension}'
+            os.remove(
+                os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
 def is_user_owner(request, id):

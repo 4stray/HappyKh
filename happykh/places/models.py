@@ -3,15 +3,15 @@ import logging
 from django.db import models
 from users.models import User, CommentAbstract
 from stdimage import models as std_models
-from utils import make_upload_image
+from utils import make_media_file_path
 
 LOGGER = logging.getLogger('happy_logger')
 
 
 class Address(models.Model):
     """Addresses model"""
-    latitude = models.DecimalField(max_digits=17, decimal_places=15)
-    longitude = models.DecimalField(max_digits=18, decimal_places=15)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
     address = models.CharField(max_length=255, blank=False, default=None)
 
     def __str__(self):
@@ -43,7 +43,11 @@ class Place(models.Model):
         :return: path to image or None if filename is empty
         """
 
-        return make_upload_image(filename, 'place/logo')
+        return make_media_file_path(
+            model_name='Place',
+            attr_name='logo',
+            original_filename=filename
+        )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)

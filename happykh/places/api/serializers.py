@@ -18,7 +18,10 @@ class AddressSerializer(serializers.ModelSerializer):
 
 
 class PlaceSerializer(serializers.ModelSerializer):
-    """Full ModelSerializer for model Place"""
+    """
+    Full ModelSerializer for model Place.
+    All data should be passed with the same keys as attributes in the model!
+    """
 
     user = UserHashedIdField()
     logo = UploadedImageField(max_length=None, )

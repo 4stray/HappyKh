@@ -7,14 +7,16 @@
     </v-flex>
     <v-flex md6 xs12>
       <v-layout justify-start column fill-height>
-        <v-card id="main" class="px-5 py-3">
+        <v-card id="main" class="px-5 py-3 title">
           <v-btn v-if=enableEditingProfile :to="{name: 'settings'}"
                  fab dark absolute bottom right color="green">
             <v-icon>edit</v-icon>
           </v-btn>
-          <h3 class="headline mb-2"> {{fullName}}</h3>
+          <h3 class="headline mb-2 font-weight-bold">{{fullName}}</h3>
+          <v-label v-if="userAge" id="userAgeLabel">Age</v-label>
           <p id="userAge" v-if="userAge">{{userAge}}</p>
-          <p id="userGender" class="text--secondary">{{userGender}}</p>
+          <v-label id="userGenderLabel">Gender</v-label>
+          <p id="userGender">{{userGender}}</p>
         </v-card>
       </v-layout>
     </v-flex>

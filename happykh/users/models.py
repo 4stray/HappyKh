@@ -6,7 +6,7 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils import timezone
 from stdimage import models as std_models
-from utils import make_upload_image
+from utils import make_media_file_path
 
 
 class UserManager(BaseUserManager):
@@ -92,7 +92,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         :return: path to image or None if filename is empty
         """
 
-        return make_upload_image(filename, 'user/profile_image')
+        return make_media_file_path(
+            model_name='User',
+            attr_name='profile_image',
+            original_filename=filename
+        )
 
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=30, blank=True)
