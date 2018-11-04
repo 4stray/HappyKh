@@ -35,8 +35,10 @@ class PlaceSerializer(serializers.ModelSerializer):
 
 
 class CommentPlaceSerializer(serializers.ModelSerializer):
-    """Full ModelSerializer for model CommentPlace"""
-    id = HashIdField()
+    """
+    Full ModelSerializer for model CommentPlace.
+    Represents with creator's data.
+    """
 
     class Meta:
         model = CommentPlace
