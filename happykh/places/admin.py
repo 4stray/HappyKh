@@ -7,7 +7,7 @@ from .models import Place, Address
 class PlaceAdmin(admin.ModelAdmin):
     """"Class for displaying custom place model on admin site"""
     fields = ['user', 'name', 'address', 'description']
-    list_display = ('name', 'address')
+    list_display = ('name', 'address', 'created')
     search_fields = ['name']
 
 
