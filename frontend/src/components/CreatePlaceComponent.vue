@@ -81,12 +81,6 @@ export default {
           headers: {
             Authorization: `Token ${this.userToken}`,
             'Content-Type': 'multipart/form-data',
-            computed: {
-              ...mapGetters({
-                userToken: 'getToken',
-                userID: 'getUserID',
-              }),
-            },
           },
         },
       )
