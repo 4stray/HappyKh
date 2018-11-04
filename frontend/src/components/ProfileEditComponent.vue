@@ -32,11 +32,18 @@
 
 <script>
 import axios from 'axios';
+import { mapGetters } from 'vuex';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
 export default {
   name: 'ProfileEditComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       userFirstName: '',
@@ -56,9 +63,9 @@ export default {
   methods: {
     fetchFormData() {
       axios.get(
-        UserAPI + this.$cookies.get('user_id'),
+        UserAPI + this.userID,
         {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+          headers: { Authorization: `Token ${this.userToken}` },
         },
       ).then((response) => {
         if (response.data.first_name === 'undefined') {
@@ -94,10 +101,10 @@ export default {
         formData.append('profile_image', imageFile.files[0]);
 
         axios.patch(
-          `${UserAPI + this.$cookies.get('user_id')}/data`, formData,
+          `${UserAPI + this.userID}/data`, formData,
           {
             headers: {
-              Authorization: `Token ${this.$cookies.get('token')}`,
+              Authorization: `Token ${this.userToken}`,
               'Content-Type': 'multipart/form-data',
             },
           },

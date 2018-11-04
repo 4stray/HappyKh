@@ -17,11 +17,18 @@
 
 <script>
 import axios from 'axios';
+import { mapGetters } from 'vuex';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
 export default {
   name: 'ChangeEmailComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       valid: false,
@@ -41,10 +48,10 @@ export default {
       }
       const newEmail = { email: this.email };
       axios.patch(
-        `${UserAPI + this.$cookies.get('user_id')}/email`,
+        `${UserAPI + this.userID}/email`,
         newEmail,
         {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+          headers: { Authorization: `Token ${this.userToken}` },
         },
       ).then(() => {
         this.$awn.success('Please check your mailbox for confirmation email');

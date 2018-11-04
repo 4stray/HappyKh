@@ -59,7 +59,7 @@ export default {
       axios.get(
         `${UserAPI + this.$route.params.id}`,
         {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+          headers: { Authorization: `Token ${this.$store.getters.getToken}` },
         },
       ).then((response) => {
         this.userFirstName = response.data.first_name;
