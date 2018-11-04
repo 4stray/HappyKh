@@ -3,7 +3,7 @@
     <div class="create-place-container">
       <v-text-field  placeholder="Search" v-model="searchValue"></v-text-field>
       <div class="text-xs-right">
-        <v-btn class="warning" large
+        <v-btn class="info" large
                :to="{ name: 'createPlace' }"
                name="create-place-button">
           Add Place

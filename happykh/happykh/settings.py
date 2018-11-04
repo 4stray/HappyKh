@@ -190,7 +190,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_DIR = 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_DIR)
 MEDIA_URL = '/media/'
 
 CORS_ORIGIN_REGEX_WHITELIST = (
@@ -208,6 +209,11 @@ SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 
+# DES Key
+
+ENCODING_DES_KEY = os.environ.get('EMAIL_ENCODING_KEY')
+
 # Salt for hashid
+
 HASHID_FIELD_SALT = os.environ.get('HASHID_FIELD_SALT')
 HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)

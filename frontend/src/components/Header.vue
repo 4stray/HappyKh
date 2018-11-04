@@ -1,5 +1,5 @@
 <template>
-  <v-toolbar>
+  <v-toolbar fixed app>
     <v-btn :to="{ name: 'home'}" flat exact>Home</v-btn>
     <v-btn v-if="isAuthenticated"
            :to="{ name: 'profile', params: { id: this.$cookies.get('user_id') } }"
