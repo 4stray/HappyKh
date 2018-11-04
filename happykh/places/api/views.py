@@ -18,6 +18,10 @@ from ..models import Place, Address, CommentPlace
 LOGGER = logging.getLogger('happy_logger')
 
 
+class CustomValidationError(Exception):
+    pass
+
+
 class PlacePage(APIView):
     """List places or create a new one"""
     authentication_classes = (TokenAuthentication,)
@@ -157,7 +161,7 @@ class CommentsAPI(APIView):
         comment_context = {'domain': get_current_site(request), }
         comment_serializer = CommentPlaceSerializer(comments_for_page,
                                                     context=comment_context,
-                                                    many=True,)
+                                                    many=True, )
         next_page_link = None
         if comments_page.has_next():
             next_page_link = get_changed_uri(
@@ -198,11 +202,13 @@ class CommentsAPI(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         data = request.data.copy()
-        data['creator'] = HASH_IDS.decode(data['creator'])[0]
-        data['place'] = place_id
-        comment_serializer = CommentPlaceSerializer(data=data,)
-        if comment_serializer.is_valid():
-            comment_serializer.save()
-            return Response(status=status.HTTP_200_OK)
-
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            data['creator'] = HASH_IDS.decode(data['creator'])[0]
+            data['place'] = place_id
+            comment_serializer = CommentPlaceSerializer(data=data, )
+            if comment_serializer.is_valid():
+                comment_serializer.save()
+                return Response(status=status.HTTP_201_CREATED)
+            raise CustomValidationError
+        except (IndexError, CustomValidationError):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
