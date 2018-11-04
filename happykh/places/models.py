@@ -73,7 +73,6 @@ class Place(models.Model):
         """
         if not self.id:
             self.created = timezone.now()
-        self.modified = timezone.now()
         return super(Place, self).save(*args, **kwargs)
 
     @staticmethod
