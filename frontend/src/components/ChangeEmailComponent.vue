@@ -34,7 +34,7 @@ export default {
       valid: false,
       email: '',
       emailRules: [
-        v => !!v || 'E-mail is required',
+        v => Boolean(v) || 'E-mail is required',
         v => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(v)
           || 'E-mail must be valid',
       ],
