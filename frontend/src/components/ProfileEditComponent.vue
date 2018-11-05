@@ -27,7 +27,7 @@
              id="imageInput"
              v-on:change="changeImage()"
              accept="image/*"/>
-      <v-btn class="success mt-3" type="submit" block>Save</v-btn>
+      <v-btn class="success mt-3" type="submit" :disabled="wasChanged()" block>Save</v-btn>
     </v-form>
   </v-card>
 </template>
@@ -43,9 +43,14 @@ export default {
     return {
       userFirstName: '',
       userLastName: '',
-      userAge: 1,
+      userAge: null,
       userGender: 'M',
       userImage: '',
+      defaultUserFirstName: null,
+      defaultUserLastName: null,
+      defaultUserAge: null,
+      defaultUserGender: null,
+      defaultUserImage: null,
       valid: true,
       ageRules: [
         age => (age >= 1 && age <= 140) || !age || 'Invalid age value',
@@ -54,6 +59,13 @@ export default {
   },
   created() {
     this.fetchFormData();
+  },
+  mounted() {
+    this.defaultUserFirstName = this.userFirstName;
+    this.defaultUserLastName = this.userLastName;
+    this.defaultUserAge = this.userAge;
+    this.defaultUserGender = this.userGender;
+    this.defaultUserImage = this.userImage;
   },
   methods: {
     fetchFormData() {
@@ -67,15 +79,20 @@ export default {
           this.userFirstName = '';
         } else {
           this.userFirstName = response.data.first_name;
+          this.defaultUserFirstName = this.userFirstName;
         }
         if (response.data.first_name === 'undefined') {
           this.userLastName = '';
         } else {
           this.userLastName = response.data.last_name;
+          this.defaultUserLastName = this.userLastName;
         }
         this.userAge = response.data.age;
+        this.defaultUserAge = this.userAge;
         this.userGender = response.data.gender;
+        this.defaultUserGender = this.userGender;
         this.userImage = response.data.profile_image;
+        this.defaultUserImage = this.userImage;
       }).catch((error) => {
         if (error.response === undefined) {
           this.$awn.alert('A server error has occurred, try again later');
@@ -129,6 +146,13 @@ export default {
         self.userImage = reader.result;
       }, false);
       reader.readAsDataURL(file);
+    },
+    wasChanged() {
+      return this.defaultUserFirstName === this.userFirstName &&
+             this.defaultUserLastName === this.userLastName &&
+             this.defaultUserAge === this.userAge &&
+             this.defaultUserGender === this.userGender &&
+             this.defaultUserImage === this.userImage;
     },
   },
 };
