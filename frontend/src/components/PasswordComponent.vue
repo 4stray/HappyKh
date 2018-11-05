@@ -30,8 +30,7 @@
 
 <script>
 import axios from 'axios';
-import store from '../store';
-import { mapGetters } from 'vuex';
+import { mapGetters, store } from 'vuex';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
@@ -60,7 +59,7 @@ export default {
     };
   },
   methods: {
-    signOut(){
+    signOut() {
       this.$awn.success('Password was successfully changed.' +
                           'Please re-login to renew your session');
       store.dispatch('signOut');
@@ -83,8 +82,8 @@ export default {
         {
           headers: { Authorization: `Token ${this.userToken}` },
         },
-      ).then(()=>{
-          this.signOut();
+      ).then(() => {
+        this.signOut();
       }).catch((error) => {
         if (error.response === undefined) {
           this.$awn.alert('A server error has occurred, try again later');
