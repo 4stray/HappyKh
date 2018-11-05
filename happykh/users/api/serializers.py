@@ -4,9 +4,9 @@ import logging
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from happykh.settings import HASH_IDS
 from rest_framework import exceptions
 from rest_framework import serializers
+from happykh.settings import HASH_IDS
 from utils import UploadedImageField
 from utils import delete_std_images_from_media
 from utils import HashIdField

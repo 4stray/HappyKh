@@ -1,8 +1,8 @@
 """Creation model for place and addresses"""
 import logging
 from django.db import models
-from users.models import User, CommentAbstract
 from stdimage import models as std_models
+from users.models import User, CommentAbstract
 from utils import make_media_file_path
 
 LOGGER = logging.getLogger('happy_logger')

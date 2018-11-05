@@ -53,11 +53,6 @@ export default {
       userAge: null,
       userGender: 'M',
       userImage: '',
-      defaultUserFirstName: null,
-      defaultUserLastName: null,
-      defaultUserAge: null,
-      defaultUserGender: null,
-      defaultUserImage: null,
       valid: true,
       ageRules: [
         age => (age >= 1 && age <= 140) || !age || 'Invalid age value',
