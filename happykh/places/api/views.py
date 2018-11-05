@@ -11,8 +11,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from utils import get_changed_uri
 
-from .serializers import PlaceSerializer, AddressSerializer, \
-    CommentPlaceSerializer
+from .serializers import (PlaceSerializer, AddressSerializer,
+                          CommentPlaceSerializer)
 from ..models import Place, Address, CommentPlace
 
 LOGGER = logging.getLogger('happy_logger')
