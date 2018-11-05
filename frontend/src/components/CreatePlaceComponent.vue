@@ -35,6 +35,7 @@
 <script>
 import axios from 'axios';
 import GoogleMapsLoader from 'google-maps';
+import { mapGetters } from 'vuex';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
@@ -53,6 +54,10 @@ export default {
     isDisabledButton() {
       return !(this.placeName && this.placeAddress);
     },
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
   },
   mounted() {
     GoogleMapsLoader.KEY = process.env.VUE_APP_GOOGLE_API;
@@ -82,7 +87,7 @@ export default {
     save() {
       const imageFile = document.querySelector('#logoInput');
       const formData = new FormData();
-      formData.set('user', this.$cookies.get('user_id'));
+      formData.set('user', this.userID);
       formData.set('name', this.placeName);
       formData.set('address', this.placeAddress);
       formData.set('description', this.placeDescription);
@@ -91,7 +96,7 @@ export default {
         `${BaseURL}/places/`, formData,
         {
           headers: {
-            Authorization: `Token ${this.$cookies.get('token')}`,
+            Authorization: `Token ${this.userToken}`,
             'Content-Type': 'multipart/form-data',
           },
         },
