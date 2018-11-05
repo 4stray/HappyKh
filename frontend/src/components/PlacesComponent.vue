@@ -4,14 +4,15 @@
       <v-layout justify-space-between row>
         <v-flex xs2 d-inline-flex>
           <v-select
+            append-icon
             :items="Object.keys(orderBy)"
             v-on:change="changeOrderBy"
             box
             label="Order by"
           ></v-select>
-          <v-btn depressed icon v-on:click="changeOrder">
-            <v-icon large v-if="desc">arrow_downward</v-icon>
-            <v-icon large v-else>arrow_upward</v-icon>
+          <v-btn icon flat v-on:click="changeOrder">
+            <v-icon large fab v-if="desc">arrow_downward</v-icon>
+            <v-icon large fab v-else>arrow_upward</v-icon>
           </v-btn>
         </v-flex>
         <v-flex xs2>

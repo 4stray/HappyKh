@@ -27,10 +27,14 @@ class PlacePage(APIView):
         :param request: HTTP Request
         :return: list of all places
         """
-        print(request.query_params)
         order = request.query_params['order']
-        places = Place.objects.all().order_by(
-            f"{order}{request.query_params['orderBy']}")
+        order_by = request.query_params['orderBy']
+        places = Place.objects.all()
+        if (order, order_by) is not None:
+            places = places.order_by(
+                f"{order}{request.query_params['orderBy']}"
+            )
+
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
