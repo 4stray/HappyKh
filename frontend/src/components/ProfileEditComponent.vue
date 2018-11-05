@@ -34,12 +34,17 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const UserAPI = '/api/users/';
+import { axiosInstanceAuth } from '../axios-config';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'ProfileEditComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       userFirstName: '',
@@ -91,11 +96,11 @@ export default {
         const imageFile = document.querySelector('#imageInput');
         formData.append('profile_image', imageFile.files[0]);
 
-        axios.patch(
-          `${UserAPI + this.$cookies.get('user_id')}/data`, formData,
+        axiosInstanceAuth.patch(
+          `/api/users/${this.userID}/data`, formData,
           {
             headers: {
-              Authorization: `Token ${this.$cookies.get('token')}`,
+              Authorization: `Token ${this.userToken}`,
               'Content-Type': 'multipart/form-data',
             },
           },

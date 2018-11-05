@@ -1,14 +1,14 @@
 /* eslint-disable */
 import Vue from 'vue';
 import Vuex from 'vuex';
-import axios from 'axios';
+import {axiosInstanceAuth} from '../axios-config';
 
 Vue.use(Vuex);
+
 const state = {
   Authenticated: window.$cookies.get('token'),
+  UserID: window.$cookies.get('user_id'),
 };
-
-const USER_ID = window.$cookies.get('user_id') || 'XG';
 
 const getters = {
   getAuthenticated: state => {
@@ -17,20 +17,24 @@ const getters = {
   getToken: state => {
     return state.Authenticated;
   },
+  getUserID: state => {
+    return state.UserID;
+  },
   getUserData: state => {
-    return axios.get('/api/users/' + USER_ID);
+    return axiosInstanceAuth.get('/api/users/' + getters.getUserID(state));
+  },
+  getPalces: state => {
+    return axiosInstanceAuth.get('/api/places/');
   }
 };
 
 const actions = {
   signOut(state) {
-    const urlLogOut = '/api/users/logout';
     state.commit('signOut');
-    axios.post(
-      urlLogOut,
-    ).then((response) => {
-      console.log('Signed out');
-    }).catch((error) => {
+    axiosInstanceAuth.post('/api/users/logout')
+      .then((response) => {
+        console.log('Signed out');
+      }).catch((error) => {
       console.log(error);
     });
   }
@@ -40,10 +44,14 @@ const mutations = {
   signOut(state) {
     mutations.setAuthenticated(state, false);
     window.$cookies.remove('token');
+    mutations.setUserID(state, null);
     window.$cookies.remove('user_id');
   },
   setAuthenticated(state, isAuthenticated) {
     state.Authenticated = isAuthenticated;
+  },
+  setUserID(state, UserID) {
+    state.UserID = UserID;
   },
 };
 

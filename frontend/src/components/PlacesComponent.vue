@@ -13,8 +13,8 @@
       <v-container grid-list-xl name="place-container">
         <v-layout row wrap>
           <PlaceCollectionComponent v-for="place in allPlaces"
-                          v-bind:place="place"
-                          :key="place.id"/>
+                                    v-bind:place="place"
+                                    :key="place.id"/>
         </v-layout>
       </v-container>
     </div>
@@ -22,9 +22,7 @@
 </template>
 
 <script>
-import axios from 'axios';
 import PlaceCollectionComponent from './PlaceCollectionComponent.vue';
-
 
 export default {
   name: 'PlacesComponent',
@@ -37,14 +35,7 @@ export default {
     };
   },
   created() {
-    const allPlacesUrl = 'http://localhost:8000/api/places/';
-    const apiConfig = {
-      headers: {
-        Authorization: `Token ${this.$store.getters.getToken}`,
-      },
-    };
-
-    axios.get(allPlacesUrl, apiConfig).then((response) => {
+    this.$store.getters.getPalces.then((response) => {
       this.allPlaces = response.data;
     }).catch((error) => {
       if (error.response === undefined) {
