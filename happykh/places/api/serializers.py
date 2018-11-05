@@ -1,9 +1,10 @@
 """Serializers for model Place"""
 
+from places.models import Place, Address, CommentPlace
 from rest_framework import serializers
+from users.api.serializers import CommentAbstractSerializer
 from users.backends import UserHashedIdField
 from utils import UploadedImageField
-from places.models import Place, Address
 
 
 class AddressSerializer(serializers.ModelSerializer):
@@ -32,3 +33,14 @@ class PlaceSerializer(serializers.ModelSerializer):
         ret = super().to_representation(instance)
         ret['address'] = Address.objects.get(id=ret['address']).address
         return ret
+
+
+class CommentPlaceSerializer(CommentAbstractSerializer):
+    """
+    ModelSerializer for CommentPlace model, which extends
+    CommentAbstractSerializer.
+    """
+
+    class Meta:
+        model = CommentPlace
+        fields = '__all__'
