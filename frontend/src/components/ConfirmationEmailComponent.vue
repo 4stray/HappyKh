@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import Axios from 'axios';
+import { axiosInstance } from '../axios-config';
 
 export default {
   name: 'ConfirmationEmailComponent',
@@ -25,7 +25,7 @@ export default {
     sendEmail() {
       const userCredentials = { user_email: this.userEmail };
 
-      Axios.post('http://127.0.0.1:8000/api/users/activate/send-email/', userCredentials)
+      axiosInstance.post('/api/users/activate/send-email/', userCredentials)
         .then(() => {
           this.$awn.success('Please check your mailbox for confirmation email');
         })

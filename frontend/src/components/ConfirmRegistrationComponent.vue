@@ -1,6 +1,6 @@
 <script>
 // @ is an alias to /src
-import axios from 'axios';
+import { axiosInstance } from '../axios-config';
 
 export default {
   name: 'ConfirmRegistrationComponent',
@@ -9,14 +9,15 @@ export default {
     const userId = this.$route.params.userId;
     const emailToken = this.$route.params.emailToken;
 
-    axios.get(
-      `http://localhost:8000/api/users/activate/${userId}/${emailToken}/`,
+    axiosInstance.get(
+      `/api/users/activate/${userId}/${emailToken}/`,
       {
         userId,
         emailToken,
       },
     ).then((response) => {
-      console.log(response.status); /* eslint-disable-line no-console */
+      /* eslint-disable-next-line no-console */
+      console.log(response.status);
       this.$awn.success('Your account has been activated successfully');
     }).catch((error) => {
       if (error.response === undefined) {

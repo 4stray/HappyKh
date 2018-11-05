@@ -9,10 +9,10 @@
     </v-btn>
     <v-spacer></v-spacer>
     <v-btn
-      v-if="isAuthenticated"
-      v-on:click.native="signOut()"
-      :to="{name: 'login'}"
-      flat color="error" exact>Sign out
+        v-if="isAuthenticated"
+        v-on:click.native="signOut()"
+        :to="{name: 'login'}"
+        flat color="error" exact>Sign out
     </v-btn>
   </v-toolbar>
 </template>
@@ -20,7 +20,6 @@
 <script>
 import { mapGetters } from 'vuex';
 import store from '../store';
-
 
 export default {
   name: 'Header',

@@ -34,8 +34,8 @@
 </template>
 
 <script>
-import { axiosInstanceAuth } from '../axios-config';
 import { mapGetters } from 'vuex';
+import { axiosInstanceAuth } from '../axios-config';
 
 export default {
   name: 'ProfileEditComponent',
@@ -100,7 +100,6 @@ export default {
           `/api/users/${this.userID}/data`, formData,
           {
             headers: {
-              Authorization: `Token ${this.userToken}`,
               'Content-Type': 'multipart/form-data',
             },
           },
@@ -140,5 +139,4 @@ img {
   width: 300px;
   margin: auto;
 }
-
 </style>

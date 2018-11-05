@@ -33,11 +33,11 @@
 </template>
 
 <script>
-import axios from 'axios';
 import GoogleMapsLoader from 'google-maps';
 import { mapGetters } from 'vuex';
+import { axiosInstanceAuth } from '../axios-config';
 
-const BaseURL = 'http://127.0.0.1:8000/api';
+
 export default {
   name: 'createPlaceComponent',
   data() {
@@ -92,11 +92,10 @@ export default {
       formData.set('address', this.placeAddress);
       formData.set('description', this.placeDescription);
       formData.append('logo', imageFile.files[0]);
-      axios.post(
-        `${BaseURL}/places/`, formData,
+      axiosInstanceAuth.post(
+        '/api/places/', formData,
         {
           headers: {
-            Authorization: `Token ${this.userToken}`,
             'Content-Type': 'multipart/form-data',
           },
         },

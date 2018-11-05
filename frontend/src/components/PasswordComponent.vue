@@ -25,10 +25,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { mapGetters } from 'vuex';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+import { axiosInstanceAuth } from '../axios-config';
 
 export default {
   name: 'PasswordComponent',
@@ -68,11 +66,10 @@ export default {
         old_password: this.oldPassword,
         new_password: this.newPassword,
       };
-      axios.patch(
-        `${UserAPI + this.userID}/password`, userCredentials,
-        {
-          headers: { Authorization: `Token ${this.userToken}` },
-        },
+
+      axiosInstanceAuth.patch(
+        `/api/users/${this.userID}/password`,
+        userCredentials,
       ).then(() => {
         this.$awn.success('Password was successfully changed.');
       }).catch((error) => {

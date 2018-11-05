@@ -35,7 +35,7 @@ export default {
     };
   },
   created() {
-    this.$store.getters.getPalces.then((response) => {
+    this.$store.getters.getPlaces.then((response) => {
       this.allPlaces = response.data;
     }).catch((error) => {
       if (error.response === undefined) {

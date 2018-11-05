@@ -23,9 +23,12 @@ const getters = {
   getUserData: state => {
     return axiosInstanceAuth.get('/api/users/' + getters.getUserID(state));
   },
-  getPalces: state => {
+  getPlaces: state => {
     return axiosInstanceAuth.get('/api/places/');
-  }
+  },
+  getPlace: (state, id) => {
+    return axiosInstanceAuth.get('/api/places/' + id);
+  },
 };
 
 const actions = {
