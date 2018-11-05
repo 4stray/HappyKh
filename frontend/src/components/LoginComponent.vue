@@ -51,6 +51,7 @@ export default {
           this.$cookies.set('token', response.data.token);
           this.$store.commit('setAuthenticated', response.data.token);
           this.$cookies.set('user_id', response.data.user_id);
+          this.$store.commit('setUserID', response.data.user_id);
           this.$router.push({ name: 'home' });
         }).catch((error) => {
           if (error.response === undefined) {
