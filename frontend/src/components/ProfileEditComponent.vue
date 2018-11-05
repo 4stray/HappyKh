@@ -20,8 +20,9 @@
         <v-radio label="Other" color="primary" value="O"></v-radio>
       </v-radio-group>
       <div>
-          <img v-if="userImage" v-bind:src=userImage alt="No image"/>
-          <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
+        <img v-if="userImage" v-bind:src=userImage alt="No image"/>
+        <img v-else id="profile_image" src="../assets/default_user.png"
+             alt="No user avatar"/>
       </div>
       <input type="file"
              id="imageInput"
@@ -35,7 +36,7 @@
 <script>
 import axios from 'axios';
 
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+const UserAPI = '/api/users/';
 
 export default {
   name: 'ProfileEditComponent',
@@ -57,12 +58,7 @@ export default {
   },
   methods: {
     fetchFormData() {
-      axios.get(
-        UserAPI + this.$cookies.get('user_id'),
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      ).then((response) => {
+      this.$store.getters.getUserData.then((response) => {
         if (response.data.first_name === 'undefined') {
           this.userFirstName = '';
         } else {

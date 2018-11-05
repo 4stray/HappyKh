@@ -8,6 +8,8 @@ const state = {
   Authenticated: window.$cookies.get('token'),
 };
 
+const USER_ID = window.$cookies.get('user_id') || 'XG';
+
 const getters = {
   getAuthenticated: state => {
     return !!getters.getToken(state);
@@ -15,27 +17,22 @@ const getters = {
   getToken: state => {
     return state.Authenticated;
   },
+  getUserData: state => {
+    return axios.get('/api/users/' + USER_ID);
+  }
 };
 
 const actions = {
   signOut(state) {
-    const urlLogOut =
-      'http://127.0.0.1:8000/api/users/logout';
-
-    const token = this.getters.getToken;
-
+    const urlLogOut = '/api/users/logout';
     state.commit('signOut');
-
     axios.post(
       urlLogOut,
-      {},
-      {
-        headers: { Authorization: `Token ${token}` },
-      }).then((response) => {
-        console.log('Signed out');
-      }).catch((error) => {
-        console.log(error);
-      });
+    ).then((response) => {
+      console.log('Signed out');
+    }).catch((error) => {
+      console.log(error);
+    });
   }
 };
 
