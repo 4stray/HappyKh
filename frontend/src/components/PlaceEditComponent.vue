@@ -1,16 +1,34 @@
 <template>
-  <div id="createPlaceComponent">
-    <h1>Edit Place:</h1>
-    <form id="placeForm" enctype="multipart/form-data">
-      <input type="text" id="name"
-             v-model="place.name" placeholder="Place name"/>
-      <textarea id="description"
-                v-model="place.description" placeholder="Description"></textarea>
-      <img v-bind:src="place.logo" id='logo' alt="No place image"/>
-      <input type="file" id="logoInput" v-on:change="changeImage()" accept="image/*"/>
-      <button class="btn-save" type="button" v-on:click="save()">Apply Changes</button>
-    </form>
-  </div>
+  <v-layout align-center justify-center row fill-height>
+    <v-flex xs6>
+      <v-card class="v-card pa-5 mb-5" id="PlaceEditComponent">
+        <h1>Edit the place:</h1>
+        <v-form id="placeForm" enctype="multipart/form-data"
+                @submit.prevent="save">
+          <v-text-field type="text" id="name"
+                        v-model="place.name"
+                        label="Place name"
+          ></v-text-field>
+          <v-text-field id="placeAddress" label="Place Address"
+                        v-model="place.address" type="text">
+          </v-text-field>
+          <v-textarea id="description"
+                      v-model="place.description"
+                      label="Description"
+          ></v-textarea>
+          <div>
+              <img v-if="place.logo" v-bind:src=place.logo id='logo'
+                   alt="Place image"/>
+              <img v-else src="../assets/default_place.png" id='default_logo'
+                   alt="Default place image"/>
+          </div>
+          <input type="file" id="logoInput" v-on:change="changeImage()"
+                 accept="image/*"/>
+          <v-btn class="success mt-3" type="submit" block>Apply Changes</v-btn>
+        </v-form>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -19,17 +37,30 @@ import axios from 'axios';
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
   name: 'PlaceEditComponent',
-  props: {
-    place: '',
+  data() {
+    return {
+      place: {
+        name: '',
+        logo: '',
+        description: '',
+        address: '',
+      },
+    };4
   },
   created() {
-    const storeSelectedPlace = this.$store.getters.getSelectedPlace;
+    const placeId = parseInt(this.$route.params.placeId);
 
-    if (storeSelectedPlace.id === this.$route.params.placeId) {
-      this.place = this.$store.getters.getSelectedPlace;
-    } else {
-      // axios request for getting place
-    }
+    this.$store.getters.getPlace(placeId).then(response => {
+      this.place = {
+        name: response.data.name,
+        logo: response.data.logo,
+        description: response.data.description,
+        address: response.data.address,
+      };
+    }).catch(error => {
+      this.$awn.alert('User access denied for editing the place');
+      this.$router.push({name: 'home'});
+    });
   },
   methods: {
     save() {
@@ -71,76 +102,8 @@ export default {
 </script>
 
 <style scoped>
-  #createPlaceComponent {
-    width: 500px;
-    font-family: 'Liberation Sans', sans, sans-serif;
-    border: 1px solid #CCCCCC;
-    background-color: #FFFFFF;
-    margin: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #placeForm {
-    display: block;
-  }
-
-  #createPlaceComponent input, textarea {
-    font-family: 'Liberation Sans', sans, sans-serif;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 300px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-  #createPlaceComponent textarea{
-    resize: none;
-    height: 6em;
-  }
-  #createPlaceComponent textarea::-webkit-scrollbar {
-    width: 1em;
-  }
-
-  #createPlaceComponent textarea::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  }
-
-  #createPlaceComponent textarea::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
-    outline: 1px solid slategrey;
-  }
-
-  #createPlaceComponent input:focus {
-    outline: none;
-  }
-
-  #createPlaceComponent img {
-    font-family: 'Liberation Sans', sans, sans-serif;
-    font-size: 14px;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 60%;
-    height: 20%;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  .btn-save {
-    width: 40%;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 25px;
-    color: #fff;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-family: 'Liberation Sans', sans, sans-serif;
-    cursor: pointer;
-    background-color: #0ca086;
-  }
+img {
+  width: 300px;
+  margin: auto;
+}
 </style>

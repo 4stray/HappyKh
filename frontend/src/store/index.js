@@ -6,12 +6,6 @@ import axios from 'axios';
 Vue.use(Vuex);
 const state = {
   Authenticated: window.$cookies.get('token'),
-  selectedPlace: {
-    id: 0,
-    name: '',
-    description: '',
-    logo: '',
-  },
 };
 
 const getters = {
@@ -21,8 +15,15 @@ const getters = {
   getToken: state => {
     return state.Authenticated;
   },
-  getSelectedPlace: state => {
-    return state.selectedPlace;
+  getPlace: (state) => (placeId) => {
+    const URLConfig = {
+      headers : {
+        Authorization: `Token ${getters.getToken(state)}`,
+      },
+    };
+    const placesURL = `http://127.0.0.1:8000/api/places/${placeId}`;
+
+    return axios.get(placesURL, URLConfig);
   },
 };
 
