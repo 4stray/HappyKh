@@ -17,7 +17,11 @@
                     v-model="confirmationPassword"
                     :rules="passwordRules"
                     label="Confirm new password"></v-text-field>
-      <v-btn type="submit" :disabled="!valid" color="success" block>
+      <v-btn type="submit"
+             v-on:click.native="saveNewPassword"
+             :disabled="!valid"
+             :to="{name: 'login'}"
+             color="success" block>
         submit
       </v-btn>
     </v-form>
@@ -26,6 +30,7 @@
 
 <script>
 import axios from 'axios';
+import store from '../store';
 import { mapGetters } from 'vuex';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
@@ -55,6 +60,11 @@ export default {
     };
   },
   methods: {
+    signOut(){
+      this.$awn.success('Password was successfully changed.' +
+                          'Please re-login to renew your session');
+      store.dispatch('signOut');
+    },
     saveNewPassword() {
       if (!this.$refs.form.validate()) {
         this.$refs.form.reset();
@@ -73,8 +83,8 @@ export default {
         {
           headers: { Authorization: `Token ${this.userToken}` },
         },
-      ).then(() => {
-        this.$awn.success('Password was successfully changed.');
+      ).then(()=>{
+          this.signOut();
       }).catch((error) => {
         if (error.response === undefined) {
           this.$awn.alert('A server error has occurred, try again later');
