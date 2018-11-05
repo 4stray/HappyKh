@@ -1,23 +1,38 @@
 <template>
-  <div id="createPlaceComponent">
-    <h1>Create your place:</h1>
-    <form id="placeForm" enctype="multipart/form-data">
-      <input type="text" id="name"
-             v-model="placeName" placeholder="*Place name"/>
-      <input id="placeAddress" placeholder="*Place address" type="text">
-      <textarea id="description"
-                v-model="placeDescription" placeholder="Description"></textarea>
-      <img v-bind:src=placeLogo id='logo' alt="No place image"/>
-      <input type="file" id="logoInput" v-on:change="changeImage()"
-             accept="image/*"/>
-      <button class="btn-save" type="button"
-              v-on:click="save()" :disabled="isDisabledButton">Create Place
-      </button>
-    </form>
-  </div>
+  <v-layout align-center justify-center row fill-height>
+    <v-flex xs6>
+      <v-card class="v-card pa-5 mb-5" id="createPlaceComponent">
+        <h1>Create your place:</h1>
+        <v-form id="placeForm" enctype="multipart/form-data"
+                @submit.prevent="save">
+          <v-text-field type="text" id="name"
+                        v-model="placeName"
+                        label="Place name"
+          ></v-text-field>
+          <v-text-field id="placeAddress" label="Place Address"
+                        v-model="formatted_address" type="text">
+          </v-text-field>
+          <v-textarea id="description"
+                      v-model="placeDescription"
+                      label="Description"
+          ></v-textarea>
+          <div>
+              <img v-if="placeLogo" v-bind:src=placeLogo id='logo'
+                   alt="Place image"/>
+              <img v-else src="../assets/default_place.png" id='default_logo'
+                   alt="Default place image"/>
+          </div>
+          <input type="file" id="logoInput" v-on:change="changeImage()"
+                 accept="image/*"/>
+          <v-btn class="success mt-3" type="submit" block>Create Place
+          </v-btn>
+        </v-form>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
-<script >
+<script>
 import axios from 'axios';
 import GoogleMapsLoader from 'google-maps';
 
@@ -28,6 +43,7 @@ export default {
     return {
       placeName: '',
       placeAddress: '',
+      formatted_address: '',
       placeLogo: '',
       placeDescription: '',
       autocomplete: null,
@@ -49,6 +65,7 @@ export default {
         (document.getElementById('placeAddress')),
         { types: ['address'], strictBounds: true },
       );
+      document.getElementById('placeAddress').placeholder = '';
       const geolocation = {
         lat: 50,
         lng: 36,
@@ -78,17 +95,16 @@ export default {
             'Content-Type': 'multipart/form-data',
           },
         },
-      )
-        .then(() => {
-          this.$awn.success('Your place was successfully created.');
-          this.$router.push({ name: 'home' });
-        }).catch(() => {
-          if (this.error.message === undefined) {
-            this.$awn.alert('A server error has occurred, try again later');
-          } else {
-            this.$awn.warning(this.error.message);
-          }
-        });
+      ).then(() => {
+        this.$awn.success('Your place was successfully created.');
+        this.$router.push({ name: 'home' });
+      }).catch(() => {
+        if (this.error.message === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else {
+          this.$awn.warning(this.error.message);
+        }
+      });
     },
     changeImage() {
       const file = document.getElementById('logoInput').files[0];
@@ -102,13 +118,15 @@ export default {
       reader.readAsDataURL(file);
     },
     onChange() {
-      if (Object.keys(this.autocomplete.getPlace()).length > 1) {
+      const place = this.autocomplete.getPlace();
+      if (Object.keys(place).length > 1) {
+        this.formatted_address = place.formatted_address;
         this.placeAddress = {
           latitude:
-            this.autocomplete.getPlace().geometry.location.toJSON().lat,
+            place.geometry.location.toJSON().lat.toFixed(10),
           longitude:
-            this.autocomplete.getPlace().geometry.location.toJSON().lng,
-          address: this.autocomplete.getPlace().formatted_address,
+            place.geometry.location.toJSON().lng.toFixed(10),
+          address: place.formatted_address,
         };
         this.placeAddress = JSON.stringify(this.placeAddress);
       } else { this.placeAddress = ''; }
@@ -117,80 +135,9 @@ export default {
 };
 </script>
 
-<style scoped lang="scss">
-  #createPlaceComponent {
-    width: 500px;
-    font-family: 'Liberation Sans', sans, sans-serif;
-    border: 1px solid #CCCCCC;
-    background-color: #FFFFFF;
-    margin: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  #placeForm {
-    display: block;
-  }
-
-  #createPlaceComponent input, textarea {
-    font-family: 'Liberation Sans', sans, sans-serif;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 300px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-  #createPlaceComponent textarea{
-    resize: none;
-    height: 6em;
-  }
-  #createPlaceComponent textarea::-webkit-scrollbar {
-    width: 1em;
-  }
-
-  #createPlaceComponent textarea::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  }
-
-  #createPlaceComponent textarea::-webkit-scrollbar-thumb {
-    background-color: darkgrey;
-    outline: 1px solid slategrey;
-  }
-
-  #createPlaceComponent input:focus {
-    outline: none;
-  }
-
-  #createPlaceComponent img {
-    font-family: 'Liberation Sans', sans, sans-serif;
-    font-size: 14px;
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 60%;
-    height: 20%;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  .btn-save {
-    width: 40%;
-    border: none;
-    border-radius: 10px;
-    padding: 10px 25px;
-    color: #fff;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-family: 'Liberation Sans', sans, sans-serif;
-    cursor: pointer;
-    background-color: #0ca086;
-    &:disabled {
-      background-color: #d3d3d3;
-    }
-  }
+<style scoped>
+img {
+  width: 300px;
+  margin: auto;
+}
 </style>

@@ -37,6 +37,12 @@ const router = new Router({
       component: ConfirmRegistration,
     },
     {
+      path: '/profile/settings',
+      name: 'settings',
+      component: ProfileSettings,
+      beforeEnter: ifAuthenticated,
+    },
+    {
       path: '/profile/:id',
       name: 'profile',
       component: Profile,
@@ -58,12 +64,6 @@ const router = new Router({
       path: '/places/:id',
       name: 'placeDetail',
       component: PlaceDetail,
-      beforeEnter: ifAuthenticated,
-    },
-    {
-      path: '/profile/settings',
-      name: 'settings',
-      component: ProfileSettings,
       beforeEnter: ifAuthenticated,
     },
   ],
