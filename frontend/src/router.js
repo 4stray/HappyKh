@@ -8,7 +8,7 @@ import PlaceDetail from './views/Place.vue';
 import Profile from './views/Profile.vue';
 import ProfileSettings from './views/ProfileSettings.vue';
 import store from './store';
-import { axiosInstance } from './axios-config';
+import axiosInstance from './axios-config';
 
 const ifAuthenticated = (to, from, next) => {
   if (store.getters.getAuthenticated) {

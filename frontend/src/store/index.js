@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {axiosInstance} from '../axios-config';
+import axiosInstance from '../axios-config';
 
 Vue.use(Vuex);
 
@@ -20,13 +20,13 @@ const getters = {
   getUserID: state => {
     return state.UserID;
   },
-  getUserData: state => {
-    return axiosInstance.get('/api/users/' + getters.getUserID(state));
+  getUserData: state => (id) => {
+    return axiosInstance.get('/api/users/' + id);
   },
   getPlaces: state => {
     return axiosInstance.get('/api/places/');
   },
-  getPlace: (state) => (id) => {
+  getPlace: state => (id) => {
     return axiosInstance.get('/api/places/' + id);
   },
 };
