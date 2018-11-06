@@ -422,7 +422,11 @@ class UserPassword(APIView):
                 return Response({'message': 'Wrong password.'},
                                 status=status.HTTP_400_BAD_REQUEST)
 
+            token_key = request.META['HTTP_AUTHORIZATION'][6:]
+            Token.objects.get(key=token_key).delete()
+
             serializer.update(user, serializer.data)
+
             LOGGER.info('Updated user password')
             return Response({'message': 'Password was updated.'},
                             status=status.HTTP_200_OK)
