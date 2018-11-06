@@ -10,9 +10,9 @@
             box
             label="Order by"
           ></v-select>
-          <v-btn icon flat v-on:click="changeOrder">
-            <v-icon large fab v-if="desc">arrow_downward</v-icon>
-            <v-icon large fab v-else>arrow_upward</v-icon>
+          <v-btn id="orderIcon" :ripple="false" icon flat v-on:click="changeOrder">
+            <v-icon medium v-if="desc">arrow_downward</v-icon>
+            <v-icon medium v-else>arrow_upward</v-icon>
           </v-btn>
         </v-flex>
         <v-flex xs2>
