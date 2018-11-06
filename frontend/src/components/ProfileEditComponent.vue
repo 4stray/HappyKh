@@ -35,7 +35,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { axiosInstanceAuth } from '../axios-config';
+import { axiosInstance } from '../axios-config';
 
 export default {
   name: 'ProfileEditComponent',
@@ -96,7 +96,7 @@ export default {
         const imageFile = document.querySelector('#imageInput');
         formData.append('profile_image', imageFile.files[0]);
 
-        axiosInstanceAuth.patch(
+        axiosInstance.patch(
           `/api/users/${this.userID}/data`, formData,
           {
             headers: {

@@ -1,7 +1,7 @@
 /* eslint-disable */
 import Vue from 'vue';
 import Vuex from 'vuex';
-import {axiosInstanceAuth} from '../axios-config';
+import {axiosInstance} from '../axios-config';
 
 Vue.use(Vuex);
 
@@ -21,20 +21,20 @@ const getters = {
     return state.UserID;
   },
   getUserData: state => {
-    return axiosInstanceAuth.get('/api/users/' + getters.getUserID(state));
+    return axiosInstance.get('/api/users/' + getters.getUserID(state));
   },
   getPlaces: state => {
-    return axiosInstanceAuth.get('/api/places/');
+    return axiosInstance.get('/api/places/');
   },
-  getPlace: (state, id) => {
-    return axiosInstanceAuth.get('/api/places/' + id);
+  getPlace: (state) => (id) => {
+    return axiosInstance.get('/api/places/' + id);
   },
 };
 
 const actions = {
   signOut(state) {
     state.commit('signOut');
-    axiosInstanceAuth.post('/api/users/logout')
+    axiosInstance.post('/api/users/logout')
       .then((response) => {
         console.log('Signed out');
       }).catch((error) => {

@@ -17,7 +17,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { axiosInstanceAuth } from '../axios-config';
+import { axiosInstance } from '../axios-config';
 
 export default {
   name: 'ChangeEmailComponent',
@@ -45,7 +45,7 @@ export default {
         return;
       }
       const newEmail = { email: this.email };
-      axiosInstanceAuth.patch(`/api/users/${this.userID}/email`, newEmail)
+      axiosInstance.patch(`/api/users/${this.userID}/email`, newEmail)
         .then(() => {
           this.$awn.success('Please check your mailbox for confirmation email');
         }).catch((error) => {

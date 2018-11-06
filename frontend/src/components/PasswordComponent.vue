@@ -26,7 +26,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { axiosInstanceAuth } from '../axios-config';
+import { axiosInstance } from '../axios-config';
 
 export default {
   name: 'PasswordComponent',
@@ -67,7 +67,7 @@ export default {
         new_password: this.newPassword,
       };
 
-      axiosInstanceAuth.patch(
+      axiosInstance.patch(
         `/api/users/${this.userID}/password`,
         userCredentials,
       ).then(() => {

@@ -24,8 +24,6 @@
 </template>
 
 <script>
-import axios from 'axios';
-
 const alertText = 'A server error has occurred, try again later';
 
 export default {
@@ -53,13 +51,13 @@ export default {
             this.$awn.alert(alertText);
           }
         }).catch((error) => {
-          if (error.response === undefined || error.response.status !== 200) {
-            this.$awn.alert(alertText);
-            this.$router.go(-1);
-          } else if (error.response.data.message) {
-            this.$awn.warning(error.response.data.message);
-          }
-        });
+        if (error.response === undefined || error.response.status !== 200) {
+          this.$awn.alert(alertText);
+          this.$router.go(-1);
+        } else if (error.response.data.message) {
+          this.$awn.warning(error.response.data.message);
+        }
+      });
     },
   },
 };

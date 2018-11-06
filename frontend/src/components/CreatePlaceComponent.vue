@@ -35,7 +35,7 @@
 <script>
 import GoogleMapsLoader from 'google-maps';
 import { mapGetters } from 'vuex';
-import { axiosInstanceAuth } from '../axios-config';
+import { axiosInstance } from '../axios-config';
 
 
 export default {
@@ -92,7 +92,7 @@ export default {
       formData.set('address', this.placeAddress);
       formData.set('description', this.placeDescription);
       formData.append('logo', imageFile.files[0]);
-      axiosInstanceAuth.post(
+      axiosInstance.post(
         '/api/places/', formData,
         {
           headers: {

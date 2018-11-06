@@ -4,11 +4,11 @@ import store from './store';
 
 const HOST = 'http://127.0.0.1:8000';
 
-export const axiosInstanceAuth = axios.create({
+export const axiosInstance = axios.create({
   baseURL: HOST,
 });
 
-axiosInstanceAuth.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   (config) => {
     const token = store.getters.getToken;
     if (token) {
@@ -18,8 +18,3 @@ axiosInstanceAuth.interceptors.request.use(
   },
   error => Promise.reject(error),
 );
-
-export const axiosInstance = axios.create({
-  baseURL: HOST,
-});
-
