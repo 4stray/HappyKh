@@ -2,7 +2,7 @@
 import logging
 from django.db import models
 from django.utils import timezone
-from users.models import User
+from users.models import User, CommentAbstract
 from stdimage import models as std_models
 from utils import make_media_file_path
 
@@ -88,3 +88,11 @@ class Place(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CommentPlace(CommentAbstract):
+    """
+    Class which adds ForeignKey to the Place for which
+    standard comment was created.
+    """
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)
