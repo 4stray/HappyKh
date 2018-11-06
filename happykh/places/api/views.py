@@ -35,13 +35,15 @@ class PlacePage(APIView):
         :param request: HTTP Request
         :return: list of all places
         """
-        order = request.query_params['order']
-        order_by = request.query_params['orderBy']
-        places = Place.objects.all()
-        if (order, order_by) is not None:
-            places = places.order_by(
-                f"{order}{request.query_params['orderBy']}"
-            )
+        try:
+            order = request.query_params['order']
+            order_by = request.query_params['orderBy']
+            if order is not None and order_by is not None:
+                places = Place.order_by(
+                    f"{order}{request.query_params['orderBy']}"
+                )
+        except KeyError:
+            places = Place.objects.all()
 
         context = {
             'variation': self.variation,
