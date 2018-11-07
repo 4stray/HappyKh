@@ -7,6 +7,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+# pylint: disable = no-name-in-module, import-error
+from rest_framework.pagination import DjangoPaginator
+from django.core.paginator import EmptyPage, PageNotAnInteger
 
 from .serializers import PlaceSerializer, AddressSerializer
 from ..models import Place, Address
@@ -32,11 +35,29 @@ class PlacePage(APIView):
             'variation': self.variation,
             'domain': get_current_site(request)
         }
-        search_option = request.query_params.get('option', None)
+        search_option = request.query_params.get('s', None)
         if search_option is not None:
             places = places.filter(name__icontains=search_option)
+
+        limit = request.query_params.get('lim', None)
+        if limit is None:
+            limit = 15
+        paginator = DjangoPaginator(places, limit)
+
+        page = request.query_params.get('p', None)
+        if page is None:
+            places = paginator.page(1)
+        else:
+            try:
+                places = paginator.page(page)
+            except PageNotAnInteger:
+                places = paginator.page(1)
+            except EmptyPage:
+                places = paginator.page(paginator.num_pages)
+
         serializer = PlaceSerializer(places, many=True, context=context)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"places": serializer.data, "pages": paginator.num_pages},
+                        status=status.HTTP_200_OK)
 
     def post(self, request):
         """
