@@ -65,7 +65,7 @@ export default {
       axios.get(
         `${PlaceAPI + this.$route.params.id}`,
         {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+          headers: { Authorization: `Token ${this.$store.getters.getToken}` },
         },
       ).then((response) => {
         this.place.id = response.data.id;

@@ -58,6 +58,21 @@ def is_user_owner(request, id):
     return user_id == token_user_id
 
 
+def get_changed_uri(request, param_name, val):
+    """
+    Changes value of url parameter in url from request.
+
+    :param request: rest_framework.request.Request object
+    :param param_name: string with name of parameter in url to be changed
+    :param val: new value to be set to parameter
+    :return: url from request with changed parameter value
+    """
+    params = request.GET.copy()
+    params[param_name] = val
+    request_uri = request.build_absolute_uri()
+    return request_uri.split('?')[0] + '?' + params.urlencode()
+
+
 class UploadedImageField(serializers.ImageField):
     """
     Class which converts a base64 string to a file when input and converts image
