@@ -17,7 +17,11 @@
                     v-model="confirmationPassword"
                     :rules="passwordRules"
                     label="Confirm new password"></v-text-field>
-      <v-btn type="submit" :disabled="!valid" color="success" block>
+      <v-btn type="submit"
+             v-on:click.native="saveNewPassword"
+             :disabled="!valid"
+             :to="{name: 'login'}"
+             color="success" block>
         submit
       </v-btn>
     </v-form>
@@ -26,11 +30,18 @@
 
 <script>
 import axios from 'axios';
+import { mapGetters, store } from 'vuex';
 
 const UserAPI = 'http://127.0.0.1:8000/api/users/';
 
 export default {
   name: 'PasswordComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       valid: false,
@@ -48,6 +59,11 @@ export default {
     };
   },
   methods: {
+    signOut() {
+      this.$awn.success('Password was successfully changed.' +
+                          'Please re-login to renew your session');
+      store.dispatch('signOut');
+    },
     saveNewPassword() {
       if (!this.$refs.form.validate()) {
         this.$refs.form.reset();
@@ -62,12 +78,12 @@ export default {
         new_password: this.newPassword,
       };
       axios.patch(
-        `${UserAPI + this.$cookies.get('user_id')}/password`, userCredentials,
+        `${UserAPI + this.userID}/password`, userCredentials,
         {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
+          headers: { Authorization: `Token ${this.userToken}` },
         },
       ).then(() => {
-        this.$awn.success('Password was successfully changed.');
+        this.signOut();
       }).catch((error) => {
         if (error.response === undefined) {
           this.$awn.alert('A server error has occurred, try again later');

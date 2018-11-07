@@ -4,15 +4,16 @@ import logging
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from rest_framework import exceptions
-from rest_framework import serializers
+from rest_framework import exceptions, serializers
+from happykh.settings import HASH_IDS
 from utils import UploadedImageField
 from utils import delete_std_images_from_media
 from utils import HashIdField
 
-from ..models import User
+from ..models import User, CommentAbstract
 
 LOGGER = logging.getLogger('happy_logger')
+
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
@@ -163,3 +164,29 @@ class EmailSerializer(serializers.ModelSerializer):
             instance.save()
 
         return instance
+
+
+class CommentAbstractSerializer(serializers.ModelSerializer):
+    """
+    Full ModelSerializer for model CommentAbstract.
+    Represents with creator's data.
+    """
+
+    class Meta:
+        model = CommentAbstract
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        """Representation data of comment and extended data of user"""
+        ret = super().to_representation(instance)
+        user_context = {
+            'variation': User.thumbnail,
+            'domain': self.context['domain']
+        }
+        comment_creator = User.objects.get(pk=instance.creator_id)
+        creator_serializer = UserSerializer(comment_creator,
+                                            context=user_context)
+        ret['creator_image'] = creator_serializer.data['profile_image']
+        ret['creator_fullname'] = comment_creator.get_full_name()
+        ret['creator'] = HASH_IDS.encode(ret['creator'])
+        return ret

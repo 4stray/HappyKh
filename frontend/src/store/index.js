@@ -6,6 +6,7 @@ import axios from 'axios';
 Vue.use(Vuex);
 const state = {
   Authenticated: window.$cookies.get('token'),
+  UserID: window.$cookies.get('user_id'),
 };
 
 const getters = {
@@ -14,6 +15,9 @@ const getters = {
   },
   getToken: state => {
     return state.Authenticated;
+  },
+  getUserID: state => {
+    return state.UserID;
   },
 };
 
@@ -43,10 +47,14 @@ const mutations = {
   signOut(state) {
     mutations.setAuthenticated(state, false);
     window.$cookies.remove('token');
+    mutations.setUserID(state, null);
     window.$cookies.remove('user_id');
   },
   setAuthenticated(state, isAuthenticated) {
     state.Authenticated = isAuthenticated;
+  },
+  setUserID(state, UserID) {
+    state.UserID = UserID;
   },
 };
 

@@ -2,7 +2,7 @@
   <v-toolbar fixed app>
     <v-btn :to="{ name: 'home'}" flat exact>Home</v-btn>
     <v-btn v-if="isAuthenticated"
-           :to="{ name: 'profile', params: { id: this.$cookies.get('user_id') } }"
+           :to="{ name: 'profile', params: { id: userID } }"
            flat exact>Profile
     </v-btn>
     <v-btn v-if="!isAuthenticated" :to="{ name: 'login'}" flat exact>Login
@@ -27,6 +27,7 @@ export default {
   computed: {
     ...mapGetters({
       isAuthenticated: 'getAuthenticated',
+      userID: 'getUserID',
     }),
   },
   methods: {
