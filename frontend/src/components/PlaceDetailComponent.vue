@@ -1,23 +1,36 @@
 <template>
-  <v-layout justify-space-around row fill-height>
-    <v-flex md6>
+  <v-layout :class="{'row': $vuetify.breakpoint.mdAndUp,
+                     'column': $vuetify.breakpoint.smAndDown}"
+            justify-space-around fill-height>
+    <v-flex offset-md3 md6 xs12>
       <v-layout justify-start column>
         <v-card id="main" class="px-5 py-3">
-          <v-img :src="placeLogo || require('@/assets/default_place.png')"
+          <v-img :src="place.logo || require('@/assets/default_place.png')"
                  height="400px"
                  width="100%"
                  name="place-image">
-        </v-img>
+          </v-img>
           <v-spacer></v-spacer>
           <h3 class="headline mb-2 font-weight-bold"
-            id="placeName"> {{placeName}}</h3>
-          <p v-if="placeDescription" class="subheading text-xs-justify"
-            id="placeDescription">{{placeDescription}}</p>
+            id="placeName"> {{place.name}}</h3>
+          <p v-if="place.description" class="subheading text-xs-justify"
+            id="placeDescription">{{place.description}}</p>
           <p v-else class="text--secondary" id="no_description">Place has no description.</p>
           <v-label class="d-block" id="labelAddress">Address</v-label>
-          <h3 class="subheading" id="placeAddress"> {{placeAddress}}</h3>
+          <h3 class="subheading" id="placeAddress"> {{place.address}}</h3>
+
+          <v-btn :to="{name: 'placeEdit', params: {placeId: place.id}}"
+             fab dark absolute bottom right color="green">
+            <v-icon>edit</v-icon>
+          </v-btn>
         </v-card>
       </v-layout>
+    </v-flex>
+    <v-flex md3 xs12>
+      <v-btn :class="{'v-btn--block mt-4': $vuetify.breakpoint.smAndDown}"
+             color="info" class="left">
+        Request access to edit
+      </v-btn>
     </v-flex>
   </v-layout>
 </template>
@@ -30,13 +43,19 @@ const alertText = 'A server error has occurred, try again later';
 
 export default {
   name: 'ProfileComponent',
-  data() {
-    return {
-      placeLogo: '',
-      placeName: '',
-      placeDescription: '',
-      placeAddress: '',
-    };
+   props: {
+    place: {
+      type: Object,
+      default() {
+        return {
+          id: 0,
+          name: '',
+          logo: '',
+          description: '',
+          address: '',
+        };
+      },
+    },
   },
   created() {
     this.fetchPlaceData();
@@ -49,11 +68,12 @@ export default {
           headers: { Authorization: `Token ${this.$cookies.get('token')}` },
         },
       ).then((response) => {
-        this.placeLogo = response.data.logo;
-        this.placeName = response.data.name;
-        this.placeAddress = response.data.address;
-        this.placeDescription = response.data.description;
-        if (this.placeName === '') {
+        this.place.id = response.data.id;
+        this.place.logo= response.data.logo;
+        this.place.name = response.data.name;
+        this.place.address= response.data.address;
+        this.place.description= response.data.description;
+        if (this.place.name === '') {
           this.$awn.alert(alertText);
         }
       }).catch((error) => {

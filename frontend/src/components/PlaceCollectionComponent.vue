@@ -1,7 +1,6 @@
 <template>
-  <v-flex only-xs12 sm4 v-on:click="changeSelectedPlace">
-      <v-card hover class="grey lighten-4"
-              v-on:click.native="changeSelectedPlace">
+  <v-flex only-xs12 sm4 v-on:click="detail">
+      <v-card hover class="grey lighten-4">
         <v-img :src="place.logo || require('@/assets/default_place.png')"
                height="200px"
                name="place-image">
@@ -32,15 +31,6 @@ export default {
     },
   },
   methods: {
-    changeSelectedPlace(event) {
-      this.$store.commit('setSelectedPlace', this.place);
-      this.$router.push({
-        name: 'placeEdit',
-        params: {
-          placeId: this.place.id,
-        },
-      });
-    },
     detail() {
       this.$router.push({
         name: 'placeDetail', params: { id: this.place.id },

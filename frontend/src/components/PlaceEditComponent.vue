@@ -45,21 +45,23 @@ export default {
         description: '',
         address: '',
       },
-    };4
+    };
   },
   created() {
-    const placeId = parseInt(this.$route.params.placeId);
+    const placeId = this.$route.params.placeId;
 
-    this.$store.getters.getPlace(placeId).then(response => {
+    this.$store.getters.getPlace(placeId).then((response) => {
       this.place = {
         name: response.data.name,
         logo: response.data.logo,
         description: response.data.description,
         address: response.data.address,
       };
-    }).catch(error => {
+    }).catch((error) => {
       this.$awn.alert('User access denied for editing the place');
-      this.$router.push({name: 'home'});
+      this.$router.push({
+        name: 'home',
+      });
     });
   },
   methods: {
