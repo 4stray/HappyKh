@@ -41,6 +41,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return instance
 
+
 # pylint: disable = abstract-method
 class LoginSerializer(serializers.Serializer):
     """

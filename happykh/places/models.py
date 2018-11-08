@@ -63,18 +63,6 @@ class Place(models.Model):
     )
     created = models.DateTimeField(editable=False, default=timezone.now)
 
-    def save(self, *args, **kwargs):
-        """
-        On save, update timestamps
-
-        :param args:
-        :param kwargs:
-        :return: place instance
-        """
-        if not self.id:
-            self.created = timezone.now()
-        return super(Place, self).save(*args, **kwargs)
-
     @staticmethod
     def get_place(place_id):
         """

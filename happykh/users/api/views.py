@@ -59,8 +59,7 @@ class UserLogin(APIView):
 
         user = serializer.validated_data['user']
         if user.is_active:
-            # pylint: disable = unused-variable
-            user_token, created = Token.objects.get_or_create(user=user)
+            user_token, _ = Token.objects.get_or_create(user=user)
             user_id = HASH_IDS.encode(user.pk)
 
             LOGGER.info('User has been logged in')
