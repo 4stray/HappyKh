@@ -17,8 +17,8 @@ config.mocks.$store = {
 describe('PlacesComponent', () => {
   const wrapper = shallowMount(PlacesComponent, config);
 
-  it('has container for create place button', () => {
-    expect(wrapper.contains('[class="create-place-container"]')).to.be.equal(true);
+  it('has container for create place button and filter', () => {
+    expect(wrapper.contains('[name="menu-container"]')).to.be.equal(true);
   });
 
   it('has button for adding place', () => {

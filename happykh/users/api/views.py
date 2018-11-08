@@ -410,21 +410,25 @@ class UserPassword(APIView):
                 LOGGER.error(
                     'Received wrong old password while changing password'
                 )
-                return Response({'message': 'Wrong password.'},
+                return Response({'message': 'Wrong password'},
                                 status=status.HTTP_400_BAD_REQUEST)
+
+            serializer.update(user, serializer.data)
 
             token_key = request.META['HTTP_AUTHORIZATION'][6:]
             Token.objects.get(key=token_key).delete()
 
-            serializer.update(user, serializer.data)
-
             LOGGER.info('Updated user password')
-            return Response({'message': 'Password was updated.'},
-                            status=status.HTTP_200_OK)
+            LOGGER.info('User has been logged out')
+
+            return Response({
+                'message':
+                    'Password was updated.'
+                    'Please re-login to renew your session'
+            }, status=status.HTTP_200_OK)
 
         LOGGER.error(
-            f'Serializer error {serializer.errors} while changing password'
-        )
+            f'Serializer error {serializer.errors} while changing password')
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
