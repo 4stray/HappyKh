@@ -7,10 +7,12 @@
             enctype="multipart/form-data">
       <v-text-field type="text" id="firstName" label="First name"
                     v-model="userFirstName"
-                    placeholder="First name"></v-text-field>
+                    placeholder="First name"
+                    :rules="firstNameRules"></v-text-field>
       <v-text-field type="text" id="lastName" label="Last name"
                     v-model="userLastName"
-                    placeholder="Last name"></v-text-field>
+                    placeholder="Last name"
+                    :rules="nameRules"></v-text-field>
       <v-text-field type="number" id="age" v-model="userAge" label="Age"
                     min="0" max="140" step="1"
                     :rules="ageRules"></v-text-field>
@@ -27,7 +29,8 @@
              id="imageInput"
              v-on:change="changeImage()"
              accept="image/*"/>
-      <v-btn class="success mt-3" type="submit" :disabled="wasChanged()" block>Save</v-btn>
+      <v-btn class="success mt-3" type="submit"
+             :disabled="wasChanged() || !valid" block>Save</v-btn>
     </v-form>
   </v-card>
 </template>
@@ -53,9 +56,18 @@ export default {
       userAge: null,
       userGender: 'M',
       userImage: '',
-      valid: true,
+      valid: false,
       ageRules: [
         age => (age >= 1 && age <= 140) || !age || 'Invalid age value',
+      ],
+      nameRules: [
+        name => /^[A-Z]/.test(name) || /^$/.test(name) || 'Name must begin with a capital letter',
+        name => /^[A-Za-z]+$/.test(name) || /^$/.test(name) || 'Name must contain only letters ',
+      ],
+      firstNameRules: [
+        name => /./.test(name) || 'This field cannot be empty',
+        name => /^[A-Z]/.test(name) || /^$/.test(name) || 'Name must begin with a capital letter',
+        name => /^[A-Za-z]+$/.test(name) || /^$/.test(name) || 'Name must contain only letters ',
       ],
     };
   },
