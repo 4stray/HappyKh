@@ -30,5 +30,6 @@ class CommentPlaceAdmin(admin.ModelAdmin):
 
 @admin.register(PlaceRating)
 class PlaceRatingAdmin(admin.ModelAdmin):
+    """Class for displaying custom PlaceRating model on admin site"""
     fields = ['user', 'place', 'rating']
     list_display = ('place', 'user', 'rating')
