@@ -1,13 +1,11 @@
 """Custom serializers for users app"""
-# pylint: disable = logging-fstring-interpolation
 import logging
 
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
+from rest_framework import exceptions, serializers
 from happykh.settings import HASH_IDS
-from rest_framework import exceptions
-from rest_framework import serializers
 from utils import UploadedImageField
 from utils import delete_std_images_from_media
 from utils import HashIdField
@@ -23,7 +21,6 @@ class UserSerializer(serializers.ModelSerializer):
     profile_image = UploadedImageField(max_length=None, )
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         exclude = ('email', 'password')
 
@@ -118,7 +115,6 @@ class PasswordSerializer(serializers.ModelSerializer):
     new_password = serializers.CharField(required=True)
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = ('old_password', 'new_password')
 
@@ -139,7 +135,6 @@ class EmailSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = ('email',)
 

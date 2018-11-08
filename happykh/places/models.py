@@ -2,8 +2,8 @@
 import logging
 from django.db import models
 from django.utils import timezone
-from users.models import User, CommentAbstract
 from stdimage import models as std_models
+from users.models import (User, CommentAbstract)
 from utils import make_media_file_path
 
 LOGGER = logging.getLogger('happy_logger')
@@ -63,23 +63,15 @@ class Place(models.Model):
     )
     created = models.DateTimeField(editable=False, default=timezone.now)
 
-    def save(self, *args, **kwargs):
-        """
-        On save, update timestamps
-
-        :param args:
-        :param kwargs:
-        :return: place instance
-        """
-        if not self.id:
-            self.created = timezone.now()
-        return super(Place, self).save(*args, **kwargs)
-
     @staticmethod
     def get_place(place_id):
+        """
+        :param  place_id: place id
+        :return: instance of Place or None
+        """
         try:
             return Place.objects.get(pk=place_id)
-        except Place.DoesNotExist:  # pylint: disable = no-member
+        except Place.DoesNotExist:
             LOGGER.error(
                 f'Can`t get place because of invalid id,'
                 f' place_id: {place_id}'

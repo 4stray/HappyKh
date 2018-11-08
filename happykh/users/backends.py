@@ -1,5 +1,4 @@
 """ Support class for user authentication """
-# pylint: disable=unused-argument, no-self-use, no-member
 import logging
 
 from rest_framework import serializers
@@ -47,7 +46,7 @@ class UserAuthentication:
             if user.check_password(user_password):
                 LOGGER.info('User authenticated')
                 return user
-        except User.DoesNotExist:  # pylint: disable = no-member
+        except User.DoesNotExist:
             LOGGER.error('User does not exist while authentication')
         return None
 
@@ -61,7 +60,7 @@ class UserAuthentication:
         try:
             user_id = HASH_IDS.decode(hashed_user_id)[0]
             return User.objects.get(pk=user_id)
-        except User.DoesNotExist:  # pylint: disable = no-member
+        except User.DoesNotExist:
             LOGGER.error(
                 f'Can`t get user profile because of invalid id,'
                 f' user_id: {id}'

@@ -3,7 +3,7 @@ from django.urls import path, include
 
 from . import views
 
-urlpatterns = [  # pylint: disable = invalid-name
+urlpatterns = [
     path('users/', include([
         path('token-validation', views.TokenValidation.as_view()),
         path('login', views.UserLogin.as_view()),
