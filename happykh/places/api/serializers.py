@@ -1,6 +1,6 @@
 """Serializers for model Place"""
 
-from places.models import Place, Address, CommentPlace
+from places.models import Place, Address, CommentPlace, PlaceRating
 from rest_framework import serializers
 from users.api.serializers import CommentAbstractSerializer
 from users.backends import UserHashedIdField
@@ -43,4 +43,10 @@ class CommentPlaceSerializer(CommentAbstractSerializer):
 
     class Meta:
         model = CommentPlace
+        fields = '__all__'
+
+
+class PlaceRatingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PlaceRating
         fields = '__all__'

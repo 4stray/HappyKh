@@ -1,3 +1,4 @@
+""" Views for places """
 import json
 import logging
 
@@ -6,14 +7,17 @@ from django.core.paginator import Paginator
 from happykh.settings import HASH_IDS
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from utils import get_changed_uri
+from users.backends import UserAuthentication
+from happykh.settings import HASH_IDS
 
 from .serializers import (PlaceSerializer, AddressSerializer,
-                          CommentPlaceSerializer)
-from ..models import Place, Address, CommentPlace
+                          CommentPlaceSerializer, PlaceRatingSerializer)
+from ..models import Place, Address, CommentPlace, PlaceRating
 
 LOGGER = logging.getLogger('happy_logger')
 
@@ -39,7 +43,7 @@ class PlacePage(APIView):
             order = request.query_params['order']
             order_by = request.query_params['orderBy']
             if order is not None and order_by is not None:
-                places = Place.order_by(
+                places = Place.objects.order_by(
                     f"{order}{request.query_params['orderBy']}"
                 )
         except KeyError:
@@ -93,9 +97,8 @@ class PlacePage(APIView):
             address_serializer = AddressSerializer(data=data)
             if address_serializer.is_valid():
                 return address_serializer.save().pk
-            else:
-                LOGGER.error(f'Serializer errors: {address_serializer.errors}')
-                return False
+            LOGGER.error(f'Serializer errors: {address_serializer.errors}')
+            return False
         return address.pk
 
 
@@ -221,3 +224,103 @@ class CommentsAPI(APIView):
             raise CustomValidationError
         except (IndexError, CustomValidationError):
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlaceRatingView(APIView):
+    """
+    Display and create place's rating
+    """
+
+    @staticmethod
+    def get_user_from_token(request):
+        """
+        Get user's id from token
+        :param request: HTTP request
+        :return: integer user_id
+        """
+        token = request.META.get('HTTP_AUTHORIZATION').split(' ')
+        token_key = str(token[1])
+        user_token = Token.objects.get(key=token_key)
+        user_id = user_token.user_id
+        return user_id
+
+    @staticmethod
+    def get_valid_request_data(request):
+        """
+        decode user's id and return request data with decoded if
+        :param request: HTTP request
+        :return: dict valid_data
+        """
+        user = UserAuthentication.get_user(request.data['user']).id
+        valid_data = {'user': user,
+                      'place': request.data['place'],
+                      'rating': request.data['rating'],
+                      }
+        return valid_data
+
+    @staticmethod
+    def get_average(place_id):
+        """
+        calculate average rating for place
+        :param place_id: integer place_id
+        :return: float average
+        """
+        ratings = PlaceRating.objects.filter(place=place_id)
+        amount = 0
+        rating = 0
+        for rate in ratings:
+            amount += 1
+            rating += rate.rating
+        average = round(rating / amount, 1)
+        return average
+
+    def get(self, request, place_id):
+        """
+        get average place's rating
+        :param request: HTTP request
+        :param place_id: integer place_id
+        :return: Response with data and status
+        """
+        try:
+            average_rating = self.get_average(place_id)
+            response = {'place': place_id,
+                        'rating': average_rating}
+            return Response(response, status=status.HTTP_200_OK)
+        except (PlaceRating.DoesNotExist, ZeroDivisionError):
+            response = {'place': place_id,
+                        'rating': 0}
+            return Response(response, status=status.HTTP_200_OK)
+
+    def post(self, request, place_id):
+        """
+        create or update user's rating for place
+        :param request: HTTP request
+        :param place_id: integer place_id
+        :return: Response with data and status
+        """
+        user = UserAuthentication.get_user(request.data['user'])
+        user_id = user.id
+        request = self.get_valid_request_data(request)
+        try:
+            """ if rating already exists, update it """
+            rate = PlaceRating.objects.get(place=place_id, user=user_id)
+            rating = PlaceRating.objects.get(pk=rate.id)
+            serializer = PlaceRatingSerializer(data=request)
+            if serializer.is_valid():
+                serializer.update(rating, serializer.validated_data)
+                response = {'place': serializer.data['place'],
+                            'user': HASH_IDS.encode(serializer.data['user']),
+                            'rating': serializer.data['rating']}
+                return Response(response, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        except PlaceRating.DoesNotExist:
+            """ if rating doesn't exist, create a new one """
+        serializer = PlaceRatingSerializer(data=request)
+        if serializer.is_valid():
+            serializer.save()
+            response = {'place': serializer.data['place'],
+                        'user': HASH_IDS.encode(serializer.data['user']),
+                        'rating': serializer.data['rating']}
+            return Response(response, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
