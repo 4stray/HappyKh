@@ -1,6 +1,7 @@
 """Creation model for place and addresses"""
 import logging
 from django.db import models
+from django.utils import timezone
 from users.models import User, CommentAbstract
 from stdimage import models as std_models
 from utils import make_media_file_path
@@ -60,6 +61,19 @@ class Place(models.Model):
         default='',
         variations=VARIATIONS_LOGO,
     )
+    created = models.DateTimeField(editable=False, default=timezone.now)
+
+    def save(self, *args, **kwargs):
+        """
+        On save, update timestamps
+
+        :param args:
+        :param kwargs:
+        :return: place instance
+        """
+        if not self.id:
+            self.created = timezone.now()
+        return super(Place, self).save(*args, **kwargs)
 
     @staticmethod
     def get_place(place_id):
