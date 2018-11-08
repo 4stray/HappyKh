@@ -8,7 +8,7 @@ import PlaceDetail from './views/Place.vue';
 import Profile from './views/Profile.vue';
 import ProfileSettings from './views/ProfileSettings.vue';
 import store from './store';
-import axiosInstance from './axios-config';
+import { axiosInstance } from './axios-requests';
 
 const ifAuthenticated = (to, from, next) => {
   if (store.getters.getAuthenticated) {
@@ -64,13 +64,12 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   if (store.getters.getAuthenticated) {
-    axiosInstance.get('api/users/token-validation')
-      .then((response) => {
-        next();
-      }).catch((error) => {
-        store.dispatch('signOut');
-        next({ name: 'login' });
-      });
+    axiosInstance.get('api/users/token-validation').then((response) => {
+      next();
+    }).catch((error) => {
+      store.dispatch('signOut');
+      next({ name: 'login' });
+    });
   } else {
     next();
   }

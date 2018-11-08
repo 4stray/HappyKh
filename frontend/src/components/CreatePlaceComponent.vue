@@ -35,7 +35,7 @@
 <script>
 import GoogleMapsLoader from 'google-maps';
 import { mapGetters } from 'vuex';
-import axiosInstance from '../axios-config';
+import { axiosInstance } from '../axios-requests';
 
 
 export default {

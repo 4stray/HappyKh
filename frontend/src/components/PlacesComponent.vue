@@ -23,6 +23,7 @@
 
 <script>
 import PlaceCollectionComponent from './PlaceCollectionComponent.vue';
+import { getPlaces } from '../axios-requests';
 
 export default {
   name: 'PlacesComponent',
@@ -35,7 +36,7 @@ export default {
     };
   },
   created() {
-    this.$store.getters.getPlaces.then((response) => {
+    getPlaces().then((response) => {
       this.allPlaces = response.data;
     }).catch((error) => {
       if (error.response === undefined) {

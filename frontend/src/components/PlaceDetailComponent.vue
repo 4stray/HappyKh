@@ -13,8 +13,9 @@
               id="placeName"> {{placeName}}</h3>
           <p v-if="placeDescription" class="subheading"
              id="placeDescription">{{placeDescription}}</p>
-          <p v-else class="text--secondary" id="no_description">Place has no
-            description.</p>
+          <p v-else class="text--secondary"
+             id="no_description">
+            Place has no description.</p>
           <v-label class="d-block" id="labelAddress">Address</v-label>
           <h3 class="subheading" id="placeAddress"> {{placeAddress}}</h3>
         </v-card>
@@ -24,7 +25,7 @@
 </template>
 
 <script>
-const alertText = 'A server error has occurred, try again later';
+import { getPlaceData } from '../axios-requests';
 
 export default {
   name: 'ProfileComponent',
@@ -41,23 +42,23 @@ export default {
   },
   methods: {
     fetchPlaceData() {
-      this.$store.getters.getPlace(this.$route.params.id)
-        .then((response) => {
-          this.placeLogo = response.data.logo;
-          this.placeName = response.data.name;
-          this.placeAddress = response.data.address;
-          this.placeDescription = response.data.description;
-          if (this.placeName === '') {
-            this.$awn.alert(alertText);
-          }
-        }).catch((error) => {
-          if (error.response === undefined || error.response.status !== 200) {
-            this.$awn.alert(alertText);
-            this.$router.go(-1);
-          } else if (error.response.data.message) {
-            this.$awn.warning(error.response.data.message);
-          }
-        });
+      const alertText = 'A server error has occurred, try again later';
+      getPlaceData(this.$route.params.id).then((response) => {
+        this.placeLogo = response.data.logo;
+        this.placeName = response.data.name;
+        this.placeAddress = response.data.address;
+        this.placeDescription = response.data.description;
+        if (this.placeName === '') {
+          this.$awn.alert(alertText);
+        }
+      }).catch((error) => {
+        if (error.response === undefined || error.response.status !== 200) {
+          this.$awn.alert(alertText);
+          this.$router.go(-1);
+        } else if (error.response.data.message) {
+          this.$awn.warning(error.response.data.message);
+        }
+      });
     },
   },
 };

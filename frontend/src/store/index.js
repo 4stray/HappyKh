@@ -1,10 +1,10 @@
 /* eslint-disable */
 import Vue from 'vue';
 import Vuex from 'vuex';
-import axiosInstance from '../axios-config';
+import {axiosInstance} from '../axios-requests';
+
 
 Vue.use(Vuex);
-
 const state = {
   Authenticated: window.$cookies.get('token'),
   UserID: window.$cookies.get('user_id'),
@@ -19,28 +19,18 @@ const getters = {
   },
   getUserID: state => {
     return state.UserID;
-  },
-  getUserData: state => (id) => {
-    return axiosInstance.get('/api/users/' + id);
-  },
-  getPlaces: state => {
-    return axiosInstance.get('/api/places/');
-  },
-  getPlace: state => (id) => {
-    return axiosInstance.get('/api/places/' + id);
-  },
+  }
 };
 
 const actions = {
   signOut(state) {
     state.commit('signOut');
-    axiosInstance.post('/api/users/logout')
-      .then((response) => {
-        console.log('Signed out');
-      }).catch((error) => {
+    axiosInstance.post('/api/users/logout').then((response) => {
+      console.log('Signed out');
+    }).catch((error) => {
       console.log(error);
     });
-  }
+  },
 };
 
 const mutations = {

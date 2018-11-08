@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import axiosInstance from '../axios-config';
+import { axiosInstance } from '../axios-requests';
 
 export default {
   name: 'LoginComponent',

@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import { getUserData } from '../axios-requests';
+
 const GENDER_CHOICES = {
   M: 'Man',
   W: 'Woman',
@@ -55,21 +57,20 @@ export default {
   },
   methods: {
     fetchUserCredentials() {
-      this.$store.getters.getUserData(this.$route.params.id)
-        .then((response) => {
-          this.userFirstName = response.data.first_name;
-          this.userLastName = response.data.last_name;
-          this.userAge = response.data.age;
-          this.userGender = GENDER_CHOICES[response.data.gender];
-          this.userImage = response.data.profile_image;
-          this.enableEditingProfile = response.data.enable_editing_profile;
-        }).catch((error) => {
-          if (error.response === undefined) {
-            this.$awn.alert('A server error has occurred, try again later');
-          } else if (error.response.data.message) {
-            this.$awn.warning(error.response.data.message);
-          }
-        });
+      getUserData(this.$route.params.id).then((response) => {
+        this.userFirstName = response.data.first_name;
+        this.userLastName = response.data.last_name;
+        this.userAge = response.data.age;
+        this.userGender = GENDER_CHOICES[response.data.gender];
+        this.userImage = response.data.profile_image;
+        this.enableEditingProfile = response.data.enable_editing_profile;
+      }).catch((error) => {
+        if (error.response === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else if (error.response.data.message) {
+          this.$awn.warning(error.response.data.message);
+        }
+      });
     },
   },
 };
