@@ -24,11 +24,12 @@
         </v-flex>
     </v-layout>
 </template>
- <script>
- import axios from 'axios';
+<script>
+import axios from 'axios';
 import { mapGetters, store } from 'vuex';
- const BaseURL = 'http://127.0.0.1:8000/api/places/rating/';
- export default {
+
+const BaseURL = 'http://127.0.0.1:8000/api/places/rating/';
+export default {
   name: 'PlaceRatingComponent',
   computed: {
     ...mapGetters({
@@ -41,16 +42,16 @@ import { mapGetters, store } from 'vuex';
       rating: 0,
     };
   },
-   created() {
+  created() {
     this.fetchRating();
   },
-   methods: {
-     fetchRating() {
+  methods: {
+    fetchRating() {
       axios.get(
         `${BaseURL + this.$route.params.id}`,
         {
           headers: { Authorization: `Token ${this.userToken}` },
-         },
+        },
       ).then((response) => {
         this.rating = response.data.rating;
       }).catch((error) => {
@@ -63,18 +64,18 @@ import { mapGetters, store } from 'vuex';
         }
       });
     },
-     save() {
+    save() {
       const ratingData = {
         user: this.userID,
         place: this.$route.params.id,
         rating: this.rating,
       };
-       const method = axios.post;
+      const method = axios.post;
       method(
         `${BaseURL + this.$route.params.id}`, ratingData,
         {
           headers: { Authorization: `Token ${this.userToken}` },
-         },
+        },
       ).then((response) => {
         this.rating = response.data.rating;
         this.$awn.success('The place was successfully rated.');
@@ -90,4 +91,4 @@ import { mapGetters, store } from 'vuex';
     },
   },
 };
- </script>
+</script>

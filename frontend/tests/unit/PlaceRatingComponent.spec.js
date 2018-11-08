@@ -2,13 +2,15 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 import Cookies from 'js-cookie';
 import VueRouter from 'vue-router';
 import PlaceRatingComponent from '../../src/components/PlaceRatingComponent.vue';
- const localVue = createLocalVue();
+
+const localVue = createLocalVue();
 localVue.use(VueRouter);
 const router = new VueRouter();
 const expect = require('chai').expect;
- Cookies.set('token', 'value_');
+
+Cookies.set('token', 'value_');
 Cookies.set('user_id', 'value_');
- describe('PlaceRatingComponent', () => {
+describe('PlaceRatingComponent', () => {
   const wrapper = shallowMount(PlaceRatingComponent, {
     localVue,
     router,
@@ -16,13 +18,13 @@ Cookies.set('user_id', 'value_');
       $cookies: Cookies,
     },
   });
-   it('has attribute for Rating', () => {
+  it('has attribute for Rating', () => {
     expect(PlaceRatingComponent.data()).to.have.property('rating');
   });
   it('has label for Rating', () => {
     expect(wrapper.find('#labelRating').text()).to.be.equal('Rate this place:');
   });
-   it('has button for rating places', () => {
+  it('has button for rating places', () => {
     expect(wrapper.contains('[id="rating-btn"]')).to.be.equal(true);
   });
 });
