@@ -1,3 +1,4 @@
+"""Functions for encoding and decoding data in users app"""
 from Crypto.Cipher import DES
 from happykh.settings import ENCODING_DES_KEY
 

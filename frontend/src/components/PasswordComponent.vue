@@ -17,7 +17,11 @@
                     v-model="confirmationPassword"
                     :rules="passwordRules"
                     label="Confirm new password"></v-text-field>
-      <v-btn type="submit" :disabled="!valid" color="success" block>
+      <v-btn type="submit"
+             v-on:click.native="saveNewPassword"
+             :disabled="!valid"
+             :to="{name: 'login'}"
+             color="success" block>
         submit
       </v-btn>
     </v-form>
@@ -53,6 +57,11 @@ export default {
     };
   },
   methods: {
+    signOut() {
+      this.$awn.success('Password was successfully changed.' +
+                          'Please re-login to renew your session');
+      store.dispatch('signOut');
+    },
     saveNewPassword() {
       if (!this.$refs.form.validate()) {
         this.$refs.form.reset();
@@ -71,7 +80,7 @@ export default {
         `/api/users/${this.userID}/password`,
         userCredentials,
       ).then(() => {
-        this.$awn.success('Password was successfully changed.');
+        this.signOut();
       }).catch((error) => {
         if (error.response === undefined) {
           this.$awn.alert('A server error has occurred, try again later');
