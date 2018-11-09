@@ -59,7 +59,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
         serializer = PlaceSerializer(self.places, many=True)
         expected = serializer.data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(expected, response.data)
+        self.assertEqual(expected, response.data['places'])
 
     def test_post(self):
         data = TEST_PLACE_DATA_POST
