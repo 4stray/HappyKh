@@ -1,4 +1,5 @@
 import 'vuetify/dist/vuetify.min.css';
+import './assets/styles/styles.css';
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import Vue from 'vue';
 import VueAWN from 'vue-awesome-notifications';

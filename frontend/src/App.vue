@@ -13,7 +13,7 @@
   @import '~vue-awesome-notifications/dist/styles/style.scss';
 
   #app {
-    font-family: 'Liberation Sans', sans, sans-serif;
+    font-family: 'Liberation Sans', sans, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
