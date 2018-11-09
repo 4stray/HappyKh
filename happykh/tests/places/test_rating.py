@@ -5,8 +5,8 @@ from rest_framework.test import APITestCase
 from places.api.views import PlaceRatingView
 from places.models import Place, PlaceRating, Address
 from tests.utils import BaseTestCase
-from .test_place import TEST_ADDRESS_DATA
 from users.models import User
+from .test_place import TEST_ADDRESS_DATA
 
 RATING_URL = '/api/places/rating/%d'
 TEST_PLACE_DATA = {
@@ -17,9 +17,9 @@ TEST_PLACE_DATA = {
 
 TEST_USER_DATA = {
     'password': 'testpassword',
-    'age': 20,
+    'age': 18,
     'gender': 'M',
-    'first_name': 'firstName',
+    'first_name': 'name',
     'last_name': 'lastName',
     'is_active': True
 }
@@ -93,4 +93,3 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
         self.assertDictEqual(expected, response.data)
-
