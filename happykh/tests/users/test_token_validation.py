@@ -34,6 +34,9 @@ class TestTokenValidation(BaseTestCase, APITestCase):
             )
 
     def test_valid_token_after_expiration_date(self):
+        """
+        test token's validation after expiration date
+        """
         self.test_user_token.created = (self.test_user_token.created -
                                         datetime.timedelta(days=5))
         self.test_user_token.save()
@@ -41,10 +44,16 @@ class TestTokenValidation(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)
 
     def test_valid_token_before_expiration_date(self):
+        """
+        test token's validation before expiration date
+        """
         response = self.client.get(USERS_TEST_TOKEN_VALIDATION_URL)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_invalid_token(self):
+        """
+        test view response for invalid token
+        """
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'invalid token')
         response = self.client.get(USERS_TEST_TOKEN_VALIDATION_URL)
         self.assertEqual(status.HTTP_401_UNAUTHORIZED, response.status_code)

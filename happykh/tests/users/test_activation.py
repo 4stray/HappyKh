@@ -13,6 +13,7 @@ CORRECT_DATA = {'user_email': CORRECT_EMAIL}
 
 @pytest.mark.django_db
 class ActivationEmailViewTestCase(BaseTestCase, APITestCase):
+    """ Test email activation """
     def setUp(self):
         self.test_user = User.objects.create_user(email=CORRECT_EMAIL,
                                                   password='test123')

@@ -1,3 +1,4 @@
+"""Tests for places"""
 import json
 
 from django.core.paginator import Paginator
@@ -43,6 +44,7 @@ CORRECT_USER_DATA = {
 
 
 class TestPlacePage(BaseTestCase, APITestCase):
+    """Test all places"""
 
     def setUp(self):
         """Create user and place objects"""
@@ -57,6 +59,9 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
 
     def test_get(self):
+        """
+        Test get request for places
+        """
         response = self.client.get(PLACE_URL)
         serializer = PlaceSerializer(self.places, many=True)
         expected = serializer.data
@@ -64,6 +69,9 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertEqual(expected, response.data)
 
     def test_post(self):
+        """
+        Test post request for places
+        """
         data = TEST_PLACE_DATA_POST
         data['user'] = self.hashed_user_id
         data['address'] = json.dumps(TEST_ADDRESS_DATA)
@@ -81,6 +89,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
 
 
 class TestCommentsAPI(BaseTestCase, APITestCase):
+    """Test comments for places"""
 
     def setUp(self):
         """Create user, place and comment objects"""
@@ -106,6 +115,9 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         )
 
     def test_get(self):
+        """
+        Test get request for comments
+        """
         comment = CommentPlace.objects.create(
             creator=self.comment_info['creator'],
             text='com2',
@@ -161,6 +173,9 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
     def test_post(self):
+        """
+        Test post request for comments
+        """
         data = self.comment_info
         data['creator'] = self.hashed_user_id
 
