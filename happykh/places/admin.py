@@ -1,6 +1,6 @@
 """"Customized Admin"""
 from django.contrib import admin
-from .models import Place, Address, CommentPlace
+from .models import Place, Address, CommentPlace, PlaceRating
 
 
 @admin.register(Place)
@@ -26,3 +26,10 @@ class CommentPlaceAdmin(admin.ModelAdmin):
     fields = ['creator', 'creation_time', 'text', 'place']
     list_display = ('creator', 'creation_time', 'text', 'place')
     ordering = ('-creation_time',)
+
+
+@admin.register(PlaceRating)
+class PlaceRatingAdmin(admin.ModelAdmin):
+    """Class for displaying custom PlaceRating model on admin site"""
+    fields = ['user', 'place', 'rating']
+    list_display = ('place', 'user', 'rating')
