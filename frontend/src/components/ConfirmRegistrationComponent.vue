@@ -1,21 +1,15 @@
 <script>
 // @ is an alias to /src
-import { axiosInstance } from '../axios-requests';
+import { getConfirmation } from '../axios-requests';
 
 export default {
   name: 'ConfirmRegistrationComponent',
   created() {
     /* eslint-disable prefer-destructuring */
-    const userId = this.$route.params.userId;
+    const email = this.$route.params.email;
     const emailToken = this.$route.params.emailToken;
 
-    axiosInstance.get(
-      `/api/users/activate/${userId}/${emailToken}/`,
-      {
-        userId,
-        emailToken,
-      },
-    ).then((response) => {
+    getConfirmation(email, emailToken).then((response) => {
       /* eslint-disable-next-line no-console */
       console.log(response.status);
       this.$awn.success('Your account has been activated successfully');

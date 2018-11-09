@@ -31,7 +31,7 @@ const router = new Router({
       component: Login,
     },
     {
-      path: '/confirm_registration/:userId/:emailToken',
+      path: '/confirm_registration/:email/:emailToken',
       name: 'confirm_registration',
       component: ConfirmRegistration,
     },

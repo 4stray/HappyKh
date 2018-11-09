@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, store } from 'vuex';
 import { axiosInstance } from '../axios-requests';
 
 export default {
@@ -76,18 +76,16 @@ export default {
         new_password: this.newPassword,
       };
 
-      axiosInstance.patch(
-        `/api/users/${this.userID}/password`,
-        userCredentials,
-      ).then(() => {
-        this.signOut();
-      }).catch((error) => {
-        if (error.response === undefined) {
-          this.$awn.alert('A server error has occurred, try again later');
-        } else if (error.response.data.message) {
-          this.$awn.warning(error.response.data.message);
-        }
-      });
+      axiosInstance.patch(`/api/users/${this.userID}/password`, userCredentials)
+        .then(() => {
+          this.signOut();
+        }).catch((error) => {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
+        });
       this.$refs.form.reset();
     },
   },

@@ -17,10 +17,10 @@
                       label="Description"
           ></v-textarea>
           <div>
-              <img v-if="placeLogo" v-bind:src=placeLogo id='logo'
-                   alt="Place image"/>
-              <img v-else src="../assets/default_place.png" id='default_logo'
-                   alt="Default place image"/>
+            <img v-if="placeLogo" v-bind:src=placeLogo id='logo'
+                 alt="Place image"/>
+            <img v-else src="../assets/default_place.png" id='default_logo'
+                 alt="Default place image"/>
           </div>
           <input type="file" id="logoInput" v-on:change="changeImage()"
                  accept="image/*"/>
@@ -102,8 +102,8 @@ export default {
       ).then(() => {
         this.$awn.success('Your place was successfully created.');
         this.$router.push({ name: 'home' });
-      }).catch(() => {
-        if (this.error.message === undefined) {
+      }).catch((error) => {
+        if (error.message === undefined) {
           this.$awn.alert('A server error has occurred, try again later');
         } else {
           this.$awn.warning(this.error.message);
@@ -133,7 +133,9 @@ export default {
           address: place.formatted_address,
         };
         this.placeAddress = JSON.stringify(this.placeAddress);
-      } else { this.placeAddress = ''; }
+      } else {
+        this.placeAddress = '';
+      }
     },
   },
 };
