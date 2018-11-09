@@ -1,6 +1,6 @@
 <template>
   <v-layout align-center justify-center row fill-height>
-    <v-flex xs6>
+    <v-flex xs12 md6>
       <v-card class="v-card pa-5 mb-5" id="PlaceEditComponent">
         <h1>Edit the place:</h1>
         <v-form id="placeForm" enctype="multipart/form-data"

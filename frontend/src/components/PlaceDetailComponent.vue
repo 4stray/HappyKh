@@ -93,4 +93,7 @@ export default {
 #placeDescription {
   word-wrap:break-word;
 }
+.material-icons {
+  display: inherit;
+}
 </style>

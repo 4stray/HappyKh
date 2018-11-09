@@ -1,31 +1,31 @@
 <template>
   <v-container>
-    <v-text-field type="text" id="name"
-                        v-model="place.name"
-                        label="Place name"
-    value="something">
-    </v-text-field>
+      <v-text-field type="text" id="name"
+                          v-model="place.name"
+                          label="Place name">
+      </v-text-field>
 
-    <v-text-field id="placeAddress" label="Place Address"
-                  v-model="formatted_address" type="text">
-    </v-text-field>
+      <v-text-field id="placeAddress" label="Place Address"
+                    v-model="formatted_address" type="text">
+      </v-text-field>
 
-    <v-textarea id="description"
-                v-model="place.description"
-                label="Description">
-    </v-textarea>
+      <v-textarea id="description"
+                  v-model="place.description"
+                  label="Description">
+      </v-textarea>
 
-    <div>
-        <img v-if="place.logo" v-bind:src=place.logo id='logo'
-             alt="Place image"/>
-        <img v-else src="../assets/default_place.png" id='default_logo'
-             alt="Default place image"/>
-    </div>
+      <div>
+          <v-img :src="place.logo || require('@/assets/default_place.png')"
+                   height="400px"
+                   width="100%"
+                   name="place-image">
+          </v-img>
+      </div>
 
-    <input type="file" id="logoInput" v-on:change="changeImage()"
-           accept="image/*"/>
+      <input type="file" id="logoInput" v-on:change="changeImage()"
+             accept="image/*"/>
 
-    <v-btn class="success mt-3" type="submit" block>Apply Changes</v-btn>
+      <v-btn class="success mt-3" type="submit" block>Apply Changes</v-btn>
   </v-container>
 </template>
 
