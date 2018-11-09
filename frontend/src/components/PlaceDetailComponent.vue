@@ -18,7 +18,7 @@
           <p v-else class="text--secondary" id="no_description">Place has no description.</p>
           <v-label class="d-block" id="labelAddress">Address</v-label>
           <h3 class="subheading" id="placeAddress"> {{place.address}}</h3>
-
+          <PlaceRatingComponent/>
           <v-btn :to="{name: 'placeEdit', params: {placeId: place.id}}"
              fab dark absolute bottom right color="green">
             <v-icon>edit</v-icon>
@@ -37,12 +37,16 @@
 
 <script>
 import axios from 'axios';
+import PlaceRatingComponent from '@/components/PlaceRatingComponent.vue';
 
 const PlaceAPI = 'http://127.0.0.1:8000/api/places/';
 const alertText = 'A server error has occurred, try again later';
 
 export default {
   name: 'ProfileComponent',
+  components: {
+    PlaceRatingComponent,
+  },
   props: {
     place: {
       type: Object,

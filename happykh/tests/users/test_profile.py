@@ -3,7 +3,6 @@ import os
 from io import BytesIO
 
 from PIL import Image
-# pylint: disable = no-member
 from django.core.files.uploadedfile import UploadedFile
 from rest_framework import status
 from rest_framework.authtoken.models import Token

@@ -3,9 +3,8 @@
     <v-flex xs6>
       <v-card class="v-card pa-5 mb-5" id="createPlaceComponent">
         <h1>Create your place:</h1>
-        <v-form id="placeForm" enctype="multipart/form-data"
-                @submit.prevent="save">
-          <PlaceFormComponent/>
+        <v-form id="placeForm" enctype="multipart/form-data">
+          <PlaceFormComponent @createPlace="save"/>
         </v-form>
       </v-card>
     </v-flex>
@@ -14,7 +13,6 @@
 
 <script>
 import axios from 'axios';
-import GoogleMapsLoader from 'google-maps';
 import PlaceFormComponent from '../components/PlaceFormComponent.vue';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
@@ -24,27 +22,24 @@ export default {
     PlaceFormComponent,
   },
   methods: {
-    save() {
-      const imageFile = document.querySelector('#logoInput');
-      const formData = new FormData();
-      formData.set('user', this.userID);
-      formData.set('name', this.placeName);
-      formData.set('address', this.placeAddress);
-      formData.set('description', this.placeDescription);
-      formData.append('logo', imageFile.files[0]);
+    save(formData) {
+      console.log(this.$store.getters.getToken);
+
       axios.post(
         `${BaseURL}/places/`, formData,
         {
           headers: {
-            Authorization: `Token ${this.userToken}`,
+            Authorization: `Token ${this.$store.getters.getToken}`,
             'Content-Type': 'multipart/form-data',
           },
         },
       ).then(() => {
+        debugger;
         this.$awn.success('Your place was successfully created.');
         this.$router.push({ name: 'home' });
-      }).catch(() => {
-        if (this.error.message === undefined) {
+      }).catch((error) => {
+        debugger;
+        if (error.message === undefined) {
           this.$awn.alert('A server error has occurred, try again later');
         } else {
           this.$awn.warning(this.error.message);

@@ -12,6 +12,7 @@ import Header from '@/components/Header.vue';
 import PlaceDetailComponent from '@/components/PlaceDetailComponent.vue';
 import GoBackComponent from '@/components/GoBackComponent.vue';
 
+
 export default {
   name: 'Profile',
   components: {

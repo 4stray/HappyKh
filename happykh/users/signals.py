@@ -1,3 +1,4 @@
+"""Module for signals connected with models form users app"""
 import logging
 
 from django.db.models.signals import pre_delete
