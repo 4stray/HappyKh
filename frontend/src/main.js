@@ -1,10 +1,10 @@
 import 'vuetify/dist/vuetify.min.css';
-import './assets/styles/styles.css';
 import 'material-design-icons-iconfont/dist/material-design-icons.css';
 import Vue from 'vue';
 import VueAWN from 'vue-awesome-notifications';
 import VueCookies from 'vue-cookies';
 import Vuetify from 'vuetify';
+import './assets/styles/styles.css';
 import App from './App.vue';
 import router from './router';
 import store from './store';
