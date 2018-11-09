@@ -5,26 +5,7 @@
         <h1>Edit the place:</h1>
         <v-form id="placeForm" enctype="multipart/form-data"
                 @submit.prevent="save">
-          <v-text-field type="text" id="name"
-                        v-model="place.name"
-                        label="Place name"
-          ></v-text-field>
-          <v-text-field id="placeAddress" label="Place Address"
-                        v-model="place.address" type="text">
-          </v-text-field>
-          <v-textarea id="description"
-                      v-model="place.description"
-                      label="Description"
-          ></v-textarea>
-          <div>
-              <img v-if="place.logo" v-bind:src=place.logo id='logo'
-                   alt="Place image"/>
-              <img v-else src="../assets/default_place.png" id='default_logo'
-                   alt="Default place image"/>
-          </div>
-          <input type="file" id="logoInput" v-on:change="changeImage()"
-                 accept="image/*"/>
-          <v-btn class="success mt-3" type="submit" block>Apply Changes</v-btn>
+          <PlaceFormComponent />
         </v-form>
       </v-card>
     </v-flex>
@@ -33,19 +14,13 @@
 
 <script>
 import axios from 'axios';
+import PlaceFormComponent from '../components/PlaceFormComponent.vue';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
   name: 'PlaceEditComponent',
-  data() {
-    return {
-      place: {
-        name: '',
-        logo: '',
-        description: '',
-        address: '',
-      },
-    };
+  components: {
+    PlaceFormComponent,
   },
   created() {
     const placeId = this.$route.params.placeId;
@@ -87,17 +62,6 @@ export default {
         }).catch(() => {
           this.$awn.warning(this.error.message);
         });
-    },
-    changeImage() {
-      const file = document.getElementById('logoInput').files[0];
-      const reader = new FileReader();
-
-      const self = this;
-      reader.addEventListener('load', () => {
-        self.placeLogo = reader.result;
-      }, false);
-
-      reader.readAsDataURL(file);
     },
   },
 };

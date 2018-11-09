@@ -43,7 +43,7 @@ const alertText = 'A server error has occurred, try again later';
 
 export default {
   name: 'ProfileComponent',
-   props: {
+  props: {
     place: {
       type: Object,
       default() {
