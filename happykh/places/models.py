@@ -88,3 +88,15 @@ class CommentPlace(CommentAbstract):
     standard comment was created.
     """
     place = models.ForeignKey(Place, on_delete=models.CASCADE)
+
+
+class PlaceRating(models.Model):
+    """
+    Create model for place rating
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)
+    rating = models.FloatField(blank=False)
+
+    def __str__(self):
+        return self.place.name
