@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 from .base import *
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.18.220.118.56']
 
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
