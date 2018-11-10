@@ -3,9 +3,7 @@
     <v-flex xs6>
       <v-card class="v-card pa-5 mb-5" id="createPlaceComponent">
         <h1>Create your place:</h1>
-        <v-form id="placeForm" enctype="multipart/form-data">
           <PlaceFormComponent @createPlace="save"/>
-        </v-form>
       </v-card>
     </v-flex>
   </v-layout>
@@ -34,11 +32,9 @@ export default {
           },
         },
       ).then(() => {
-        debugger;
         this.$awn.success('Your place was successfully created.');
         this.$router.push({ name: 'home' });
       }).catch((error) => {
-        debugger;
         if (error.message === undefined) {
           this.$awn.alert('A server error has occurred, try again later');
         } else {

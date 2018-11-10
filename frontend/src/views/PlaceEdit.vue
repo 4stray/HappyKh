@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import PlaceEditComponent from '../components/PlaceEditComponent.vue';
+import PlaceEditComponent from '@/components/PlaceEditComponent.vue';
 import GoBackComponent from '@/components/GoBackComponent.vue';
 
 export default {

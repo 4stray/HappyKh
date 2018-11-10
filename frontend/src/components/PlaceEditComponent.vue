@@ -3,10 +3,7 @@
     <v-flex xs12 md6>
       <v-card class="v-card pa-5 mb-5" id="PlaceEditComponent">
         <h1>Edit the place:</h1>
-        <v-form id="placeForm" enctype="multipart/form-data"
-                @submit.prevent="save">
-          <PlaceFormComponent @updatePlace="save"/>
-        </v-form>
+          <PlaceFormComponent :placeProp="place" @updatePlace="save"/>
       </v-card>
     </v-flex>
   </v-layout>
@@ -21,6 +18,9 @@ export default {
   name: 'PlaceEditComponent',
   components: {
     PlaceFormComponent,
+  },
+  props: {
+    place: '',
   },
   created() {
     const placeId = this.$route.params.placeId;
@@ -41,7 +41,9 @@ export default {
   },
   methods: {
     save(formData) {
-      console.log(formData);
+      const event = formData;
+
+      console.log(event);
     },
   },
 };

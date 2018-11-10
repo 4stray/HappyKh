@@ -1,16 +1,16 @@
 <template>
-  <v-container>
-    <v-text-field type="text" id="name"
-                  v-model="place.name"
-                      label="Place name">
+  <v-form id="placeForm" enctype="multipart/form-data"
+          @submit.prevent="createOrUpdatePlace">
+
+    <v-text-field type="text" id="name" v-model="place.name"
+                  label="Place name">
     </v-text-field>
 
     <v-text-field id="placeAddress" label="Place Address"
                   v-model="formatted_address" type="text">
     </v-text-field>
 
-    <v-textarea id="description"
-                v-model="place.description"
+    <v-textarea id="description" v-model="place.description"
                 label="Description">
     </v-textarea>
 
@@ -18,31 +18,52 @@
            height="400px" width="100%" name="place-image">
     </v-img>
 
-    <input type="file" id="logoInput" v-on:change="changeImage()"
+    <input type="file" id="logoInput" v-on:change="changeImage"
            accept="image/*"/>
 
-    <v-btn class="success mt-3" type="submit" block v-on:click="updatePlace">
+    <v-btn class="success mt-3" type="submit" block
+           v-on:click="createOrUpdatePlace">
       Apply Changes
     </v-btn>
-  </v-container>
+  </v-form>
 </template>
 
 <script>
 import GoogleMapsLoader from 'google-maps';
 
 export default {
-  name: "PlaceFormComponent",
+  name: 'PlaceFormComponent',
+  props: {
+    placeProp: {
+      type: Object,
+      default() {
+        return {
+          id: 0,
+          name: '',
+          logo: '',
+          description: '',
+          address: '',
+        };
+      },
+    },
+  },
   data() {
     return {
-      place: {
-        name: 'place data',
-        logo: '',
-        description: '',
-        address: '',
-      },
-      formatted_address: '',
       autocomplete: null,
+      // formatted_address: '',
     };
+  },
+  computed: {
+    place() {
+      // this.formatted_address = this.place.address;
+      return this.placeProp;
+    },
+    formatted_address() {
+      if (this.autocomplete) {
+        return this.onChange();
+      }
+      return this.place.address;
+    },
   },
   mounted() {
     GoogleMapsLoader.KEY = process.env.VUE_APP_GOOGLE_API;
@@ -65,17 +86,17 @@ export default {
         radius: 20000,
       });
       this.autocomplete.setBounds(circle.getBounds());
-      this.autocomplete.addListener('place_changed', this.onChange);
+      // this.autocomplete.addListener('place_changed', this.onChange);
+      this.formatted_address();
     });
   },
   methods: {
-    updatePlace() {
+    createOrUpdatePlace() {
       const imageFile = document.querySelector('#logoInput');
       const placeId = this.$route.params.placeId;
 
       const formData = new FormData();
 
-      console.log(this.$store.getters.getUserID);
       formData.set('user', this.$store.getters.getUserID);
       formData.set('name', this.place.name);
       formData.set('description', this.place.description);
@@ -104,7 +125,7 @@ export default {
     onChange() {
       const place = this.autocomplete.getPlace();
       if (Object.keys(place).length > 1) {
-        this.formatted_address = place.formatted_address;
+        // this.formatted_address = place.formatted_address;
         this.place.address = {
           latitude:
             place.geometry.location.toJSON().lat.toFixed(10),
@@ -112,13 +133,15 @@ export default {
             place.geometry.location.toJSON().lng.toFixed(10),
           address: place.formatted_address,
         };
-        this.place.address = JSON.stringify(this.place.address);
-      } else {
-        this.place.address = '';
+        this.place.address = JSON.stringify(this.placeAddress);
+        return place.formatted_address;
       }
+
+      this.place.address = '';
+      return this.place.address;
     },
   },
-}
+};
 </script>
 
 <style scoped>
