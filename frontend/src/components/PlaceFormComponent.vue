@@ -101,9 +101,8 @@ export default {
       const file = document.getElementById('logoInput').files[0];
       const reader = new FileReader();
 
-      const self = this;
       reader.addEventListener('load', () => {
-        self.place.logo = reader.result;
+        this.place.logo = reader.result;
       }, false);
 
       reader.readAsDataURL(file);

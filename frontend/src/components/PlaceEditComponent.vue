@@ -11,8 +11,8 @@
 
 <script>
 import PlaceFormComponent from '../components/PlaceFormComponent.vue';
+import { getPlaceData } from '../axios-requests';
 
-const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
   name: 'PlaceEditComponent',
   components: {
@@ -24,7 +24,7 @@ export default {
   created() {
     const placeId = this.$route.params.placeId;
 
-    this.$store.getters.getPlace(placeId).then((response) => {
+    getPlaceData(placeId).then((response) => {
       this.place = {
         name: response.data.name,
         logo: response.data.logo,

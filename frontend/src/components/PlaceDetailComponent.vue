@@ -9,7 +9,7 @@
       </v-btn>
     </v-flex>
     <v-flex offset-md3 md6 xs12>
-      <v-layout justify-start column>
+      <v-layout column>
         <v-card id="main" class="px-5 py-3">
           <v-img :src="place.logo || require('@/assets/default_place.png')"
                  height="400px"
@@ -20,16 +20,12 @@
           <v-spacer></v-spacer>
 
           <h3 class="headline mb-2 font-weight-bold"
-            id="placeName"> {{place.name}}</h3>
-
-          <p v-if="place.description" class="subheading text-xs-justify"
-             id="placeDescription">
-            {{place.description}}
-          </p>
-
-          <p v-else class="text--secondary" id="no_description">
-            Place has no description.
-          </p>
+              id="placeName"> {{place.name}}</h3>
+          <p v-if="place.description" class="subheading"
+             id="placeDescription">{{place.description}}</p>
+          <p v-else class="text--secondary"
+             id="no_description">
+            Place has no description.</p>
 
           <v-label class="d-block" id="labelAddress">Address</v-label>
 
@@ -46,10 +42,7 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const PlaceAPI = 'http://127.0.0.1:8000/api/places/';
-const alertText = 'A server error has occurred, try again later';
+import { getPlaceData } from '../axios-requests';
 
 export default {
   name: 'ProfileComponent',
@@ -69,12 +62,8 @@ export default {
   },
   methods: {
     fetchPlaceData() {
-      axios.get(
-        `${PlaceAPI + this.$route.params.id}`,
-        {
-          headers: { Authorization: `Token ${this.$store.getters.getToken}` },
-        },
-      ).then((response) => {
+      const alertText = 'A server error has occurred, try again later';
+      getPlaceData(this.$route.params.id).then((response) => {
         this.place = {
           id: response.data.id,
           logo: response.data.logo,
@@ -101,7 +90,8 @@ export default {
 
 <style scoped>
 #placeDescription {
-  word-wrap:break-word;
+  word-wrap: break-word;
+  text-align: justify;
 }
 .material-icons {
   display: inherit;

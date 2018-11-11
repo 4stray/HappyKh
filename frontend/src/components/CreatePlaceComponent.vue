@@ -10,10 +10,9 @@
 </template>
 
 <script>
-import axios from 'axios';
 import PlaceFormComponent from '../components/PlaceFormComponent.vue';
+import { axiosInstance } from '../axios-requests';
 
-const BaseURL = 'http://127.0.0.1:8000/api';
 export default {
   name: 'createPlaceComponent',
   components: {
@@ -21,11 +20,10 @@ export default {
   },
   methods: {
     createPlace(formData) {
-      axios.post(
-        `${BaseURL}/places/`, formData,
+      axiosInstance.post(
+        '/api/places/', formData,
         {
           headers: {
-            Authorization: `Token ${this.$store.getters.getToken}`,
             'Content-Type': 'multipart/form-data',
           },
         },

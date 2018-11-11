@@ -1,7 +1,8 @@
 /* eslint-disable */
 import Vue from 'vue';
 import Vuex from 'vuex';
-import axios from 'axios';
+import {axiosInstance} from '../axios-requests';
+
 
 Vue.use(Vuex);
 const state = {
@@ -16,41 +17,20 @@ const getters = {
   getToken: state => {
     return state.Authenticated;
   },
-  getPlace: (state) => (placeId) => {
-    const URLConfig = {
-      headers: {
-        Authorization: `Token ${getters.getToken(state)}`,
-      },
-    };
-    const placesURL = `http://127.0.0.1:8000/api/places/${placeId}`;
-
-    return axios.get(placesURL, URLConfig);
-  },
   getUserID: state => {
     return state.UserID;
-  },
+  }
 };
 
 const actions = {
   signOut(state) {
-    const urlLogOut =
-      'http://127.0.0.1:8000/api/users/logout';
-
-    const token = this.getters.getToken;
-
     state.commit('signOut');
-
-    axios.post(
-      urlLogOut,
-      {},
-      {
-        headers: { Authorization: `Token ${token}` },
-      }).then((response) => {
-        console.log('Signed out');
-      }).catch((error) => {
-        console.log(error);
-      });
-  }
+    axiosInstance.post('/api/users/logout').then((response) => {
+      console.log('Signed out');
+    }).catch((error) => {
+      console.log(error);
+    });
+  },
 };
 
 const mutations = {
