@@ -7,7 +7,7 @@
     </v-text-field>
 
     <v-text-field id="placeAddress" label="Place Address"
-                  v-model="formattedAddress" type="text">
+                  v-model="place.address.address" type="text">
     </v-text-field>
 
     <v-textarea id="description" v-model="place.description"
@@ -40,7 +40,16 @@ export default {
           name: '',
           logo: '',
           description: '',
-          address: '',
+          address: {
+            type: Object,
+            default() {
+              return {
+                longitude: '',
+                latitude: '',
+                address: '',
+              };
+            },
+          },
         };
       },
     },
@@ -48,13 +57,7 @@ export default {
   data() {
     return {
       autocomplete: null,
-      formattedAddress: '',
     };
-  },
-  watch: {
-    place(newPlaceValue) {
-      this.formattedAddress = newPlaceValue.address;
-    },
   },
   mounted() {
     GoogleMapsLoader.KEY = process.env.VUE_APP_GOOGLE_API;
@@ -83,7 +86,6 @@ export default {
   methods: {
     savePlace() {
       const placeId = this.$route.params.placeId;
-      const imageFile = document.querySelector('#logoInput');
       const formData = new FormData();
 
       if (placeId) {
@@ -92,8 +94,8 @@ export default {
       formData.set('user', this.$store.getters.getUserID);
       formData.set('name', this.place.name);
       formData.set('description', this.place.description);
-      formData.set('address', this.place.address);
-      formData.append('logo', imageFile.files[0]);
+      formData.set('address', JSON.stringify(this.place.address));
+      formData.append('logo', document.querySelector('#logoInput').files[0]);
 
       this.$emit('savePlace', formData);
     },
@@ -110,7 +112,7 @@ export default {
     onChange() {
       const place = this.autocomplete.getPlace();
       if (Object.keys(place).length > 1) {
-        this.formattedAddress = place.formatted_address;
+        this.place.formattedAddress = place.formatted_address;
         this.place.address = {
           latitude:
             place.geometry.location.toJSON().lat.toFixed(10),
@@ -118,9 +120,8 @@ export default {
             place.geometry.location.toJSON().lng.toFixed(10),
           address: place.formatted_address,
         };
-        this.place.address = JSON.stringify(this.place.address);
       } else {
-        this.place.address = '';
+        this.place.address = {};
       }
     },
   },

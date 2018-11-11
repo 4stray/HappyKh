@@ -11,7 +11,7 @@
 
 <script>
 import PlaceFormComponent from '../components/PlaceFormComponent.vue';
-import { getPlaceData } from '../axios-requests';
+import { axiosInstance, getPlaceData } from '../axios-requests';
 
 export default {
   name: 'PlaceEditComponent',
@@ -40,9 +40,25 @@ export default {
   },
   methods: {
     updatePlace(formData) {
-      const event = formData;
+      const placeId = this.$route.params.placeId;
 
-      console.log(event);
+      axiosInstance.put(
+        `/api/places/${placeId}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      ).then(() => {
+        this.$awn.success('Your place was successfully edited.');
+      }).catch((error) => {
+        if (error.message) {
+          this.$awn.warning(error.message);
+        } else {
+          this.$awn.alert('A server error has occurred, try again later');
+        }
+      });
     },
   },
 };

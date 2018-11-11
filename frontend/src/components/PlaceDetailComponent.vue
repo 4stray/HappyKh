@@ -29,7 +29,9 @@
 
           <v-label class="d-block" id="labelAddress">Address</v-label>
 
-          <h3 class="subheading" id="placeAddress"> {{place.address}}</h3>
+          <h3 class="subheading" id="placeAddress">
+            {{place.address.address}}
+          </h3>
 
           <v-btn :to="{name: 'placeEdit', params: {placeId: place.id}}"
                  fab dark absolute top right color="green">
@@ -53,7 +55,11 @@ export default {
         name: '',
         logo: '',
         description: '',
-        address: '',
+        address: {
+          longitude: '',
+          latitude: '',
+          address: '',
+        },
       },
     };
   },

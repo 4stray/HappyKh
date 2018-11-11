@@ -128,6 +128,33 @@ class PlaceSinglePage(APIView):
         place_serializer = PlaceSerializer(single_place, context=place_context)
         return Response(place_serializer.data, status=status.HTTP_200_OK)
 
+    def put(self, request, place_id):
+        """
+        Updates place by given place id
+        :param request: HTTP Request
+        :param place_id: place's id
+        :return: status code
+        """
+        single_place = Place.get_place(place_id)
+
+        request_data = request.data.copy()
+        address_data = json.loads(request_data.get('address'))
+        request_data['address'] = PlacePage.get_address_pk(data=address_data)
+
+        place_serializer = PlaceSerializer(data=request_data)
+
+        if not single_place:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        elif not place_serializer.is_valid():
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            place_serializer.update(
+                single_place,
+                place_serializer.validated_data
+            )
+
+        return Response(status=status.HTTP_200_OK)
+
 
 class CommentsAPI(APIView):
     """Get comments for a place or create new one for place"""
