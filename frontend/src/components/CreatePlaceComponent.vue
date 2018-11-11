@@ -17,10 +17,10 @@
                       label="Description"
           ></v-textarea>
           <div>
-              <img v-if="placeLogo" v-bind:src=placeLogo id='logo'
-                   alt="Place image"/>
-              <img v-else src="../assets/default_place.png" id='default_logo'
-                   alt="Default place image"/>
+            <img v-if="placeLogo" v-bind:src=placeLogo id='logo'
+                 alt="Place image"/>
+            <img v-else src="../assets/default_place.png" id='default_logo'
+                 alt="Default place image"/>
           </div>
           <input type="file" id="logoInput" v-on:change="changeImage()"
                  accept="image/*"/>
@@ -33,11 +33,11 @@
 </template>
 
 <script>
-import axios from 'axios';
 import GoogleMapsLoader from 'google-maps';
 import { mapGetters } from 'vuex';
+import { axiosInstance } from '../axios-requests';
 
-const BaseURL = 'http://127.0.0.1:8000/api';
+
 export default {
   name: 'createPlaceComponent',
   data() {
@@ -92,19 +92,18 @@ export default {
       formData.set('address', this.placeAddress);
       formData.set('description', this.placeDescription);
       formData.append('logo', imageFile.files[0]);
-      axios.post(
-        `${BaseURL}/places/`, formData,
+      axiosInstance.post(
+        '/api/places/', formData,
         {
           headers: {
-            Authorization: `Token ${this.userToken}`,
             'Content-Type': 'multipart/form-data',
           },
         },
       ).then(() => {
         this.$awn.success('Your place was successfully created.');
         this.$router.push({ name: 'home' });
-      }).catch(() => {
-        if (this.error.message === undefined) {
+      }).catch((error) => {
+        if (error.message === undefined) {
           this.$awn.alert('A server error has occurred, try again later');
         } else {
           this.$awn.warning(this.error.message);
@@ -134,7 +133,9 @@ export default {
           address: place.formatted_address,
         };
         this.placeAddress = JSON.stringify(this.placeAddress);
-      } else { this.placeAddress = ''; }
+      } else {
+        this.placeAddress = '';
+      }
     },
   },
 };

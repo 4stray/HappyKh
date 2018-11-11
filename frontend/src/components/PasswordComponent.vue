@@ -29,10 +29,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { mapGetters, store } from 'vuex';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+import { axiosInstance } from '../axios-requests';
 
 export default {
   name: 'PasswordComponent',
@@ -77,20 +75,17 @@ export default {
         old_password: this.oldPassword,
         new_password: this.newPassword,
       };
-      axios.patch(
-        `${UserAPI + this.userID}/password`, userCredentials,
-        {
-          headers: { Authorization: `Token ${this.userToken}` },
-        },
-      ).then(() => {
-        this.signOut();
-      }).catch((error) => {
-        if (error.response === undefined) {
-          this.$awn.alert('A server error has occurred, try again later');
-        } else if (error.response.data.message) {
-          this.$awn.warning(error.response.data.message);
-        }
-      });
+
+      axiosInstance.patch(`/api/users/${this.userID}/password`, userCredentials)
+        .then(() => {
+          this.signOut();
+        }).catch((error) => {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
+        });
       this.$refs.form.reset();
     },
   },
