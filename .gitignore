@@ -117,4 +117,5 @@ dmypy.json
 .idea
 media/
 package-lock.json
-env_varibles.txt
+env_variables.txt
+*/static/*

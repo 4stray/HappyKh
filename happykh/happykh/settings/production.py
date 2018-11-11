@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 from .base import *
 
-ALLOWED_HOSTS = ['.18.220.118.56']
+ALLOWED_HOSTS = ['18.218.25.240']
 
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
@@ -26,3 +26,10 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+CORS_ORIGIN_REGEX_WHITELIST = (
+    # For Client
+    r'http://localhost*',
+    r'http://127.0.0.1:*',
+    r'http://18.218.25.240:*',
+)
