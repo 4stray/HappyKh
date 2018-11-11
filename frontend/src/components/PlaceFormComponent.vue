@@ -1,13 +1,13 @@
 <template>
   <v-form id="placeForm" enctype="multipart/form-data"
-          @submit.prevent="createOrUpdatePlace">
+          @submit.prevent="savePlace">
 
     <v-text-field type="text" id="name" v-model="place.name"
                   label="Place name">
     </v-text-field>
 
     <v-text-field id="placeAddress" label="Place Address"
-                  v-model="formatted_address" type="text">
+                  v-model="formattedAddress" type="text">
     </v-text-field>
 
     <v-textarea id="description" v-model="place.description"
@@ -20,9 +20,7 @@
 
     <input type="file" id="logoInput" v-on:change="changeImage"
            accept="image/*"/>
-
-    <v-btn class="success mt-3" type="submit" block
-           v-on:click="createOrUpdatePlace">
+    <v-btn class="success mt-3" type="submit" block>
       Apply Changes
     </v-btn>
   </v-form>
@@ -34,7 +32,7 @@ import GoogleMapsLoader from 'google-maps';
 export default {
   name: 'PlaceFormComponent',
   props: {
-    placeProp: {
+    place: {
       type: Object,
       default() {
         return {
@@ -50,19 +48,12 @@ export default {
   data() {
     return {
       autocomplete: null,
-      // formatted_address: '',
+      formattedAddress: '',
     };
   },
-  computed: {
-    place() {
-      // this.formatted_address = this.place.address;
-      return this.placeProp;
-    },
-    formatted_address() {
-      if (this.autocomplete) {
-        return this.onChange();
-      }
-      return this.place.address;
+  watch: {
+    place(newPlaceValue) {
+      this.formattedAddress = newPlaceValue.address;
     },
   },
   mounted() {
@@ -86,30 +77,25 @@ export default {
         radius: 20000,
       });
       this.autocomplete.setBounds(circle.getBounds());
-      // this.autocomplete.addListener('place_changed', this.onChange);
-      this.formatted_address();
+      this.autocomplete.addListener('place_changed', this.onChange);
     });
   },
   methods: {
-    createOrUpdatePlace() {
-      const imageFile = document.querySelector('#logoInput');
+    savePlace() {
       const placeId = this.$route.params.placeId;
-
+      const imageFile = document.querySelector('#logoInput');
       const formData = new FormData();
 
+      if (placeId) {
+        formData.set('id', placeId);
+      }
       formData.set('user', this.$store.getters.getUserID);
       formData.set('name', this.place.name);
       formData.set('description', this.place.description);
       formData.set('address', this.place.address);
       formData.append('logo', imageFile.files[0]);
 
-      if (placeId) {
-        formData.set('id', placeId);
-
-        this.$emit('updatePlace', formData);
-      } else {
-        this.$emit('createPlace', formData);
-      }
+      this.$emit('savePlace', formData);
     },
     changeImage() {
       const file = document.getElementById('logoInput').files[0];
@@ -125,7 +111,7 @@ export default {
     onChange() {
       const place = this.autocomplete.getPlace();
       if (Object.keys(place).length > 1) {
-        // this.formatted_address = place.formatted_address;
+        this.formattedAddress = place.formatted_address;
         this.place.address = {
           latitude:
             place.geometry.location.toJSON().lat.toFixed(10),
@@ -133,12 +119,10 @@ export default {
             place.geometry.location.toJSON().lng.toFixed(10),
           address: place.formatted_address,
         };
-        this.place.address = JSON.stringify(this.placeAddress);
-        return place.formatted_address;
+        this.place.address = JSON.stringify(this.place.address);
+      } else {
+        this.place.address = '';
       }
-
-      this.place.address = '';
-      return this.place.address;
     },
   },
 };

@@ -3,7 +3,7 @@
     <v-flex xs6>
       <v-card class="v-card pa-5 mb-5" id="createPlaceComponent">
         <h1>Create your place:</h1>
-          <PlaceFormComponent @createPlace="save"/>
+          <PlaceFormComponent @savePlace="createPlace"/>
       </v-card>
     </v-flex>
   </v-layout>
@@ -20,9 +20,7 @@ export default {
     PlaceFormComponent,
   },
   methods: {
-    save(formData) {
-      console.log(this.$store.getters.getToken);
-
+    createPlace(formData) {
       axios.post(
         `${BaseURL}/places/`, formData,
         {

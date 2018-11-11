@@ -16,17 +16,27 @@
                  width="100%"
                  name="place-image">
           </v-img>
+
           <v-spacer></v-spacer>
+
           <h3 class="headline mb-2 font-weight-bold"
             id="placeName"> {{place.name}}</h3>
+
           <p v-if="place.description" class="subheading text-xs-justify"
-            id="placeDescription">{{place.description}}</p>
-          <p v-else class="text--secondary" id="no_description">Place has no description.</p>
+             id="placeDescription">
+            {{place.description}}
+          </p>
+
+          <p v-else class="text--secondary" id="no_description">
+            Place has no description.
+          </p>
+
           <v-label class="d-block" id="labelAddress">Address</v-label>
+
           <h3 class="subheading" id="placeAddress"> {{place.address}}</h3>
 
           <v-btn :to="{name: 'placeEdit', params: {placeId: place.id}}"
-             fab dark absolute top right color="green">
+                 fab dark absolute top right color="green">
             <v-icon>edit</v-icon>
           </v-btn>
         </v-card>
@@ -43,19 +53,16 @@ const alertText = 'A server error has occurred, try again later';
 
 export default {
   name: 'ProfileComponent',
-  props: {
-    place: {
-      type: Object,
-      default() {
-        return {
-          id: 0,
-          name: '',
-          logo: '',
-          description: '',
-          address: '',
-        };
+  data() {
+    return {
+      place: {
+        id: 0,
+        name: '',
+        logo: '',
+        description: '',
+        address: '',
       },
-    },
+    };
   },
   created() {
     this.fetchPlaceData();
@@ -68,11 +75,14 @@ export default {
           headers: { Authorization: `Token ${this.$store.getters.getToken}` },
         },
       ).then((response) => {
-        this.place.id = response.data.id;
-        this.place.logo = response.data.logo;
-        this.place.name = response.data.name;
-        this.place.address = response.data.address;
-        this.place.description = response.data.description;
+        this.place = {
+          id: response.data.id,
+          logo: response.data.logo,
+          name: response.data.name,
+          address: response.data.address,
+          description: response.data.description,
+        };
+
         if (this.place.name === '') {
           this.$awn.alert(alertText);
         }

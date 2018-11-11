@@ -3,14 +3,13 @@
     <v-flex xs12 md6>
       <v-card class="v-card pa-5 mb-5" id="PlaceEditComponent">
         <h1>Edit the place:</h1>
-          <PlaceFormComponent :placeProp="place" @updatePlace="save"/>
+          <PlaceFormComponent :place="place" @savePlace="updatePlace"/>
       </v-card>
     </v-flex>
   </v-layout>
 </template>
 
 <script>
-import axios from 'axios';
 import PlaceFormComponent from '../components/PlaceFormComponent.vue';
 
 const BaseURL = 'http://127.0.0.1:8000/api';
@@ -40,7 +39,7 @@ export default {
     });
   },
   methods: {
-    save(formData) {
+    updatePlace(formData) {
       const event = formData;
 
       console.log(event);
