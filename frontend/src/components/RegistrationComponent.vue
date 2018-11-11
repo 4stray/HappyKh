@@ -28,9 +28,7 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const UserAPI = 'http://localhost:8000/api/users';
+import { axiosInstance } from '../axios-requests';
 
 export default {
   name: 'RegistrationComponent',
@@ -75,7 +73,7 @@ export default {
         first_name: this.userFirstName,
       };
 
-      axios.post(`${UserAPI}/registration`, userCredentials)
+      axiosInstance.post('/api/users/registration', userCredentials)
         .then(() => {
           this.$awn.success('Successful registration.' +
             ' Please check your mailbox for confirmation email.');

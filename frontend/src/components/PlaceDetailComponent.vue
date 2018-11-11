@@ -7,13 +7,15 @@
                  height="400px"
                  width="100%"
                  name="place-image">
-        </v-img>
+          </v-img>
           <v-spacer></v-spacer>
           <h3 class="headline mb-2 font-weight-bold"
-            id="placeName"> {{placeName}}</h3>
+              id="placeName"> {{placeName}}</h3>
           <p v-if="placeDescription" class="subheading"
-            id="placeDescription">{{placeDescription}}</p>
-          <p v-else class="text--secondary" id="no_description">Place has no description.</p>
+             id="placeDescription">{{placeDescription}}</p>
+          <p v-else class="text--secondary"
+             id="no_description">
+            Place has no description.</p>
           <v-label class="d-block" id="labelAddress">Address</v-label>
           <h3 class="subheading" id="placeAddress"> {{placeAddress}}</h3>
         </v-card>
@@ -23,10 +25,7 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const PlaceAPI = 'http://127.0.0.1:8000/api/places/';
-const alertText = 'A server error has occurred, try again later';
+import { getPlaceData } from '../axios-requests';
 
 export default {
   name: 'ProfileComponent',
@@ -43,12 +42,8 @@ export default {
   },
   methods: {
     fetchPlaceData() {
-      axios.get(
-        `${PlaceAPI + this.$route.params.id}`,
-        {
-          headers: { Authorization: `Token ${this.$store.getters.getToken}` },
-        },
-      ).then((response) => {
+      const alertText = 'A server error has occurred, try again later';
+      getPlaceData(this.$route.params.id).then((response) => {
         this.placeLogo = response.data.logo;
         this.placeName = response.data.name;
         this.placeAddress = response.data.address;
@@ -71,6 +66,6 @@ export default {
 
 <style scoped>
 #placeDescription {
-  word-wrap:break-word;
+  word-wrap: break-word;
 }
 </style>
