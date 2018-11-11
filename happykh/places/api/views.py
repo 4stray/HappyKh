@@ -130,7 +130,7 @@ class PlaceSinglePage(APIView):
 
     def put(self, request, place_id):
         """
-        Updates place by given place id
+        Updates place by the given id
         :param request: HTTP Request
         :param place_id: place's id
         :return: status code
@@ -154,6 +154,20 @@ class PlaceSinglePage(APIView):
             )
 
         return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request, place_id):
+        """ 
+        Deletes place by the given id
+        :param request: HTTP request
+        :param place_id: place's id
+        :return: status code
+        """
+        try:
+            single_place = Place.objects.get(id=place_id)
+            single_place.delete()
+            return Response(status=status.HTTP_200_OK)
+        except Place.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class CommentsAPI(APIView):

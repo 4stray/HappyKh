@@ -2,8 +2,14 @@
   <v-layout align-center justify-center row fill-height>
     <v-flex xs12 md6>
       <v-card class="v-card pa-5 mb-5" id="PlaceEditComponent">
+        <v-btn v-on:click.native="deletePlace"
+                 fab dark absolute top right color="red" title="Delete Place">
+          <v-icon>delete</v-icon>
+        </v-btn>
         <h1>Edit the place:</h1>
-          <PlaceFormComponent :place="place" @savePlace="updatePlace"/>
+          <PlaceFormComponent :place="place"
+                              @savePlace="updatePlace"
+                              @deletePlace="deletePlace"/>
       </v-card>
     </v-flex>
   </v-layout>
@@ -23,7 +29,6 @@ export default {
   },
   created() {
     const placeId = this.$route.params.placeId;
-
     getPlaceData(placeId).then((response) => {
       this.place = {
         name: response.data.name,
@@ -60,6 +65,20 @@ export default {
         }
       });
     },
+    deletePlace() {
+      const placeId = this.$route.params.placeId;
+
+      axiosInstance.delete(`/api/places/${placeId}`).then(() => {
+        this.$router.push({ name: 'home' });
+        this.$awn.success('Your place was successfully deleted.');
+      }).catch((error) => {
+        if (error.message) {
+          this.$awn.warning(error.message);
+        } else {
+          this.$awn.alert('A server error has occurred, try again later');
+        }
+      });
+    },
   },
 };
 </script>
@@ -68,5 +87,8 @@ export default {
 img {
   width: 300px;
   margin: auto;
+}
+.material-icons {
+  display: inherit;
 }
 </style>
