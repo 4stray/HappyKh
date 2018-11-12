@@ -110,7 +110,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.COMMENT_URL = '/api/places/' + str(self.place.id) + '/comments'
         self.comment = CommentPlace.objects.create(
             creator=self.comment_info['creator'],
-            text=self.comment_info['text'],
+            text=self.comment_info['comment'],
             place=self.comment_info['place'],
         )
 
