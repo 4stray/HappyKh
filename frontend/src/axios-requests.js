@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
 
-const HOST = 'http://18.218.25.240';
+const HOST = 'https://18.218.25.240';
 
 export const axiosInstance = axios.create({
   baseURL: HOST,
