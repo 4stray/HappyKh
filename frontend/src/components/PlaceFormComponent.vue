@@ -14,14 +14,14 @@
                 label="Description">
     </v-textarea>
 
-    <v-img :src="place.logo || require('@/assets/default_place.png')"
+    <v-img id="logoImg" :src="place.logo || require('@/assets/default_place.png')"
            height="400px" width="100%" name="place-image">
     </v-img>
 
     <input type="file" id="logoInput" v-on:change="changeImage"
            accept="image/*"/>
     <v-btn class="success mt-3" type="submit" block>
-      Apply Changes
+      Save
     </v-btn>
   </v-form>
 </template>

@@ -14,7 +14,8 @@
           <v-img :src="place.logo || require('@/assets/default_place.png')"
                  height="400px"
                  width="100%"
-                 name="place-image">
+                 name="place-image"
+                 id="logoImg">
           </v-img>
 
           <v-spacer></v-spacer>
