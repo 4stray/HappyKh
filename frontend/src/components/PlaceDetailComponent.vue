@@ -18,6 +18,7 @@
             Place has no description.</p>
           <v-label class="d-block" id="labelAddress">Address</v-label>
           <h3 class="subheading" id="placeAddress"> {{placeAddress}}</h3>
+          <PlaceRatingComponent/>
         </v-card>
       </v-layout>
     </v-flex>
