@@ -1,7 +1,10 @@
 /* eslint-disable no-param-reassign */
 import axios from 'axios';
 
-const HOST = 'https://18.218.25.240';
+let HOST = 'http://127.0.0.1:8000/';
+if (process.env.NODE_ENV === 'production') {
+  HOST = process.env.API_URL_PREFIX;
+}
 
 export const axiosInstance = axios.create({
   baseURL: HOST,
