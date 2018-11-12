@@ -31,6 +31,13 @@ TEST_PLACE_DATA_POST = {
     'address': 1,
 }
 
+TEST_PLACE_DATA_PUT = {
+    'name': 'test name',
+    'description': 'test description',
+    'logo': 'undefined',
+    'address': json.dumps(TEST_ADDRESS_DATA),
+}
+
 CORRECT_USER_DATA = {
     'email': 'test@mail.com',
     'password': 'testpassword',
@@ -70,6 +77,14 @@ class TestPlacePage(BaseTestCase, APITestCase):
         response = self.client.post(PLACE_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
+    def test_delete_existing_place(self):
+        response = self.client.delete(f'{PLACE_URL}{self.place.id}')
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_delete_nonexisting_place(self):
+        response = self.client.delete(f'{PLACE_URL}0')
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
     def test_get_single_place(self):
         """Gets single place data"""
         response = self.client.get(SINGLE_PLACE_URL % self.place.pk)
@@ -78,6 +93,34 @@ class TestPlacePage(BaseTestCase, APITestCase):
 
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertDictEqual(expected, response.data)
+
+    def test_changing_place_without_any_change(self):
+        TEST_PLACE_DATA_PUT['user'] = self.hashed_user_id
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}',
+                                   TEST_PLACE_DATA_PUT)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_changing_place_text_fields(self):
+        TEST_PLACE_DATA_PUT['user'] = self.hashed_user_id
+        TEST_PLACE_DATA_PUT['name'] = 'New name'
+        TEST_PLACE_DATA_PUT['description'] = 'New description'
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}',
+                                   TEST_PLACE_DATA_PUT)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_changing_place_address(self):
+        TEST_PLACE_DATA_PUT['address'] = json.dumps({
+            'longitude': 50,
+            'latitude': 49.99,
+            'address': 'New Test Address',
+        })
+        TEST_PLACE_DATA_PUT['user'] = self.hashed_user_id
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}',
+                                   TEST_PLACE_DATA_PUT)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
 class TestCommentsAPI(BaseTestCase, APITestCase):

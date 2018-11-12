@@ -88,9 +88,6 @@ export default {
       const placeId = this.$route.params.placeId;
       const formData = new FormData();
 
-      if (placeId) {
-        formData.set('id', placeId);
-      }
       formData.set('user', this.$store.getters.getUserID);
       formData.set('name', this.place.name);
       formData.set('description', this.place.description);
