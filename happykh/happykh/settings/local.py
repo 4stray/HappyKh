@@ -15,6 +15,8 @@ from .base import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+FRONT_URL_PREFIX = 'http://127.0.0.1:8080/#/'
+
 ALLOWED_HOSTS = '*'
 
 # Database

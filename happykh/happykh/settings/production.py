@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 from .base import *
 
+FRONT_URL_PREFIX = 'https://happykh.netlify.com/#/'
 ALLOWED_HOSTS = ['18.218.25.240']
 
 DB_USER = os.environ.get('DB_USER')
@@ -32,4 +33,5 @@ CORS_ORIGIN_REGEX_WHITELIST = (
     r'http://localhost*',
     r'http://127.0.0.1:*',
     r'http://18.218.25.240:*',
+    r'https://happykh.netlify.com',
 )

@@ -233,7 +233,7 @@ class UserActivation(APIView):
                 f'We just needed to verify that {email} '
                 f'is your email address.'
                 f' Just click the link below \n'
-                f'http://127.0.0.1:8080/#/confirm_registration/'
+                f'{settings.FRONT_URL_PREFIX}confirm_registration/'
                 f'{email_crypt}/{email_token}/',
                 settings.EMAIL_HOST_USER,
                 [email]
