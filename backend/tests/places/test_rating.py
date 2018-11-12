@@ -82,7 +82,7 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         expected = {'place': self.place.pk,
                     'user': self.hashed_new_user_id,
                     'rating': data['rating']}
-        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         self.assertDictEqual(expected, response.data)
 

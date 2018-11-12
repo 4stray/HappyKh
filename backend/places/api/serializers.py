@@ -2,8 +2,10 @@
 
 from places.models import Place, Address, CommentPlace, PlaceRating
 from rest_framework import serializers
+from users.models import User
 from users.api.serializers import CommentAbstractSerializer
 from users.backends import UserHashedIdField
+
 from utils import UploadedImageField
 
 
@@ -50,3 +52,12 @@ class PlaceRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = PlaceRating
         fields = '__all__'
+
+    def create(self, validated_data):
+        rating = {'rating': validated_data.get('rating')}
+        user = User.objects.get(pk=validated_data.get('user'))
+        place = Place.objects.get(pk=validated_data.get('place'))
+        rate, created = PlaceRating.objects.update_or_create(place=place,
+                                                             user=user,
+                                                             defaults=rating)
+        return rate
