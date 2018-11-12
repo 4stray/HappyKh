@@ -1,13 +1,8 @@
-import Cookies from 'js-cookie';
 import { shallowMount } from '@vue/test-utils';
-import PlaceFormComponent
-  from '../../src/components/PlaceFormComponent.vue';
+import PlaceFormComponent from '@/components/PlaceFormComponent.vue';
 
 
 const expect = require('chai').expect;
-
-Cookies.set('token', 'value_');
-Cookies.set('user_id', 'value_');
 
 describe('PlaceFormComponent props', () => {
   const wrapper = shallowMount(PlaceFormComponent);
@@ -72,6 +67,7 @@ describe('mounted PlaceFormComponent', () => {
         logo: 'testImage.png',
       },
     });
+
     expect(wrapper.find('#logoImg').attributes('src'))
       .to.be.equal(wrapper.vm.place.logo);
   });

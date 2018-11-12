@@ -1,13 +1,8 @@
-import Cookies from 'js-cookie';
 import { shallowMount } from '@vue/test-utils';
-import CreatePlaceComponent
-  from '../../src/components/CreatePlaceComponent.vue';
+import CreatePlaceComponent from '@/components/CreatePlaceComponent.vue';
 
 
 const expect = require('chai').expect;
-
-Cookies.set('token', 'value_');
-Cookies.set('user_id', 'value_');
 
 describe('mounted CreatePlaceComponent', () => {
   const wrapper = shallowMount(CreatePlaceComponent);

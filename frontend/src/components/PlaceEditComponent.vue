@@ -1,11 +1,12 @@
 <template>
   <v-layout align-center justify-center row fill-height>
     <v-flex xs12 md6>
-      <v-card class="v-card pa-5 mb-5" id="PlaceEditComponent">
+      <v-card class="v-card pa-5 mb-5" id="placeEditComponent">
         <v-btn v-on:click.native="deletePlace"
                  fab dark absolute top right color="red" title="Delete Place">
           <v-icon>delete</v-icon>
         </v-btn>
+
         <h1>Edit the place:</h1>
           <PlaceFormComponent :place="place"
                               @savePlace="updatePlace"
