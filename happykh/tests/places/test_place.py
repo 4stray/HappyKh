@@ -109,8 +109,9 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
                              }
         self.COMMENT_URL = '/api/places/' + str(self.place.id) + '/comments'
         self.comment = CommentPlace.objects.create(
+            #pylint: disable=duplicate-code
             creator=self.comment_info['creator'],
-            text=self.comment_info['comment'],
+            text=self.comment_info['text'],
             place=self.comment_info['place'],
         )
 

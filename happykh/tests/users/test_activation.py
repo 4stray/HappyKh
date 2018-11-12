@@ -21,7 +21,7 @@ class ActivationEmailViewTestCase(BaseTestCase, APITestCase):
     def test_invalid_email(self):
         """Test view response for invalid email"""
         data = CORRECT_DATA.copy()
-        data['user_email'] = 'fakemail@mail.com'
+        data['user_email'] = 'fake_mail.com'
         response = self.client.post(LOGIN_URL, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertEqual('Invalid email', response.data['message'])
