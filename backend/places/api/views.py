@@ -254,14 +254,18 @@ class PlaceRatingView(APIView):
         :param place_id: integer place_id
         :return: Response with data and status
         """
-        user = UserAuthentication.get_user(request.POST.get('user'))
+        user_id = request.data.get('user')
+        if not user_id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        user = UserAuthentication.get_user(user_id)
         if not user:
             return Response({'message': 'User does not exist'},
                             status=status.HTTP_400_BAD_REQUEST)
 
         request_data = {'user': user.id,
                         'place': place_id,
-                        'rating': request.POST.get('rating')}
+                        'rating': request.data.get('rating')}
         serializer = PlaceRatingSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
