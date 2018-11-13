@@ -2,9 +2,9 @@
 import json
 import logging
 
+from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import Paginator
-from happykh.settings import HASH_IDS
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -13,7 +13,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from utils import get_changed_uri
 from users.backends import UserAuthentication
-from happykh.settings import HASH_IDS
 
 from .serializers import (PlaceSerializer, AddressSerializer,
                           CommentPlaceSerializer, PlaceRatingSerializer)
@@ -267,7 +266,7 @@ class CommentsAPI(APIView):
 
         data = request.data.copy()
         try:
-            data['creator'] = HASH_IDS.decode(data['creator'])[0]
+            data['creator'] = settings.HASH_IDS.decode(data['creator'])[0]
             data['place'] = place_id
             comment_serializer = CommentPlaceSerializer(data=data, )
             if comment_serializer.is_valid():
@@ -360,19 +359,24 @@ class PlaceRatingView(APIView):
             serializer = PlaceRatingSerializer(data=request)
             if serializer.is_valid():
                 serializer.update(rating, serializer.validated_data)
+                user_id = serializer.data['user']
+                user_id_encrypted = settings.HASH_IDS.encode(user_id)
                 response = {'place': serializer.data['place'],
-                            'user': HASH_IDS.encode(serializer.data['user']),
+                            'user': user_id_encrypted,
                             'rating': serializer.data['rating']}
                 return Response(response, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
         except PlaceRating.DoesNotExist:
             """ if rating doesn't exist, create a new one """
         serializer = PlaceRatingSerializer(data=request)
         if serializer.is_valid():
             serializer.save()
+            user_id = serializer.data['user']
+            user_id_encrypted = settings.HASH_IDS.encode(user_id)
             response = {'place': serializer.data['place'],
-                        'user': HASH_IDS.encode(serializer.data['user']),
+                        'user': user_id_encrypted,
                         'rating': serializer.data['rating']}
             return Response(response, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
