@@ -1,8 +1,8 @@
 """ Support class for user authentication """
 import logging
 
-from happykh.settings import HASH_IDS
 from rest_framework import serializers
+from happykh.settings import HASH_IDS
 from users.models import User
 
 LOGGER = logging.getLogger('happy_logger')

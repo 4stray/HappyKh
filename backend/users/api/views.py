@@ -9,8 +9,6 @@ from django.core.validators import ValidationError
 from django.core.validators import validate_email
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from happykh.settings import EMAIL_HOST_USER
-from happykh.settings import HASH_IDS
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
@@ -19,6 +17,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from happykh.settings import EMAIL_HOST_USER
+from happykh.settings import HASH_IDS
 from utils import is_user_owner
 from .serializers import EmailSerializer
 from .serializers import LoginSerializer
