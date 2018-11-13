@@ -1,7 +1,7 @@
 """Test activation email view"""
 import pytest
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 from tests.utils import BaseTestCase
 from users.models import User
 
@@ -30,9 +30,7 @@ class ActivationEmailViewTestCase(BaseTestCase, APITestCase):
         data = CORRECT_DATA.copy()
         data['user_email'] = 'fake@mail.com'
         response = self.client.post(LOGIN_URL, data)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-        self.assertEqual('There is no user with such email',
-                         response.data['message'])
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_is_active(self):
         """Test is user already activated"""

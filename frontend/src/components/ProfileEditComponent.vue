@@ -90,7 +90,7 @@ export default {
         const formData = new FormData();
         formData.set('first_name', this.userFirstName);
         formData.set('last_name', this.userLastName);
-        formData.set('age', this.userAge);
+        formData.set('age', this.userAge || '');
         formData.set('gender', this.userGender);
 
         const imageFile = document.querySelector('#imageInput');

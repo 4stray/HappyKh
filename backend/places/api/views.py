@@ -127,8 +127,8 @@ class CommentsAPI(APIView):
                  Response with error status
         """
         place = Place.get_place(place_id)
-        objects_per_page = request.GET.get('objects_per_page')
-        page = request.GET.get('page')
+        objects_per_page = request.GET.get('objects_per_page', '')
+        page = request.GET.get('page', '')
 
         if place is None:
             LOGGER.warning(f'Place #{place_id} not found')
@@ -142,15 +142,19 @@ class CommentsAPI(APIView):
             LOGGER.warning(f'Wrong objects_per_page={objects_per_page}'
                            f' argument.')
             return Response(status=status.HTTP_400_BAD_REQUEST)
-
-        if not objects_per_page.isdigit():
-            LOGGER.warning(f'Wrong page={page} argument.')
+        elif int(objects_per_page) == 0:
+            LOGGER.warning(f"Objects_per_page argument can't be 0")
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        objects_per_page = int(objects_per_page)
-        page = int(page)
-        paginator = Paginator(all_comments, objects_per_page)
-        comments_page = paginator.get_page(page)
+        if not page.isdigit():
+            LOGGER.warning(f'Wrong page={page} argument.')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        elif int(page) == 0:
+            LOGGER.warning(f"Page argument can't be 0")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        paginator = Paginator(all_comments, int(objects_per_page))
+        comments_page = paginator.get_page(int(page))
         comments_for_page = comments_page.object_list
 
         comment_context = {'domain': get_current_site(request), }
@@ -192,13 +196,12 @@ class CommentsAPI(APIView):
         :return: Response with status
         """
         place = Place.get_place(place_id)
-
         if place is None:
             LOGGER.warning(f'Place #{place_id} not found')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         data = request.data.copy()
-        user = UserAuthentication.get_user(request.data.get('user'))
+        user = UserAuthentication.get_user(request.data.get('creator'))
         if not user:
             return Response({'message': 'User does not exist'},
                             status=status.HTTP_400_BAD_REQUEST)

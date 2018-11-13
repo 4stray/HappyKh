@@ -99,7 +99,7 @@ class TestUserProfile(BaseTestCase, APITestCase):
         edited_user.age = None
         response = self.client.patch(
             USERS_PROFILE_DATA_URL % self.hashed_user_id,
-            {'age': 'null'}
+            {'age': ''}
         )
 
         serializer_edited_user = UserSerializer(edited_user)

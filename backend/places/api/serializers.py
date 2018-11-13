@@ -56,7 +56,7 @@ class PlaceRatingSerializer(serializers.ModelSerializer):
         rating = {'rating': validated_data.get('rating')}
         user = validated_data.get('user')
         place = validated_data.get('place')
-        rate, created = PlaceRating.objects.update_or_create(place=place,
-                                                             user=user,
-                                                             defaults=rating)
+        rate, _ = PlaceRating.objects.update_or_create(place=place,
+                                                       user=user,
+                                                       defaults=rating)
         return rate

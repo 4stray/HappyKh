@@ -1,8 +1,8 @@
 """ Support class for user authentication """
 import logging
 
-from rest_framework import serializers
 from happykh.settings import HASH_IDS
+from rest_framework import serializers
 from users.models import User
 
 LOGGER = logging.getLogger('happy_logger')
@@ -65,4 +65,7 @@ class UserAuthentication:
                 f'Can`t get user profile because of invalid id,'
                 f' user_id: {id}'
             )
-            return None
+        except IndexError:
+            LOGGER.error('Invalid hashed_user_id')
+
+        return None
