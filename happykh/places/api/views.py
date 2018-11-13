@@ -241,6 +241,7 @@ class CommentsAPI(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         comment_context = {'domain': get_current_site(request)}
+        data.update(edited=True)
         comment_serializer = CommentPlaceSerializer(comment,
                                                     data=data,
                                                     context=comment_context)

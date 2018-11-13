@@ -104,6 +104,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
             text=self.comment_info['text'],
             place=self.comment_info['place'],
         )
+        self.pk = CommentPlace.objects.last().pk
 
     def test_get(self):
         comment = CommentPlace.objects.create(
@@ -182,3 +183,44 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         response = self.client.post(self.COMMENT_URL, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertEqual(2, CommentPlace.objects.count())
+
+    def test_successful_delete(self):
+        pk = CommentPlace.objects.create(
+            creator=self.comment_info['creator'],
+            text='com2',
+            place=self.comment_info['place'],
+        ).pk
+        self.comment_info.update(id=pk)
+        response = self.client.delete(self.COMMENT_URL, self.comment_info)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_failed_delete(self):
+        data = self.comment_info.copy()
+        data.update(id=self.pk+1)
+        response = self.client.delete(self.COMMENT_URL, data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_successful_update(self):
+        data = self.comment_info.copy()
+        data.update(creator=self.hashed_user_id)
+        data.update(id=self.pk)
+        data.update(text=self.comment_info.get('text') + 'test')
+        response = self.client.put(self.COMMENT_URL, data)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(True, response.data['edited'])
+        self.assertEqual(data['text'], response.data['text'])
+
+    def test_update_with_wrong_id(self):
+        data = self.comment_info.copy()
+        data.update(creator=self.hashed_user_id)
+        data.update(id=self.pk + 1)
+        response = self.client.put(self.COMMENT_URL, data)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_update_with_invalid_text(self):
+        data = self.comment_info.copy()
+        data.update(creator=self.hashed_user_id)
+        data.update(id=self.pk)
+        data.update(text='')
+        response = self.client.put(self.COMMENT_URL, data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
