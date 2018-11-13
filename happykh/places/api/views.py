@@ -152,7 +152,10 @@ class CommentsAPI(APIView):
             LOGGER.warning(f'Place #{place_id} not found')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        all_comments = CommentPlace.objects.filter(place=place_id)
+        all_comments = CommentPlace.objects\
+            .filter(place=place_id)\
+            .order_by('-creation_time')
+
         if all_comments is None or not all_comments:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -217,10 +220,11 @@ class CommentsAPI(APIView):
         try:
             data['creator'] = HASH_IDS.decode(data['creator'])[0]
             data['place'] = place_id
-            comment_serializer = CommentPlaceSerializer(data=data, )
+            comment_context = {'domain': get_current_site(request), }
+            comment_serializer = CommentPlaceSerializer(data=data, context=comment_context,)
             if comment_serializer.is_valid():
                 comment_serializer.save()
-                return Response(status=status.HTTP_201_CREATED)
+                return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
             raise CustomValidationError
         except (IndexError, CustomValidationError):
             return Response(status=status.HTTP_400_BAD_REQUEST)

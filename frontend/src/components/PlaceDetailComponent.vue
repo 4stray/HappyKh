@@ -19,6 +19,7 @@
           <v-label class="d-block" id="labelAddress">Address</v-label>
           <h3 class="subheading" id="placeAddress"> {{placeAddress}}</h3>
           <PlaceRatingComponent/>
+          <CommentsCollectionComponent/>
         </v-card>
       </v-layout>
     </v-flex>
@@ -27,9 +28,12 @@
 
 <script>
 import { getPlaceData } from '../axios-requests';
+import CommentsCollectionComponent from './CommentsCollectionComponent';
+import PlaceRatingComponent from './PlaceRatingComponent';
 
 export default {
   name: 'ProfileComponent',
+  components: { PlaceRatingComponent, CommentsCollectionComponent },
   data() {
     return {
       placeLogo: '',
