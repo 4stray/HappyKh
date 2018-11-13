@@ -64,15 +64,13 @@ export default {
       valid: false,
       rules: {
         required: value => Boolean(value) || 'This field is required',
-        address: value => {
-            return (value && Boolean(value.longitude && value.latitude))
-              || 'Field must be filled from drop down menu';
-        },
+        address: value => (value && Boolean(value.longitude && value.latitude))
+              || 'Field must be filled from drop down menu',
       },
-      userChangeAddress: function(value) {
-        value.longitude = null;
-        value.latitude = null;
-      }
+      userChangeAddress(value) {
+        this.$props.place.address.longitude = 0;
+        this.$props.place.address.latitude = 0;
+      },
     };
   },
   mounted() {
