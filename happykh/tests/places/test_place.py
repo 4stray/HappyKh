@@ -95,31 +95,46 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertDictEqual(expected, response.data)
 
     def test_changing_place_without_any_change(self):
-        TEST_PLACE_DATA_PUT['user'] = self.hashed_user_id
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['user'] = self.hashed_user_id
 
-        response = self.client.put(f'{PLACE_URL}{self.place.id}',
-                                   TEST_PLACE_DATA_PUT)
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
-    def test_changing_place_text_fields(self):
-        TEST_PLACE_DATA_PUT['user'] = self.hashed_user_id
-        TEST_PLACE_DATA_PUT['name'] = 'New name'
-        TEST_PLACE_DATA_PUT['description'] = 'New description'
+    def test_changing_place_with_invalid_id(self):
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['user'] = self.hashed_user_id
 
-        response = self.client.put(f'{PLACE_URL}{self.place.id}',
-                                   TEST_PLACE_DATA_PUT)
+        response = self.client.put(f'{PLACE_URL}{0}', test_data)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_changing_place_with_blank_name(self):
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['user'] = self.hashed_user_id
+        test_data['name'] = ''
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_changing_place_text_fields(self):
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['user'] = self.hashed_user_id
+        test_data['name'] = 'New name'
+        test_data['description'] = 'New description'
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_changing_place_address(self):
-        TEST_PLACE_DATA_PUT['address'] = json.dumps({
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['address'] = json.dumps({
             'longitude': 50,
             'latitude': 49.99,
             'address': 'New Test Address',
         })
-        TEST_PLACE_DATA_PUT['user'] = self.hashed_user_id
+        test_data['user'] = self.hashed_user_id
 
-        response = self.client.put(f'{PLACE_URL}{self.place.id}',
-                                   TEST_PLACE_DATA_PUT)
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
 
