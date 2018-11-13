@@ -117,3 +117,5 @@ dmypy.json
 .idea
 media/
 package-lock.json
+env_variables.txt
+/happykh/happykh/static/*
