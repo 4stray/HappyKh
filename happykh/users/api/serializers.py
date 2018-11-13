@@ -1,15 +1,13 @@
 """Custom serializers for users app"""
 import logging
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from rest_framework import exceptions
-from rest_framework import serializers
-from happykh.settings import HASH_IDS
-from utils import UploadedImageField
-from utils import delete_std_images_from_media
-from utils import HashIdField
+from rest_framework import exceptions, serializers
+from utils import (UploadedImageField, delete_std_images_from_media,
+                   HashIdField)
 
 from ..models import User, CommentAbstract
 
@@ -41,6 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
 
 # pylint: disable = abstract-method
 class LoginSerializer(serializers.Serializer):
@@ -189,5 +188,5 @@ class CommentAbstractSerializer(serializers.ModelSerializer):
                                             context=user_context)
         ret['creator_image'] = creator_serializer.data['profile_image']
         ret['creator_fullname'] = comment_creator.get_full_name()
-        ret['creator'] = HASH_IDS.encode(ret['creator'])
+        ret['creator'] = settings.HASH_IDS.encode(ret['creator'])
         return ret

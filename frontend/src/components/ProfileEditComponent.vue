@@ -22,8 +22,9 @@
         <v-radio label="Other" color="primary" value="O"></v-radio>
       </v-radio-group>
       <div>
-          <img v-if="userImage" v-bind:src=userImage alt="No image"/>
-          <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
+        <img v-if="userImage" v-bind:src=userImage alt="No image"/>
+        <img v-else id="profile_image" src="../assets/default_user.png"
+             alt="No user avatar"/>
       </div>
       <input type="file"
              id="imageInput"
@@ -36,10 +37,8 @@
 </template>
 
 <script>
-import axios from 'axios';
 import { mapGetters } from 'vuex';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+import { axiosInstance, getUserData } from '../axios-requests';
 
 export default {
   name: 'ProfileEditComponent',
@@ -83,12 +82,7 @@ export default {
   },
   methods: {
     fetchFormData() {
-      axios.get(
-        UserAPI + this.userID,
-        {
-          headers: { Authorization: `Token ${this.userToken}` },
-        },
-      ).then((response) => {
+      getUserData(this.userID).then((response) => {
         if (response.data.first_name === 'undefined') {
           this.userFirstName = '';
         } else {
@@ -126,11 +120,10 @@ export default {
         const imageFile = document.querySelector('#imageInput');
         formData.append('profile_image', imageFile.files[0]);
 
-        axios.patch(
-          `${UserAPI + this.userID}/data`, formData,
+        axiosInstance.patch(
+          `/api/users/${this.userID}/data`, formData,
           {
             headers: {
-              Authorization: `Token ${this.userToken}`,
               'Content-Type': 'multipart/form-data',
             },
           },
@@ -177,5 +170,4 @@ img {
   width: 300px;
   margin: auto;
 }
-
 </style>

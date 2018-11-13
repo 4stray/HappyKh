@@ -1,16 +1,19 @@
 import Cookies from 'js-cookie';
+import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import PlaceDetail from '../../src/components/PlaceDetailComponent.vue';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
+localVue.use(Vuex);
 const router = new VueRouter();
 const expect = require('chai').expect;
 const should = require('chai').should();
 
 Cookies.set('token', 'value_');
 Cookies.set('user_id', 'value_');
+
 
 describe('PlaceDetail data()', () => {
   it('has placeLogo', () => {
@@ -30,9 +33,6 @@ describe('PlaceDetail for empty place', () => {
   const wrapper = shallowMount(PlaceDetail, {
     localVue,
     router,
-    mocks: {
-      $cookies: Cookies,
-    },
   });
   wrapper.setData({
     placeLogo: '',
@@ -53,9 +53,6 @@ describe('PlaceDetail for place with data', () => {
   const wrapper = shallowMount(PlaceDetail, {
     localVue,
     router,
-    mocks: {
-      $cookies: Cookies,
-    },
   });
   const testUserData = {
     placeLogo: 'logo.png',
