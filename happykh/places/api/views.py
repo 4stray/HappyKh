@@ -215,7 +215,6 @@ class CommentsAPI(APIView):
 
         data = request.data.copy()
         try:
-            data['creator'] = HASH_IDS.decode(data['creator'])[0]
             data['place'] = place_id
             comment_serializer = CommentPlaceSerializer(data=data, )
             if comment_serializer.is_valid():
@@ -223,6 +222,49 @@ class CommentsAPI(APIView):
                 return Response(status=status.HTTP_201_CREATED)
             raise CustomValidationError
         except (IndexError, CustomValidationError):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def put(self, request, place_id):
+        """
+        Update CommentPlace object.
+
+        :param request: HTTP Request
+        :param place_id: id of place for which comment was written
+        :return: Response with status
+        """
+        data = request.data.copy()
+        data.update(place=place_id)
+
+        comment = CommentPlace.objects.filter(pk=data['id']).first()
+        if not comment:
+            LOGGER.warning(f'Comment #{data["id"]} not found')
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        comment_context = {'domain': get_current_site(request)}
+        comment_serializer = CommentPlaceSerializer(comment,
+                                                    data=data,
+                                                    context=comment_context)
+        if comment_serializer.is_valid():
+            comment_serializer.save()
+            return Response(comment_serializer.data, status=status.HTTP_200_OK)
+
+        LOGGER.warning(
+            f'Comment serialization errors {comment_serializer.errors}')
+        return Response(comment_serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, place_id):
+        """
+        Delete CommentPlace object.
+
+        :param request: HTTP Request
+        :return: Response with status
+        """
+        data = request.data.copy()
+        try:
+            CommentPlace.objects.get(pk=data['id']).delete()
+            return Response(status=status.HTTP_200_OK)
+        except CommentPlace.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 

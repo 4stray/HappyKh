@@ -40,10 +40,13 @@ class CommentPlaceSerializer(CommentAbstractSerializer):
     ModelSerializer for CommentPlace model, which extends
     CommentAbstractSerializer.
     """
+    creator = UserHashedIdField()
 
     class Meta:
         model = CommentPlace
         fields = '__all__'
+        extra_kwargs = {'creator': {'required': True},
+                        'place': {'required': True}}
 
 
 class PlaceRatingSerializer(serializers.ModelSerializer):
