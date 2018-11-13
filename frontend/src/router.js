@@ -4,6 +4,7 @@ import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import CreatePlace from './views/CreatePlace.vue';
+import PlaceEdit from './views/PlaceEdit.vue';
 import PlaceDetail from './views/Place.vue';
 import Profile from './views/Profile.vue';
 import ProfileSettings from './views/ProfileSettings.vue';
@@ -51,6 +52,12 @@ const router = new Router({
       path: '/places/create',
       name: 'createPlace',
       component: CreatePlace,
+      beforeEnter: ifAuthenticated,
+    },
+    {
+      path: '/places/edit/:placeId',
+      name: 'placeEdit',
+      component: PlaceEdit,
       beforeEnter: ifAuthenticated,
     },
     {
