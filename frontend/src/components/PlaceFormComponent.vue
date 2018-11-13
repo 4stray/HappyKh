@@ -1,12 +1,16 @@
 <template>
-  <v-form id="placeForm" enctype="multipart/form-data"
-          @submit.prevent="savePlace">
+  <v-form id="placeForm" ref="placeForm" enctype="multipart/form-data"
+          @submit.prevent="savePlace" v-model="valid">
 
     <v-text-field type="text" id="name" v-model="place.name"
+                  :rules="[rules.required]"
                   label="Place name">
     </v-text-field>
 
-    <v-text-field id="placeAddress" label="Place Address"
+    <v-text-field id="placeAddress"
+                  :rules="[rules.required, rules.address(place.address)]"
+                  @change="userChangeAddress(place.address)"
+                  label="Place Address"
                   v-model="place.address.address" type="text">
     </v-text-field>
 
@@ -20,7 +24,7 @@
 
     <input type="file" id="logoInput" v-on:change="changeImage"
            accept="image/*"/>
-    <v-btn class="success mt-3" type="submit" block>
+    <v-btn class="success mt-3" :disabled="!valid" type="submit" block>
       Save
     </v-btn>
   </v-form>
@@ -57,6 +61,18 @@ export default {
   data() {
     return {
       autocomplete: null,
+      valid: false,
+      rules: {
+        required: value => Boolean(value) || 'This field is required',
+        address: value => {
+            return (value && Boolean(value.longitude && value.latitude))
+              || 'Field must be filled from drop down menu';
+        },
+      },
+      userChangeAddress: function(value) {
+        value.longitude = null;
+        value.latitude = null;
+      }
     };
   },
   mounted() {
@@ -85,6 +101,11 @@ export default {
   },
   methods: {
     savePlace() {
+      if (!this.$refs.placeForm.validate()) {
+        this.$refs.placeForm.reset();
+        return;
+      }
+
       const placeId = this.$route.params.placeId;
       const formData = new FormData();
 
@@ -109,7 +130,6 @@ export default {
     onChange() {
       const place = this.autocomplete.getPlace();
       if (Object.keys(place).length > 1) {
-        this.place.formattedAddress = place.formatted_address;
         this.place.address = {
           latitude:
             place.geometry.location.toJSON().lat.toFixed(10),
