@@ -34,8 +34,10 @@
             {{place.address.address}}
           </h3>
 
+          <PlaceRatingComponent/>
+
           <v-btn :to="{name: 'placeEdit', params: {placeId: place.id}}"
-                 fab dark absolute top right color="green">
+                 fab dark absolute bottom right color="green">
             <v-icon>edit</v-icon>
           </v-btn>
         </v-card>
@@ -45,10 +47,15 @@
 </template>
 
 <script>
+import PlaceRatingComponent from '@/components/PlaceRatingComponent.vue';
 import { getPlaceData } from '../axios-requests';
+
 
 export default {
   name: 'ProfileComponent',
+  components: {
+    PlaceRatingComponent,
+  },
   data() {
     return {
       place: {

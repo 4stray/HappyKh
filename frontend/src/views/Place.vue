@@ -2,7 +2,6 @@
   <v-container grid-list-md fluid>
     <GoBackComponent/>
     <PlaceDetailComponent />
-    <PlaceRatingComponent/>
   </v-container>
 </template>
 
@@ -11,7 +10,6 @@
 import Header from '@/components/Header.vue';
 import PlaceDetailComponent from '@/components/PlaceDetailComponent.vue';
 import GoBackComponent from '@/components/GoBackComponent.vue';
-import PlaceRatingComponent from '@/components/PlaceRatingComponent.vue';
 
 export default {
   name: 'Profile',
@@ -19,7 +17,6 @@ export default {
     Header,
     PlaceDetailComponent,
     GoBackComponent,
-    PlaceRatingComponent,
   },
 };
 </script>
