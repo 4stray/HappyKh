@@ -1,10 +1,12 @@
-from places.api.views import PlaceRatingView
-from places.models import Place, PlaceRating, Address
+"""Tests for place's rating"""
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
+from places.api.views import PlaceRatingView
+from places.models import Place, PlaceRating, Address
 from tests.utils import BaseTestCase
 from users.models import User
+from .test_place import TEST_ADDRESS_DATA
 
 RATING_URL = '/api/places/rating/%d'
 TEST_PLACE_DATA = {
@@ -12,16 +14,12 @@ TEST_PLACE_DATA = {
     'description': 'test description',
     'logo': 'undefined',
 }
-TEST_ADDRESS_DATA = {
-    'latitude': 50,
-    'longitude': 34,
-    'address': 'some str',
-}
+
 TEST_USER_DATA = {
     'password': 'testpassword',
-    'age': 20,
+    'age': 18,
     'gender': 'M',
-    'first_name': 'firstName',
+    'first_name': 'name',
     'last_name': 'lastName',
     'is_active': True
 }
@@ -31,6 +29,7 @@ TEST_RATING_DATA = {
 
 
 class TestPlaceRating(BaseTestCase, APITestCase):
+    """Test rating"""
     def setUp(self):
         """Create user and place objects"""
         super().setUp()
@@ -50,6 +49,9 @@ class TestPlaceRating(BaseTestCase, APITestCase):
                                                  **TEST_RATING_DATA)
 
     def test_get(self):
+        """
+        Test get request for rating
+        """
         response = self.client.get(RATING_URL % self.place.pk)
         average_rating = PlaceRatingView.get_average(self.place.pk)
         expected = {'place': self.place.pk,
@@ -65,6 +67,9 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_post_update(self):
+        """
+        Test post request for rating update
+        """
         data = {
             'place': self.place.pk,
             'user': self.hashed_user_id,
@@ -75,6 +80,7 @@ class TestPlaceRating(BaseTestCase, APITestCase):
                     'user': self.hashed_user_id,
                     'rating': data['rating']}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
         self.assertDictEqual(expected, response.data)
 
     def test_post_update_with_non_existing_user(self):
@@ -89,6 +95,9 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_post_create(self):
+        """
+        Test post request for rating creation
+        """
         data = {
             'place': self.place.pk,
             'user': self.hashed_new_user_id,
