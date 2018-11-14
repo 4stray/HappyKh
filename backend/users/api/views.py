@@ -3,27 +3,24 @@ import datetime
 import logging
 from smtplib import SMTPException
 
+from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.core.validators import ValidationError
 from django.core.validators import validate_email
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from rest_framework import status
+
+from rest_framework import exceptions, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from happykh.settings import EMAIL_HOST_USER
-from happykh.settings import HASH_IDS
 from utils import is_user_owner
-from .serializers import EmailSerializer
-from .serializers import LoginSerializer
-from .serializers import PasswordSerializer
-from .serializers import UserSerializer
+from .serializers import (EmailSerializer, LoginSerializer, PasswordSerializer,
+                          UserSerializer)
 from .tokens import account_activation_token
 from ..backends import UserAuthentication
 from ..cryptography import decode, encode
@@ -225,9 +222,9 @@ class UserActivation(APIView):
                 f'Confirm {email} on HappyKH',
                 f'We just needed to verify that {email} is your email address.'
                 f' Just click the link below \n'
-                f'http://127.0.0.1:8080/#/confirm_registration/'
+                f'{settings.FRONT_URL_PREFIX}confirm_registration/'
                 f'{email_crypt}/{email_token}/',
-                EMAIL_HOST_USER,
+                settings.EMAIL_HOST_USER,
                 [email]
             )
             LOGGER.info('Confirmation mail has been sent')

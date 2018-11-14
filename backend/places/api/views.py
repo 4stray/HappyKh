@@ -2,6 +2,7 @@
 import json
 import logging
 
+from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import Paginator
 from rest_framework import status
@@ -13,8 +14,7 @@ from users.backends import UserAuthentication
 
 from utils import get_changed_uri
 from .serializers import (PlaceSerializer, AddressSerializer,
-                          CommentPlaceSerializer, PlaceRatingSerializer
-                          )
+                          CommentPlaceSerializer, PlaceRatingSerializer)
 from ..models import Place, Address, CommentPlace, PlaceRating
 
 LOGGER = logging.getLogger('happy_logger')
@@ -109,6 +109,58 @@ class PlaceSinglePage(APIView):
         }
         place_serializer = PlaceSerializer(single_place, context=place_context)
         return Response(place_serializer.data, status=status.HTTP_200_OK)
+
+    def put(self, request, place_id):
+        """
+        Updates place by the given id
+        :param request: HTTP Request
+        :param place_id: place's id
+        :return: status code
+        """
+        single_place = Place.get_place(place_id)
+
+        request_data = request.data.copy()
+        address_data = json.loads(request_data.get('address'))
+        request_data['address'] = PlacePage.get_address_pk(data=address_data)
+
+        place_serializer = PlaceSerializer(data=request_data)
+
+        if not single_place:
+            LOGGER.error(f'Place with id {place_id} does not exist')
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        elif not place_serializer.is_valid():
+            LOGGER.error(
+                f'Place is not valid due to validation errors: '
+                f'{place_serializer.errors}'
+            )
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        LOGGER.info(f'Place with id {place_id} was successfully updated')
+
+        place_serializer.update(
+            single_place,
+            place_serializer.validated_data
+        )
+        return Response(status=status.HTTP_200_OK)
+
+    def delete(self, request, place_id):
+        """
+        Deletes place by the given id
+        :param request: HTTP request
+        :param place_id: place's id
+        :return: status code
+        """
+        try:
+            single_place = Place.objects.get(id=place_id)
+            single_place.delete()
+
+            LOGGER.info(f'Place with id {place_id} was deleted')
+
+            return Response(status=status.HTTP_200_OK)
+        except Place.DoesNotExist:
+            LOGGER.info(f'Place with id {place_id} was not deleted')
+
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 class CommentsAPI(APIView):
