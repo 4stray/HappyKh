@@ -79,7 +79,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
     def test_get_single_place(self):
-        """Gets single place data"""
+        """Test get request for single place data"""
         response = self.client.get(SINGLE_PLACE_URL % self.place.pk)
         serializer = PlaceSerializer(self.place)
         expected = serializer.data

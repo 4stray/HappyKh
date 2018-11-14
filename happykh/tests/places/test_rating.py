@@ -62,7 +62,7 @@ class TestPlaceRating(BaseTestCase, APITestCase):
 
     def test_post_update(self):
         """
-        Test rating update
+        Test post request for rating update
         """
         data = {
             'place': self.place.pk,
@@ -79,7 +79,7 @@ class TestPlaceRating(BaseTestCase, APITestCase):
 
     def test_post_create(self):
         """
-        Test rating creation
+        Test post request for rating creation
         """
         data = {
             'place': self.place.pk,

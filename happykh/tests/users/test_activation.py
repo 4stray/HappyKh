@@ -27,7 +27,7 @@ class ActivationEmailViewTestCase(BaseTestCase, APITestCase):
         self.assertEqual('Invalid email', response.data['message'])
 
     def test_is_user_in_db(self):
-        """Test is user with such email in db"""
+        """Test if user with such email exists in db"""
         data = CORRECT_DATA.copy()
         data['user_email'] = 'fake@mail.com'
         response = self.client.post(LOGIN_URL, data)

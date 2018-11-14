@@ -45,14 +45,14 @@ class TestTokenValidation(BaseTestCase, APITestCase):
 
     def test_valid_token_before_expiration_date(self):
         """
-        test token's validation before expiration date
+        test view response of get request for token
         """
         response = self.client.get(USERS_TEST_TOKEN_VALIDATION_URL)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_invalid_token(self):
         """
-        test view response for invalid token
+        test view response for get request of invalid token
         """
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'invalid token')
         response = self.client.get(USERS_TEST_TOKEN_VALIDATION_URL)
