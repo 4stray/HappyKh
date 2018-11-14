@@ -2,12 +2,12 @@
 import json
 
 from django.core.paginator import Paginator
-from places.api.serializers import PlaceSerializer
-from places.models import Place, Address, CommentPlace
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from tests.utils import BaseTestCase
+from places.api.serializers import PlaceSerializer
+from places.models import Place, Address, CommentPlace
 from users.models import User
 
 PLACE_URL = '/api/places/'
