@@ -210,6 +210,15 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertFalse(serializer.is_valid())
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+        invalid_email = ''
+        response = self.client.patch(
+            USERS_PROFILE_EMAIL_URL % self.hashed_user_id,
+            {'email': invalid_email}
+        )
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+
     def test_patch_existing_email(self):
         """test update user's email with email of existing user"""
         testing_email = "second@test.com"
@@ -218,8 +227,9 @@ class TestUserProfile(BaseTestCase, APITestCase):
             USERS_PROFILE_EMAIL_URL % self.hashed_user_id,
             {'email': testing_email}
         )
-
+        expected = {'message': 'User with such email already exists'}
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(expected, response.data)
 
     def test_patch_invalid_profile_image(self):
         """test update user's password with invalid new password"""

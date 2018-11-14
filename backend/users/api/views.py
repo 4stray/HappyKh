@@ -52,12 +52,6 @@ class UserLogin(APIView):
                             status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.validated_data['user']
-        if not user.is_active:
-            LOGGER.warning('Attempt to login by unregistered user')
-            return Response({
-                'message': "You can't login, you have to register first."
-            }, status=status.HTTP_400_BAD_REQUEST)
-
         user_token, _ = Token.objects.get_or_create(user=user)
         user_id = settings.HASH_IDS.encode(user.pk)
 
@@ -86,7 +80,7 @@ class UserLogout(APIView):
 
         LOGGER.info('User has been logged out')
         return Response({'message': 'User has been logged out'},
-                        status=status.HTTP_201_CREATED)
+                        status=status.HTTP_200_OK)
 
 
 class UserRegistration(APIView):

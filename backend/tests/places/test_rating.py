@@ -3,10 +3,12 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from places.api.views import PlaceRatingView
+from places.api.serializers import PlaceRatingSerializer
 from places.models import Place, PlaceRating, Address
 from tests.utils import BaseTestCase
 from users.models import User
 from .test_place import TEST_ADDRESS_DATA
+
 
 RATING_URL = '/api/places/rating/%d'
 TEST_PLACE_DATA = {
@@ -91,8 +93,11 @@ class TestPlaceRating(BaseTestCase, APITestCase):
             'user': user_id,
             'rating': 2,
         }
+        expected = 'User does not exist'
         response = self.client.post(RATING_URL % self.place.pk, data)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(expected, response.data['detail'])
+
 
     def test_post_create(self):
         """
@@ -108,5 +113,26 @@ class TestPlaceRating(BaseTestCase, APITestCase):
                     'user': self.hashed_new_user_id,
                     'rating': data['rating']}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-
         self.assertDictEqual(expected, response.data)
+
+    def test_post_without_user(self):
+        """Test post request for rating creation without user id"""
+        data = {
+            'place': self.place.pk,
+            'rating': TEST_RATING_DATA['rating'],
+        }
+        response = self.client.post(RATING_URL % self.place.pk, data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_post_create_invalid_rating(self):
+        """Test post request with invalid rating format"""
+        data = {
+            'place': self.place.pk,
+            'user': self.hashed_new_user_id,
+            'rating': 'rating',
+        }
+        response = self.client.post(RATING_URL % self.place.pk, data)
+
+        serializer = PlaceRatingSerializer(data=data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertFalse(serializer.is_valid())
