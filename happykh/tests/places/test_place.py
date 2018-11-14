@@ -86,10 +86,12 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
     def test_delete_existing_place(self):
+        """Test response for place deletion"""
         response = self.client.delete(f'{PLACE_URL}{self.place.id}')
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_delete_nonexisting_place(self):
+        """Test response for deletion of place that doesn't exist"""
         response = self.client.delete(f'{PLACE_URL}0')
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
@@ -103,6 +105,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertDictEqual(expected, response.data)
 
     def test_changing_place_without_any_change(self):
+        """Test response for changing place without changes"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['user'] = self.hashed_user_id
 
@@ -110,6 +113,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_changing_place_with_invalid_id(self):
+        """Test response for changing place with invalid id"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['user'] = self.hashed_user_id
 
@@ -117,6 +121,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_changing_place_with_blank_name(self):
+        """Test response for changing place with no name"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['user'] = self.hashed_user_id
         test_data['name'] = ''
@@ -125,6 +130,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_changing_place_text_fields(self):
+        """Test response for changing place"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['user'] = self.hashed_user_id
         test_data['name'] = 'New name'
@@ -134,6 +140,7 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_changing_place_address(self):
+        """Test response for changing place's address"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['address'] = json.dumps({
             'longitude': 50,
