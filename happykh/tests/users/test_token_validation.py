@@ -22,7 +22,7 @@ class TestTokenValidation(BaseTestCase, APITestCase):
         )
 
     def tearDown(self):
-        """ teardown any state that were previously setup with a call of
+        """ Teardown any state that were previously setup with a call of
         setup.
         """
         instance = self.test_user
@@ -35,7 +35,7 @@ class TestTokenValidation(BaseTestCase, APITestCase):
 
     def test_valid_token_after_expiration_date(self):
         """
-        test token's validation after expiration date
+        Test token's validation after expiration date
         """
         self.test_user_token.created = (self.test_user_token.created -
                                         datetime.timedelta(days=5))
@@ -45,14 +45,14 @@ class TestTokenValidation(BaseTestCase, APITestCase):
 
     def test_valid_token_before_expiration_date(self):
         """
-        test view response of get request for token
+        Test view response of get request for token
         """
         response = self.client.get(USERS_TEST_TOKEN_VALIDATION_URL)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_invalid_token(self):
         """
-        test view response for get request of invalid token
+        Test view response for get request of invalid token
         """
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + 'invalid token')
         response = self.client.get(USERS_TEST_TOKEN_VALIDATION_URL)
