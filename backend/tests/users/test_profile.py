@@ -68,6 +68,12 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertDictEqual(expected, response.data)
 
+    def test_get_invalid_id(self):
+        """Test if user id is not valid"""
+        wrong_hashed_id = '&'
+        response = self.client.get(USERS_PROFILE_URL % wrong_hashed_id)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
     def test_get_unauthorized_user(self):
         """test if user is unauthorized"""
         new_test_user = User.objects.create_user(email="second@test.com",

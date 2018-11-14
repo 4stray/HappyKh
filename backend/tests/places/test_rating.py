@@ -1,8 +1,8 @@
+from places.api.views import PlaceRatingView
+from places.models import Place, PlaceRating, Address
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
-from places.api.views import PlaceRatingView
-from places.models import Place, PlaceRating, Address
 from tests.utils import BaseTestCase
 from users.models import User
 
@@ -58,6 +58,12 @@ class TestPlaceRating(BaseTestCase, APITestCase):
 
         self.assertDictEqual(expected, response.data)
 
+    def test_get_empty_rating(self):
+        """Test rating with invalid place id"""
+        place_id = 100
+        response = self.client.get(RATING_URL % place_id)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
     def test_post_update(self):
         data = {
             'place': self.place.pk,
@@ -69,8 +75,18 @@ class TestPlaceRating(BaseTestCase, APITestCase):
                     'user': self.hashed_user_id,
                     'rating': data['rating']}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-
         self.assertDictEqual(expected, response.data)
+
+    def test_post_update_with_non_existing_user(self):
+        """Test send rating with wrong user id"""
+        user_id = 100
+        data = {
+            'place': self.place.pk,
+            'user': user_id,
+            'rating': 2,
+        }
+        response = self.client.post(RATING_URL % self.place.pk, data)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_post_create(self):
         data = {
@@ -85,4 +101,3 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         self.assertDictEqual(expected, response.data)
-

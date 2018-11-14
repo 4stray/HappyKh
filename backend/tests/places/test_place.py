@@ -1,11 +1,11 @@
 import json
 
 from django.core.paginator import Paginator
+from places.api.serializers import PlaceSerializer
+from places.models import Place, Address, CommentPlace
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
-from places.api.serializers import PlaceSerializer
-from places.models import Place, Address, CommentPlace
 from tests.utils import BaseTestCase
 from users.models import User
 
@@ -137,6 +137,19 @@ class TestPlacePage(BaseTestCase, APITestCase):
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
+    def test_changing_place_address_for_empty_one(self):
+        """Test update place's address for invalid"""
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 0,
+            'latitude': 0,
+            'address': '',
+        })
+        test_data['user'] = self.hashed_user_id
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
 
 class TestCommentsAPI(BaseTestCase, APITestCase):
 
@@ -203,6 +216,10 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
         wrong_get_url = self.COMMENT_URL + '?objects_per_page=1'
+        response = self.client.get(wrong_get_url)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+        wrong_get_url = self.COMMENT_URL + '?objects_per_page=0'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
