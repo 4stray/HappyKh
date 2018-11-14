@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/Formeme/HappyKh.svg?branch=master)](https://travis-ci.com/Formeme/HappyKh)
+[![codecov](https://codecov.io/gh/Formeme/HappyKh/branch/master/graph/badge.svg)](https://codecov.io/gh/Formeme/HappyKh)
 # HappyKh Project Setup (for unix systems)
 ## Supported platforms: Linux, MacOS
 ## Preinstalled Software Requirements

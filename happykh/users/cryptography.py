@@ -1,6 +1,7 @@
 """Functions for encoding and decoding data in users app"""
+
+from django.conf import settings
 from Crypto.Cipher import DES
-from happykh.settings import ENCODING_DES_KEY
 
 
 def encode(encoding_text):
@@ -9,7 +10,7 @@ def encode(encoding_text):
     :param encoding_text: String
     :return:
     """
-    des = DES.new(ENCODING_DES_KEY.encode(), DES.MODE_ECB)
+    des = DES.new(settings.ENCODING_DES_KEY.encode(), DES.MODE_ECB)
 
     while (len(encoding_text) % 8) != 0:
         encoding_text += " "
@@ -25,7 +26,7 @@ def decode(decoding_hex):
     :param decoding_hex: String
     :return: String
     """
-    des = DES.new(ENCODING_DES_KEY.encode(), DES.MODE_ECB)
+    des = DES.new(settings.ENCODING_DES_KEY.encode(), DES.MODE_ECB)
 
     decoding_bytes = bytes.fromhex(decoding_hex)
     decoded_bytes = des.decrypt(decoding_bytes)
