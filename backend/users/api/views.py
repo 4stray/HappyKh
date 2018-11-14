@@ -59,7 +59,7 @@ class UserLogin(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         user_token, _ = Token.objects.get_or_create(user=user)
-        user_id = HASH_IDS.encode(user.pk)
+        user_id = settings.HASH_IDS.encode(user.pk)
 
         LOGGER.info('User has been logged in')
         return Response({

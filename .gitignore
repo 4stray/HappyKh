@@ -118,4 +118,4 @@ dmypy.json
 media/
 package-lock.json
 env_variables.txt
-/happykh/happykh/static/*
+/backend/happykh/static/*

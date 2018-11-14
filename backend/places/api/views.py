@@ -2,9 +2,9 @@
 import json
 import logging
 
-from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -14,7 +14,8 @@ from users.backends import UserAuthentication
 
 from utils import get_changed_uri
 from .serializers import (PlaceSerializer, AddressSerializer,
-                          CommentPlaceSerializer, PlaceRatingSerializer)
+                          CommentPlaceSerializer, PlaceRatingSerializer
+                          )
 from ..models import Place, Address, CommentPlace, PlaceRating
 
 LOGGER = logging.getLogger('happy_logger')
@@ -98,11 +99,8 @@ class PlaceSinglePage(APIView):
         :param place_id: place's id
         :return: place's data, status code
         """
-        single_place = Place.get_place(place_id)
-        if single_place is None:
-            LOGGER.warning(f'Place #{place_id} not found')
-            return Response(status=status.HTTP_404_NOT_FOUND)
 
+        single_place = get_object_or_404(Place, pk=place_id)
         place_context = {
             'variation': self.place_variation,
             'domain': get_current_site(request)
@@ -117,8 +115,7 @@ class PlaceSinglePage(APIView):
         :param place_id: place's id
         :return: status code
         """
-        single_place = Place.get_place(place_id)
-
+        single_place = get_object_or_404(Place, pk=place_id)
         request_data = request.data.copy()
         address_data = json.loads(request_data.get('address'))
         request_data['address'] = PlacePage.get_address_pk(data=address_data)
@@ -178,15 +175,12 @@ class CommentsAPI(APIView):
         :return: Response with data of comment and it's creator or
                  Response with error status
         """
-        place = Place.get_place(place_id)
+
+        place = get_object_or_404(Place, pk=place_id)
         objects_per_page = request.GET.get('objects_per_page', '')
         page = request.GET.get('page', '')
 
-        if place is None:
-            LOGGER.warning(f'Place #{place_id} not found')
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        all_comments = CommentPlace.objects.filter(place=place_id)
+        all_comments = CommentPlace.objects.filter(place=place.id)
         if not all_comments:
             return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -247,19 +241,12 @@ class CommentsAPI(APIView):
         :param place_id: id of place for which comment was written
         :return: Response with status
         """
-        place = Place.get_place(place_id)
-        if place is None:
-            LOGGER.warning(f'Place #{place_id} not found')
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
+        place = get_object_or_404(Place, pk=place_id)
         data = request.data.copy()
         user = UserAuthentication.get_user(request.data.get('creator'))
-        if not user:
-            return Response({'message': 'User does not exist'},
-                            status=status.HTTP_400_BAD_REQUEST)
 
         data['creator'] = user.id
-        data['place'] = place_id
+        data['place'] = place.id
         comment_serializer = CommentPlaceSerializer(data=data)
         if comment_serializer.is_valid():
             comment_serializer.save()

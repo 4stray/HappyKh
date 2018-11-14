@@ -18,10 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
     id = HashIdField()
     profile_image = UploadedImageField(max_length=None, )
-    age = serializers.IntegerField(max_value=140,
-                                   min_value=0,
-                                   allow_null=True,
-                                   default=None)
 
     class Meta:
         model = User
@@ -70,7 +66,7 @@ class LoginSerializer(serializers.Serializer):
             )
             raise email_validation_error
 
-        if not user_email and user_password:
+        if not (user_email and user_password):
             authorization_error = exceptions.ValidationError
             authorization_error.default_detail = \
                 'Must provide user email and password'
@@ -94,15 +90,15 @@ class LoginSerializer(serializers.Serializer):
             raise account_exists_error
 
         if not user.is_active:
-            account_activation_error = exceptions.ValidationError
-            account_activation_error.default_detail = \
+            activation_error = exceptions.ValidationError
+            activation_error.default_detail = \
                 'Please, check you mailbox in order ' \
                 'to activate your account'
             LOGGER.warning(
                 f'Serializer: Validation warning, '
-                f'{authorization_error.default_detail}'
+                f'{activation_error.default_detail}'
             )
-            raise account_activation_error
+            raise activation_error
 
         attrs['user'] = user
         return attrs
