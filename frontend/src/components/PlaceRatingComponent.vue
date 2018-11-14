@@ -1,8 +1,7 @@
 <template>
   <v-layout justify-space-around row fill-height>
-    <v-flex md6>
+    <v-flex xs12 mt-4>
       <v-layout justify-start column>
-        <v-card id="main" class="px-5 py-3">
           <v-label class="d-block" id="labelRating">Rate this place:</v-label>
           <v-rating
               id="placeRating"
@@ -19,7 +18,6 @@
               flat>
             Rate Now
           </v-btn>
-        </v-card>
       </v-layout>
     </v-flex>
   </v-layout>
