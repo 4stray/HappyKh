@@ -2,6 +2,7 @@
 import logging
 
 from rest_framework import serializers
+from rest_framework import exceptions
 from happykh.settings import HASH_IDS
 from users.models import User
 
@@ -68,4 +69,4 @@ class UserAuthentication:
         except IndexError:
             LOGGER.error('Invalid hashed_user_id')
 
-        return None
+        raise exceptions.NotFound(detail='User does not exist')

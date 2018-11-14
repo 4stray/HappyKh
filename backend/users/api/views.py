@@ -255,9 +255,6 @@ class UserProfile(APIView):
         :return: Response(data, status)
         """
         user = UserAuthentication.get_user(id)
-        if user is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
@@ -294,9 +291,6 @@ class UserProfile(APIView):
                             status=status.HTTP_403_FORBIDDEN)
 
         user = UserAuthentication.get_user(id)
-        if user is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
         request_data = request.data.copy()
         context = {
             'variation': self.variation,
@@ -337,9 +331,6 @@ class UserEmail(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         user = UserAuthentication.get_user(id)
-        if user is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
         if User.objects.filter(email=new_email).exists():
             LOGGER.warning(f'User with id: {user.pk} tried to change '
                            f'his email to existing')
@@ -378,9 +369,6 @@ class UserPassword(APIView):
         :return: Response(message, status)
         """
         user = UserAuthentication.get_user(id)
-        if user is None:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
         serializer = PasswordSerializer(data=request.data)
         if not serializer.is_valid():
             LOGGER.error(f'Serializer error {serializer.errors}'

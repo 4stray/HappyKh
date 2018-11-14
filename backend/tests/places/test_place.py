@@ -175,10 +175,10 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
 
         data['creator'] = 'KLK'
         response = self.client.post(self.COMMENT_URL, data)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
         self.assertEqual(2, CommentPlace.objects.count())
 
         data['text'] = None
         response = self.client.post(self.COMMENT_URL, data)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
         self.assertEqual(2, CommentPlace.objects.count())
