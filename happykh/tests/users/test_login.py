@@ -4,7 +4,7 @@ from rest_framework import status
 from tests.utils import BaseTestCase
 from users.models import User
 
-CORRECT_EMAIL = 'test@mail.com'
+CORRECT_EMAIL = 'test_mail@mail.com'
 CORRECT_PASSWORD = 'testPassword'
 LOGIN_URL = '/api/users/login'
 

@@ -5,7 +5,6 @@ import uuid
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import UploadedFile
-from happykh.settings import HASH_IDS, MEDIA_DIR
 from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from stdimage.models import StdImageFieldFile
@@ -40,7 +39,7 @@ def delete_std_images_from_media(std_image_file, variations):
     if std_image_file and \
             isinstance(std_image_file, StdImageFieldFile) and \
             os.path.isfile(std_image_file.path):
-        path = std_image_file.path.split(MEDIA_DIR+'/')[-1]
+        path = std_image_file.path.split(settings.MEDIA_DIR + '/')[-1]
         os.remove(
             os.path.join(settings.MEDIA_ROOT, path))
         for variant in variations:
@@ -54,7 +53,7 @@ def delete_std_images_from_media(std_image_file, variations):
 def is_user_owner(request, id):
     token_key = request.META['HTTP_AUTHORIZATION'][6:]
     token_user_id = Token.objects.get(key=token_key).user.id
-    user_id = HASH_IDS.decode(id)[0]
+    user_id = settings.HASH_IDS.decode(id)[0]
     return user_id == token_user_id
 
 
@@ -108,8 +107,8 @@ class HashIdField(serializers.Field):
     """
 
     def to_representation(self, data):
-        return HASH_IDS.encode(data)
+        return settings.HASH_IDS.encode(data)
 
     def to_internal_value(self, data):
-        user_id = HASH_IDS.decode(data)[0]
+        user_id = settings.HASH_IDS.decode(data)[0]
         return super(HashIdField, self).to_internal_value(user_id)

@@ -13,6 +13,7 @@ CORRECT_DATA = {'user_email': CORRECT_EMAIL}
 
 @pytest.mark.django_db
 class ActivationEmailViewTestCase(BaseTestCase, APITestCase):
+    """ Test email activation """
     def setUp(self):
         self.test_user = User.objects.create_user(email=CORRECT_EMAIL,
                                                   password='test123')
@@ -20,13 +21,13 @@ class ActivationEmailViewTestCase(BaseTestCase, APITestCase):
     def test_invalid_email(self):
         """Test view response for invalid email"""
         data = CORRECT_DATA.copy()
-        data['user_email'] = 'fakemail.com'
+        data['user_email'] = 'fake_mail.com'
         response = self.client.post(LOGIN_URL, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
         self.assertEqual('Invalid email', response.data['message'])
 
     def test_is_user_in_db(self):
-        """Test is user with such email in db"""
+        """Test if user with such email exists in db"""
         data = CORRECT_DATA.copy()
         data['user_email'] = 'fake@mail.com'
         response = self.client.post(LOGIN_URL, data)
