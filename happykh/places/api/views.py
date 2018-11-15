@@ -157,7 +157,7 @@ class CommentsAPI(APIView):
             .order_by('-creation_time')
 
         if all_comments is None or not all_comments:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         try:
             objects_per_page = int(objects_per_page)

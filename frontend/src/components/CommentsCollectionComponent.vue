@@ -3,7 +3,7 @@
         <v-layout column>
             <v-flex xs12 v-if="pageDifference">
                 <v-form @submit.prevent="upload">
-                    <v-btn class="upload-button" color="#9cbbed" type="submit">
+                    <v-btn id="uploadButton" color="#9cbbed" type="submit">
                         View {{commentsNotLoad}} more
                     </v-btn>
                 </v-form>
@@ -14,17 +14,17 @@
             <v-flex xs12>
                 <v-layout column>
                     <v-form enctype="multipart/form-data"
-                            @submit.prevent="leftComment">
+                            @submit.prevent="leaveComment">
                         <v-textarea
+                                id="newCommentInput"
                                 row-height="20"
                                 rows="4"
                                 v-model="newComment"
-                                color="#010305"
-                                label="Left your comment here"
+                                label="Leave your comment here"
                         ></v-textarea>
                         <v-flex xs12>
                             <v-layout row align-left>
-                                <v-btn color="#0b563d" type="submit">Submit</v-btn>
+                                <v-btn id="postCommentBtn" color="#4286f4" type="submit">Submit</v-btn>
                             </v-layout>
                         </v-flex>
                     </v-form>
@@ -53,7 +53,7 @@ export default {
     },
   },
   methods: {
-    leftComment() {
+    leaveComment() {
       if (this.newComment.length >= 4) {
         const formData = new FormData();
         const id = this.$route.params.id;
@@ -80,21 +80,27 @@ export default {
         });
       }
     },
-    upload() {
-      const id = this.$route.params.id;
-      this.page += 1;
-      const params = {
+    pushComments(responseData) {
+      for (let i = 0; i < responseData.length; i += 1) {
+        this.allComments.unshift(responseData[i]);
+      }
+    },
+    getRequestParams() {
+      return {
         params: {
           objects_per_page: this.objects_per_page,
           page: this.page,
         },
       };
+    },
+    upload() {
+      const id = this.$route.params.id;
+      this.page += 1;
+      const params = this.getRequestParams();
       getComments(id, params)
         .then((response) => {
           const responseData = response.data.comments;
-          for (let i = 0; i < responseData.length; i += 1) {
-            this.allComments.unshift(responseData[i]);
-          }
+          this.pushComments(responseData);
         }).catch((error) => {
           if (error.response === undefined) {
             this.$awn.alert('A server error has occurred, try again later');
@@ -102,6 +108,22 @@ export default {
             this.$awn.alert(error);
           }
           this.page -= 1;
+        });
+    },
+    fetchCommentsCollectionData() {
+      const id = this.$route.params.id;
+      const params = this.getRequestParams();
+      getComments(id, params)
+        .then((response) => {
+          this.pushComments(response.data.comments);
+          this.numberOfPages = response.data.number_of_pages;
+          this.count = response.data.count;
+        }).catch((error) => {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.alert(error);
+          }
         });
     },
   },
@@ -116,31 +138,13 @@ export default {
     };
   },
   created() {
-    const id = this.$route.params.id;
-    const params = {
-      params: {
-        objects_per_page: this.objects_per_page,
-        page: this.page,
-      },
-    };
-    getComments(id, params)
-      .then((response) => {
-        this.allComments = response.data.comments.reverse();
-        this.numberOfPages = response.data.number_of_pages;
-        this.count = response.data.count;
-      }).catch((error) => {
-        if (error.response === undefined) {
-          this.$awn.alert('A server error has occurred, try again later');
-        } else {
-          this.$awn.alert(error);
-        }
-      });
+    this.fetchCommentsCollectionData();
   },
 };
 </script>
 
 <style scoped>
-    .upload-button {
+    #uploadButton {
         width: 100%;
         opacity: 0.5;
     }
