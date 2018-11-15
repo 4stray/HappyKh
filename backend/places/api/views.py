@@ -14,8 +14,7 @@ from users.backends import UserAuthentication
 
 from utils import get_changed_uri
 from .serializers import (PlaceSerializer, AddressSerializer,
-                          CommentPlaceSerializer, PlaceRatingSerializer
-                          )
+                          CommentPlaceSerializer, PlaceRatingSerializer)
 from ..models import Place, Address, CommentPlace, PlaceRating
 
 LOGGER = logging.getLogger('happy_logger')
@@ -60,6 +59,7 @@ class PlacePage(APIView):
             'variation': self.variation,
             'domain': get_current_site(request)
         }
+
         serializer = PlaceSerializer(data=data, context=context)
         if serializer.is_valid():
             pk = serializer.save()
@@ -180,9 +180,11 @@ class CommentsAPI(APIView):
         objects_per_page = request.GET.get('objects_per_page', '')
         page = request.GET.get('page', '')
 
-        all_comments = CommentPlace.objects.filter(place=place.id)
+        all_comments = CommentPlace.objects.filter(
+            place=place_id).order_by('-creation_time')
+
         if not all_comments:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_404_NOT_FOUND)
 
         if not objects_per_page.isdigit():
             LOGGER.warning(f'Wrong objects_per_page={objects_per_page}'
@@ -206,7 +208,7 @@ class CommentsAPI(APIView):
         comment_context = {'domain': get_current_site(request), }
         comment_serializer = CommentPlaceSerializer(comments_for_page,
                                                     context=comment_context,
-                                                    many=True)
+                                                    many=True, )
         next_page_link = None
         if comments_page.has_next():
             next_page_link = get_changed_uri(
@@ -247,10 +249,12 @@ class CommentsAPI(APIView):
 
         data['creator'] = user.id
         data['place'] = place.id
-        comment_serializer = CommentPlaceSerializer(data=data)
+        comment_context = {'domain': get_current_site(request), }
+        comment_serializer = CommentPlaceSerializer(data=data, context=comment_context)
         if comment_serializer.is_valid():
             comment_serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(comment_serializer.data,
+                            status=status.HTTP_201_CREATED)
 
         return Response(comment_serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)

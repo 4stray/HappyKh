@@ -29,12 +29,12 @@
             Place has no description.</p>
 
           <v-label class="d-block" id="labelAddress">Address</v-label>
-
           <h3 class="subheading" id="placeAddress">
             {{place.address.address}}
           </h3>
 
           <PlaceRatingComponent/>
+          <CommentsCollectionComponent/>
 
           <v-btn :to="{name: 'placeEdit', params: {placeId: place.id}}"
                  fab dark absolute bottom right color="green">
@@ -47,15 +47,14 @@
 </template>
 
 <script>
-import PlaceRatingComponent from '@/components/PlaceRatingComponent.vue';
 import { getPlaceData } from '../axios-requests';
+import CommentsCollectionComponent from './CommentsCollectionComponent';
+import PlaceRatingComponent from './PlaceRatingComponent';
 
 
 export default {
   name: 'ProfileComponent',
-  components: {
-    PlaceRatingComponent,
-  },
+  components: { PlaceRatingComponent, CommentsCollectionComponent },
   data() {
     return {
       place: {

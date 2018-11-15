@@ -37,6 +37,9 @@ export function getPlaceRating(id) {
   return axiosInstance.get(`/api/places/rating/${id}`);
 }
 
+export function getComments(id, params) {
+  return axiosInstance.get(`/api/places/${id}/comments`, params);
+}
 export function getConfirmation(email, token) {
   return axiosInstance.get(`/api/users/activate/${email}/${token}/`);
 }
