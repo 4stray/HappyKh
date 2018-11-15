@@ -125,7 +125,7 @@ class PlaceSinglePage(APIView):
         if not single_place:
             LOGGER.error(f'Place with id {place_id} does not exist')
             return Response(status=status.HTTP_404_NOT_FOUND)
-        elif not place_serializer.is_valid():
+        if not place_serializer.is_valid():
             LOGGER.error(
                 f'Place is not valid due to validation errors: '
                 f'{place_serializer.errors}'
@@ -176,7 +176,7 @@ class CommentsAPI(APIView):
                  Response with error status
         """
 
-        place = get_object_or_404(Place, pk=place_id)
+        get_object_or_404(Place, pk=place_id)
         objects_per_page = request.GET.get('objects_per_page', '')
         page = request.GET.get('page', '')
 
@@ -190,14 +190,14 @@ class CommentsAPI(APIView):
             LOGGER.warning(f'Wrong objects_per_page={objects_per_page}'
                            f' argument.')
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        elif int(objects_per_page) == 0:
+        if int(objects_per_page) == 0:
             LOGGER.warning(f"Objects_per_page argument can't be 0")
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if not page.isdigit():
             LOGGER.warning(f'Wrong page={page} argument.')
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        elif int(page) == 0:
+        if int(page) == 0:
             LOGGER.warning(f"Page argument can't be 0")
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -250,14 +250,14 @@ class CommentsAPI(APIView):
         data['creator'] = user.id
         data['place'] = place.id
         comment_context = {'domain': get_current_site(request), }
-        comment_serializer = CommentPlaceSerializer(data=data, context=comment_context)
+        comment_serializer = CommentPlaceSerializer(data=data,
+                                                    context=comment_context)
         if comment_serializer.is_valid():
             comment_serializer.save()
             return Response(comment_serializer.data,
                             status=status.HTTP_201_CREATED)
 
-        return Response(comment_serializer.errors,
-                        status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class PlaceRatingView(APIView):
