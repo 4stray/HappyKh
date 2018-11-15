@@ -1,5 +1,4 @@
 <template>
-    <v-container>
         <v-layout column>
             <v-flex xs12 v-if="pageDifference">
                 <v-form @submit.prevent="upload">
@@ -24,14 +23,15 @@
                         ></v-textarea>
                         <v-flex xs12>
                             <v-layout row align-left>
-                                <v-btn id="postCommentBtn" color="#4286f4" type="submit">Submit</v-btn>
+                                <v-btn id="postCommentBtn"
+                                       color="#4286f4"
+                                       type="submit">Submit</v-btn>
                             </v-layout>
                         </v-flex>
                     </v-form>
                 </v-layout>
             </v-flex>
         </v-layout>
-    </v-container>
 </template>
 
 <script>

@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <v-container grid-list-md fluid>
     <GoBackComponent/>
-    <PlaceDetailComponent/>
-  </div>
+    <PlaceDetailComponent />
+  </v-container>
 </template>
 
 <script>
