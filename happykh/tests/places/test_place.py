@@ -105,8 +105,9 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
             place=self.comment_info['place'],
         )
         self.pk = CommentPlace.objects.last().pk
+        self.comment_count = CommentPlace.objects.count()
 
-    def test_get(self):
+    def test_successful_get(self):
         comment = CommentPlace.objects.create(
             creator=self.comment_info['creator'],
             text='com2',
@@ -137,52 +138,66 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.assertEqual(1, len(response.data['comments']))
         self.assertEqual(comment.text, response.data['comments'][0]['text'])
 
+    def test_get_with_wrong_page_attr(self):
         wrong_get_url = self.COMMENT_URL + '?page=0&objects_per_page=1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+    def test_get_with_wrong_object_per_page_attr(self):
         wrong_get_url = self.COMMENT_URL + '?page=1&objects_per_page=-1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+    def test_get_with_missing_page_attr(self):
         wrong_get_url = self.COMMENT_URL + '?objects_per_page=1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+    def test_get_with_missing_object_per_page_attr(self):
         wrong_get_url = self.COMMENT_URL + '?page=1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+    def test_get_with_wrong_place(self):
         wrong_get_url = '/api/places/0/comments'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
+    def test_get_without_comments_in_db(self):
+        get_url = self.COMMENT_URL + '?page=2&objects_per_page=1'
         CommentPlace.objects.all().delete()
         response = self.client.get(get_url)
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
-    def test_post(self):
+    def test_successful_post(self):
         data = self.comment_info
         data['creator'] = self.hashed_user_id
 
         response = self.client.post(self.COMMENT_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
-        self.assertEqual(2, CommentPlace.objects.count())
+        self.assertEqual(self.comment_count+1, CommentPlace.objects.count())
 
+    def test_post_with_wrong_place(self):
         comment_url = '/api/places/0/comments'
+        data = self.comment_info
         response = self.client.post(comment_url, data)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
-        self.assertEqual(2, CommentPlace.objects.count())
+        self.assertEqual(self.comment_count, CommentPlace.objects.count())
 
+    def test_post_with_wrong_user(self):
+        data = self.comment_info
         data['creator'] = 'KLK'
+
         response = self.client.post(self.COMMENT_URL, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-        self.assertEqual(2, CommentPlace.objects.count())
+        self.assertEqual(self.comment_count, CommentPlace.objects.count())
 
+    def test_post_with_invalid_text(self):
+        data = self.comment_info
         data['text'] = None
         response = self.client.post(self.COMMENT_URL, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-        self.assertEqual(2, CommentPlace.objects.count())
+        self.assertEqual(self.comment_count, CommentPlace.objects.count())
 
     def test_successful_delete(self):
         pk = CommentPlace.objects.create(
