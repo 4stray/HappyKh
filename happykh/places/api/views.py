@@ -203,9 +203,8 @@ class CommentsAPI(APIView):
             LOGGER.warning(f'Place #{place_id} not found')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        all_comments = CommentPlace.objects\
-            .filter(place=place_id)\
-            .order_by('-creation_time')
+        all_comments = CommentPlace.objects.filter(
+            place=place_id).order_by('-creation_time')
 
         if all_comments is None or not all_comments:
             return Response(status=status.HTTP_404_NOT_FOUND)
