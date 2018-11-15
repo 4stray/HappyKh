@@ -236,7 +236,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
 
         CommentPlace.objects.all().delete()
         response = self.client.get(get_url)
-        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_post(self):
         """
