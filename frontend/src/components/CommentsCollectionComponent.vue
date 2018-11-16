@@ -179,11 +179,11 @@ export default {
           }
         });
     },
-    setFocus(comment){
+    setFocus(comment) {
       this.commentToUpdate = comment;
       this.$refs.commentText.value = comment.text;
       this.$refs.commentText.focus();
-    }
+    },
   },
   data() {
     return {

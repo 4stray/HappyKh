@@ -46,9 +46,9 @@ export default {
     deleteComment() {
       this.$parent.$emit('deleteComment', this.comment);
     },
-    updateComment(){
+    updateComment() {
       this.$parent.$emit('updateComment', this.comment);
-    }
+    },
   },
   computed: {
     dateTime() {
