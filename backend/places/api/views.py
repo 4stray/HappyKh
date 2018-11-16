@@ -274,12 +274,13 @@ class PlaceRatingView(APIView):
         """
         ratings = PlaceRating.objects.filter(place=place_id)
         if not ratings.count():
-            return 0
+            return {'average': 0, 'amount': 0}
 
         amount = ratings.count()
         rating = sum([rate.rating for rate in ratings])
         average = round(rating / amount, 1)
-        return average
+        response = {'average': average, 'amount': amount}
+        return response
 
     def get(self, request, place_id):
         """
@@ -290,7 +291,8 @@ class PlaceRatingView(APIView):
         """
         average_rating = self.get_average(place_id)
         response = {'place': place_id,
-                    'rating': average_rating}
+                    'rating': average_rating['average'],
+                    'amount': average_rating['amount']}
         return Response(response, status=status.HTTP_200_OK)
 
     def post(self, request, place_id):
@@ -305,16 +307,19 @@ class PlaceRatingView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         user = UserAuthentication.get_user(user_id)
+        amount = self.get_average(place_id)
 
         request_data = {'user': user.id,
                         'place': place_id,
-                        'rating': request.data.get('rating')}
+                        'rating': request.data.get('rating'),
+                        'amount': amount['amount']}
         serializer = PlaceRatingSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
             response = {'user': request.data.get('user'),
                         'place': serializer.data['place'],
-                        'rating': serializer.data['rating']}
+                        'rating': serializer.data['rating'],
+                        'amount': amount['amount']}
 
             return Response(response, status=status.HTTP_200_OK)
 

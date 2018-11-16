@@ -3,6 +3,7 @@
     <v-flex md6>
       <v-layout justify-start column>
           <v-label class="d-block" id="labelRating">Rate this place:</v-label>
+          <h6 class="subheading" id="displayRating"> {{ display_rating }}</h6>
           <v-rating
               id="placeRating"
               v-model="rating"
@@ -33,10 +34,13 @@ export default {
       userToken: 'getToken',
       userID: 'getUserID',
     }),
-  },
+
+},
   data() {
     return {
       rating: 0,
+        amount: 0,
+        display_rating: "",
     };
   },
   created() {
@@ -46,6 +50,8 @@ export default {
     fetchRating() {
       getPlaceRating(this.$route.params.id).then((response) => {
         this.rating = response.data.rating;
+        this.amount = response.data.amount;
+        this.display_rating = this.rating + " / " + this.amount;
       }).catch((error) => {
         if (error.response === undefined) {
           this.$awn.alert('A server is currently unavailable');
@@ -65,6 +71,8 @@ export default {
       axiosInstance.post(`/api/places/rating/${this.$route.params.id}`, ratingData)
         .then((response) => {
           this.rating = response.data.rating;
+          this.amount = response.data.amount;
+          this.display_rating = this.rating + " / " + this.amount;
           this.$awn.success('The place was successfully rated.');
         }).catch((error) => {
           if (error.response === undefined) {
