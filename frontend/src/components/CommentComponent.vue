@@ -21,7 +21,7 @@
                     </v-flex>
                     <p class="text-sm-left body-2 pt-2">{{comment.text}}</p>
                     <v-layout align-start justify-end row>
-                        <span class="caption" v-if="edited">(edited)</span>
+                        <span class="caption" v-if="comment.edited">(edited)</span>
                         <v-btn fab flat small bottom v-on:click="updateComment">
                         <v-icon size="1.3em" dark>edit</v-icon>
                     </v-btn>
@@ -67,7 +67,7 @@ export default {
           place: '',
           creator_image: '',
           creator_fullname: '',
-          edited: false
+          edited: '',
         };
       },
     },
