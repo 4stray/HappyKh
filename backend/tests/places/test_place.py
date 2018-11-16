@@ -152,6 +152,19 @@ class TestPlacePage(BaseTestCase, APITestCase):
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
+    def test_changing_place_address_for_empty_one(self):
+        """Test update place's address for invalid"""
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 0,
+            'latitude': 0,
+            'address': '',
+        })
+        test_data['user'] = self.hashed_user_id
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
 
 class TestCommentsAPI(BaseTestCase, APITestCase):
     """Test comments for places"""
@@ -173,7 +186,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
                              'place': self.place,
                              }
         self.comment = CommentPlace.objects.create(
-            #pylint: disable=duplicate-code
+            # pylint: disable=duplicate-code
             creator=self.comment_info['creator'],
             text=self.comment_info['text'],
             place=self.comment_info['place'],
@@ -231,7 +244,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_get_with_missing_object_per_page_attr(self):
-        wrong_get_url = self.COMMENT_URL + '?page=1'
+        wrong_get_url = self.COMMENT_URL + '?objects_per_page=0'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 

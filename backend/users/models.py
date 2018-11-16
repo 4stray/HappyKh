@@ -101,7 +101,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
-    age = models.PositiveSmallIntegerField(blank=True, null=True, )
+    age = models.PositiveSmallIntegerField(blank=True, null=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=2,
                               default=woman)
     profile_image = std_models.StdImageField(
@@ -122,7 +122,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = f'{self.first_name} { self.last_name}'
         return full_name.strip()
 
     def get_short_name(self):
