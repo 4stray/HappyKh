@@ -2,11 +2,11 @@
     <v-flex xs12>
         <v-layout align-center justify-space-around row class="ma-3">
             <v-flex xs1 grow>
-                <v-avatar size="65" color="indigo mr-4">
+                <v-avatar size="65" color="">
                     <img
                             class="avatar"
                             v-on:click="link"
-                            :src="comment.creator_image"
+                            :src="comment.creator_image || require('@/assets/default_user.png')"
                     >
                 </v-avatar>
             </v-flex>
