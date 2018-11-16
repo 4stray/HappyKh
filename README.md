@@ -92,9 +92,24 @@ GRANT ALL PRIVILEGES ON DATABASE happykh TO localadmin;
 ```
 
 ### Environment Variables Description
+#### Django Environent Variables
+
 **SENDGRID_API_KEY** - WebAPI key is mandatory for sending email
 
 **EMAIL_HOST_USER** - mailbox which will be used to send email from to other users
+
+**EMAIL_ENCODING_KEY** - WebAPI key is mandatory for sending and changing an email
+
+**HASHID_FIELD_SALT** - WebAPI key is mandatory for cyphering user id
+
+**DJANGO_SETTINGS_MODULE** - the variable is mandatory for specifying Django settings 
+
+###
+
+#### Vue.js Environent Variables
+
+**VUE_APP_GOOGLE_API** - WebAPI key is mandatory for connecting to the Google API maps service 
+
 #
 ### Project Styleguides
 #### [Frontend Styleguide](https://github.com/Formeme/HappyKh/wiki/Frontend-Styleguide)
