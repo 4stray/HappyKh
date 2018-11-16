@@ -1,32 +1,26 @@
-<template>
-  <div>
-    <h1>Congratulations!</h1>
-    <p>You've just activated your account</p>
-  </div>
-</template>
-
 <script>
 // @ is an alias to /src
-import axios from 'axios';
+import { getConfirmation } from '../axios-requests';
 
 export default {
   name: 'ConfirmRegistrationComponent',
   created() {
     /* eslint-disable prefer-destructuring */
-    const userId = this.$route.params.userId;
+    const email = this.$route.params.email;
     const emailToken = this.$route.params.emailToken;
 
-    axios.get(
-      `http://localhost:8000/api/users/activate/${userId}/${emailToken}/`,
-      {
-        userId,
-        emailToken,
-      },
-    ).then((response) => {
-      console.log(response.status); /* eslint-disable-line no-console */
+    getConfirmation(email, emailToken).then((response) => {
+      /* eslint-disable-next-line no-console */
+      console.log(response.status);
+      this.$awn.success('Your account has been activated successfully');
     }).catch((error) => {
-      console.log(error); /* eslint-disable-line no-console */
+      if (error.response === undefined) {
+        this.$awn.alert('A server error has occurred, try again later');
+      } else {
+        this.$awn.warning(error.response.data.message);
+      }
     });
+    this.$router.push({ name: 'login' });
   },
 };
 </script>

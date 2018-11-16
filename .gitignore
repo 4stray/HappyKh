@@ -95,6 +95,8 @@ env.bak/
 venv.bak/
 env_happykh
 happykh/sendgrid.env
+happykh/hashid.env
+
 
 # Spyder project settings
 .spyderproject
@@ -115,3 +117,5 @@ dmypy.json
 .idea
 media/
 package-lock.json
+env_variables.txt
+/happykh/happykh/static/*

@@ -1,11 +1,14 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import confirmationEmail from '../../src/components/ConfirmationEmailComponent.vue';
 
 const expect = require('chai').expect;
-const should = require('chai').should();
+
+const localVue = createLocalVue();
+localVue.use(Vuetify);
 
 describe('confirmationEmail', () => {
-  const wrapper = shallowMount(confirmationEmail);
+  const wrapper = shallowMount(confirmationEmail, { localVue });
 
   it('has default userEmail', () => {
     expect(confirmationEmail.data()).to.have.property('userEmail');

@@ -1,34 +1,36 @@
 <template>
-  <div id="ProfileComponent">
-    <h1>Your profile:</h1>
-    <form id="profileForm" enctype="multipart/form-data">
-      <input type="text" :disabled="isDisabled" id="first_name"
-             v-model="userFirstName" placeholder="First name"/>
-      <input type="text" :disabled="isDisabled" id="last_name"
-             v-model="userLastName" placeholder="Last name"/>
-      <input type="number" v-model.number="userAge" :disabled="isDisabled" id="age"
-             min="0" max="140" step="1"/>
-      <select :disabled="isDisabled" v-model="userGender">
-        <option disabled value="">Choose your gender</option>
-        <option>Man</option>
-        <option>Woman</option>
-      </select>
-      <img v-if="userImage" v-bind:src=userImage id="image" alt="Something happened with image" />
-      <img v-else src='../assets/blank-profile-picture.png' id="blank" alt="No profile image"/>
-      <input type="file" id="imageInput" :disabled="isDisabled"
-             v-on:change="changeImage()"
-             accept="image/*"/>
-      <button class="btn-change" v-on:click=edit()>{{ enableText }}</button>
-      <button class="btn-save" type="button" v-on:click="save()">Save changes</button>
-    </form>
-  </div>
+  <v-layout justify-space-around row fill-height>
+    <v-flex md4 xs12>
+      <img v-if="userImage" v-bind:src=userImage alt="No image" width="80%"
+           id="userImage"/>
+      <img v-else src="../assets/default_user.png" alt="No user avatar"/>
+    </v-flex>
+    <v-flex md6 xs12>
+      <v-layout justify-start column fill-height>
+        <v-card id="main" class="px-5 py-3 title">
+          <v-btn v-if=enableEditingProfile :to="{name: 'settings'}"
+                 fab dark absolute bottom right color="green">
+            <v-icon>edit</v-icon>
+          </v-btn>
+          <h3 class="headline mb-2 font-weight-bold">{{fullName}}</h3>
+          <v-label v-if="userAge" id="userAgeLabel">Age</v-label>
+          <p id="userAge" v-if="userAge">{{userAge}}</p>
+          <v-label id="userGenderLabel">Gender</v-label>
+          <p id="userGender">{{userGender}}</p>
+        </v-card>
+      </v-layout>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
-import axios from 'axios';
+import { getUserData } from '../axios-requests';
 
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
-const GENDER_CHOISES = { M: 'Man', W: 'Woman' };
+const GENDER_CHOICES = {
+  M: 'Man',
+  W: 'Woman',
+  O: 'Other',
+};
 
 export default {
   name: 'ProfileComponent',
@@ -37,172 +39,45 @@ export default {
       userFirstName: '',
       userLastName: '',
       userAge: 0,
-      userGender: 'Male',
+      userGender: 'M',
       userImage: '',
-      isDisabled: true,
-      enableText: 'Enable editing',
+      enableEditingProfile: false,
     };
   },
   created() {
     this.fetchUserCredentials();
   },
+  computed: {
+    fullName() {
+      if (this.userFirstName) {
+        return `${this.userFirstName} ${this.userLastName}`;
+      }
+      return '';
+    },
+  },
   methods: {
     fetchUserCredentials() {
-      axios.get(
-        `${UserAPI + this.$cookies.get('user_id')}`,
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      )
-        .then((response) => {
-          this.userFirstName = response.data.first_name;
-          this.userLastName = response.data.last_name;
-          this.userAge = response.data.age;
-          this.userGender = GENDER_CHOISES[response.data.gender];
-          this.userImage = response.data.profile_image;
-        }).catch((error) => {
-          this.$awn.warning(this.error.message);
-        });
-    },
-    save() {
-      const imageFile = document.querySelector('#imageInput');
-      const age = this.userAge;
-      if (Number.isInteger(Number(age)) && age >= 0 && age <= 140 && age != null) {
-        const formData = new FormData();
-        formData.set('first_name', this.userFirstName);
-        formData.set('last_name', this.userLastName);
-        formData.set('age', this.userAge);
-        formData.set('gender', this.userGender.charAt(0));
-        formData.append('profile_image', imageFile.files[0]);
-
-        axios.patch(
-          UserAPI + this.$cookies.get('user_id'), formData,
-          {
-            headers: {
-              Authorization: `Token ${this.$cookies.get('token')}`,
-              'Content-Type': 'multipart/form-data',
-            },
-          },
-        )
-          .then((response) => {
-            this.isDisabled = true;
-            this.enableText = 'Enable editing';
-            this.userFirstName = response.data.first_name;
-            this.userLastName = response.data.last_name;
-            this.userAge = response.data.age;
-            this.userGender = GENDER_CHOISES[response.data.gender];
-            this.userImage = response.data.profile_image;
-            this.$awn.success('Your profile was successfully updated.');
-          }).catch((error) => {
-            this.$awn.warning(this.error.message);
-          });
-      } else {
-        this.userAge = 0;
-        this.$awn.warning('Enter valid age.');
-      }
-    },
-    edit() {
-      this.isDisabled = !this.isDisabled;
-      if (this.isDisabled) {
-        this.enableText = 'Enable editing';
-      } else {
-        this.enableText = 'Disable editing';
-      }
-    },
-    changeImage() {
-      const file = document.getElementById('imageInput').files[0];
-      const reader = new FileReader();
-
-      const self = this;
-      reader.addEventListener('load', () => {
-        self.userImage = reader.result;
-      }, false);
-
-      reader.readAsDataURL(file);
+      getUserData(this.$route.params.id).then((response) => {
+        this.userFirstName = response.data.first_name;
+        this.userLastName = response.data.last_name;
+        this.userAge = response.data.age;
+        this.userGender = GENDER_CHOICES[response.data.gender];
+        this.userImage = response.data.profile_image;
+        this.enableEditingProfile = response.data.enable_editing_profile;
+      }).catch((error) => {
+        if (error.response === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else if (error.response.data.message) {
+          this.$awn.warning(error.response.data.message);
+        }
+      });
     },
   },
 };
 </script>
 
 <style scoped>
-  #ProfileComponent {
-    width: 500px;
-    border: 1px solid #CCCCCC;
-    background-color: #FFFFFF;
-    margin: auto;
-    margin-top: 130px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  input {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 300px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  input:focus {
-    outline: none;
-  }
-
-  img {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 300px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  select {
-    padding: 10px 15px;
-    margin-bottom: 10px;
-    width: 332px;
-    height: 40px;
-    border: 1px solid #ccc;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-  }
-
-  .btn-change {
-    margin-top: 5px;
-    background-color: #ffc107;
-    color: #fff;
-    border: none;
-    padding: 10px 25px;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-family: "Liberation Sans", sans;
-    border-radius: 20px;
-    cursor: pointer;
-  }
-
-  .btn-change:hover {
-    background-color: #ffa000;
-  }
-
-  .btn-save {
-    margin-top: 5px;
-    background-color: #ffc107;
-    color: #fff;
-    border: none;
-    padding: 10px 25px;
-    text-transform: uppercase;
-    font-weight: 600;
-    font-family: "Liberation Sans", sans;
-    border-radius: 20px;
-    cursor: pointer;
-  }
-
-  .btn-save:hover {
-    background-color: #ffa000;
-  }
+.material-icons {
+  display: inherit;
+}
 </style>
