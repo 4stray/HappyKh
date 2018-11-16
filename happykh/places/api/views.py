@@ -249,7 +249,6 @@ class CommentsAPI(APIView):
             "previous": previous_page_link,
             "comments": comment_serializer.data,
         }
-
         return Response(response_dict, status=status.HTTP_200_OK)
 
     def post(self, request, place_id):
@@ -268,6 +267,7 @@ class CommentsAPI(APIView):
 
         data = request.data.copy()
         try:
+            data['creator'] = settings.HASH_IDS.decode(data['creator'])[0]
             data['place'] = place_id
             comment_context = {'domain': get_current_site(request), }
             comment_serializer = CommentPlaceSerializer(data=data, context=comment_context,)
@@ -278,20 +278,25 @@ class CommentsAPI(APIView):
         except (IndexError, CustomValidationError):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, place_id):
+
+class SingleCommentAPI(APIView):
+
+    def put(self, request, place_id, comment_id):
         """
         Update CommentPlace object.
 
         :param request: HTTP Request
         :param place_id: id of place for which comment was written
+        :param comment_id id of comment being updated
         :return: Response with status
         """
         data = request.data.copy()
+        data.update(creator=settings.HASH_IDS.decode(data['creator'])[0])
         data.update(place=place_id)
 
-        comment = CommentPlace.objects.filter(pk=data['id']).first()
+        comment = CommentPlace.objects.filter(pk=comment_id).first()
         if not comment:
-            LOGGER.warning(f'Comment #{data["id"]} not found')
+            LOGGER.warning(f'Comment #{comment_id} not found')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         comment_context = {'domain': get_current_site(request)}
@@ -308,16 +313,16 @@ class CommentsAPI(APIView):
         return Response(comment_serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, place_id):
+    def delete(self, request, place_id, comment_id):
         """
         Delete CommentPlace object.
 
         :param request: HTTP Request
+        :param comment_id if of comment being delete
         :return: Response with status
         """
-        data = request.data.copy()
         try:
-            CommentPlace.objects.get(pk=data['id']).delete()
+            CommentPlace.objects.get(pk=comment_id).delete()
             return Response(status=status.HTTP_200_OK)
         except CommentPlace.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)

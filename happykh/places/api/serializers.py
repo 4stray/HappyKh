@@ -60,7 +60,7 @@ class CommentPlaceSerializer(CommentAbstractSerializer):
     ModelSerializer for CommentPlace model, which extends
     CommentAbstractSerializer.
     """
-    creator = UserHashedIdField()
+    #creator = UserHashedIdField()
 
     class Meta:
         model = CommentPlace
