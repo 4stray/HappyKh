@@ -1,33 +1,24 @@
 """Views for app users"""
-# pylint: disable = no-member, no-self-use, no-else-return, invalid-name,
-# pylint: disable = unused-argument, unused-argument, logging-fstring-interpolation
-# pylint: disable = redefined-builtin
 import datetime
 import logging
 from smtplib import SMTPException
 
+from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
-from django.core.validators import ValidationError
-from django.core.validators import validate_email
+from django.core.validators import ValidationError, validate_email
 from django.utils import timezone
 
-from rest_framework import exceptions
-from rest_framework import status
+from rest_framework import exceptions, status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-# pylint: disable = no-name-in-module, import-error
 from utils import is_user_owner
-from happykh.settings import EMAIL_HOST_USER
-from happykh.settings import HASH_IDS
-from .serializers import EmailSerializer
-from .serializers import LoginSerializer
-from .serializers import PasswordSerializer
-from .serializers import UserSerializer
+from .serializers import (EmailSerializer, LoginSerializer, PasswordSerializer,
+                          UserSerializer)
 from .tokens import account_activation_token
 from ..backends import UserAuthentication
 from ..models import User
@@ -63,20 +54,18 @@ class UserLogin(APIView):
 
         user = serializer.validated_data['user']
         if user.is_active:
-            # pylint: disable = unused-variable
-            user_token, created = Token.objects.get_or_create(user=user)
-            user_id = HASH_IDS.encode(user.pk)
+            user_token, _ = Token.objects.get_or_create(user=user)
+            user_id = settings.HASH_IDS.encode(user.pk)
 
             LOGGER.info('User has been logged in')
             return Response({
                 'token': user_token.key,
                 'user_id': user_id,
             }, status=status.HTTP_200_OK)
-        else:
-            LOGGER.warning('Attempt to login by unregistered user')
-            return Response({
-                'message': "You can't login, you have to register first."
-            }, status=status.HTTP_400_BAD_REQUEST)
+        LOGGER.warning('Attempt to login by unregistered user')
+        return Response({
+            'message': "You can't login, you have to register first."
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserLogout(APIView):
@@ -141,12 +130,11 @@ class UserRegistration(APIView):
                                             is_active=False)
             if UserActivation.send_email_confirmation(user):
                 return Response(status=status.HTTP_201_CREATED)
-            else:
-                LOGGER.error('Confirmation email has not been delivered')
-                return Response({
-                    'message': 'The mail has not been delivered'
-                               ' due to connection reasons'
-                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            LOGGER.error('Confirmation email has not been delivered')
+            return Response({
+                'message': 'The mail has not been delivered'
+                           ' due to connection reasons'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserActivation(APIView):
@@ -195,7 +183,6 @@ class UserActivation(APIView):
         :param token: String
         :return: Response({message}, status)
         """
-        # pylint: disable=unused-argument
         try:
             email = decode(email_crypt)
             user = User.objects.get(email=email)
@@ -206,7 +193,7 @@ class UserActivation(APIView):
                 return Response({
                     'message': 'User is already exists and activated'
                 }, status=status.HTTP_400_BAD_REQUEST)
-            elif account_activation_token.check_token(user, token):
+            if account_activation_token.check_token(user, token):
                 user.is_active = True
                 user.save()
 
@@ -214,14 +201,13 @@ class UserActivation(APIView):
                 return Response({
                     'message': "User's account has been activated"
                 }, status=status.HTTP_201_CREATED)
-            else:
-                LOGGER.error(
-                    f'User activation with invalid token,'
-                    f' user_email: {user.email}, token: {token}'
-                )
-                return Response({
-                    'message': 'Invalid token'
-                }, status=status.HTTP_400_BAD_REQUEST)
+            LOGGER.error(
+                f'User activation with invalid token,'
+                f' user_email: {user.email}, token: {token}'
+            )
+            return Response({
+                'message': 'Invalid token'
+            }, status=status.HTTP_400_BAD_REQUEST)
         except (TypeError, ValueError, OverflowError,
                 User.DoesNotExist) as error:
             LOGGER.error(f'Error {error} while user activation')
@@ -247,9 +233,9 @@ class UserActivation(APIView):
                 f'We just needed to verify that {email} '
                 f'is your email address.'
                 f' Just click the link below \n'
-                f'http://127.0.0.1:8080/#/confirm_registration/'
+                f'{settings.FRONT_URL_PREFIX}confirm_registration/'
                 f'{email_crypt}/{email_token}/',
-                EMAIL_HOST_USER,
+                settings.EMAIL_HOST_USER,
                 [email]
             )
             LOGGER.info('Confirmation mail has been sent')
@@ -336,7 +322,7 @@ class UserProfile(APIView):
             partial=True,
             context=context,
         )
-        user_id = HASH_IDS.decode(id)[0]
+        user_id = settings.HASH_IDS.decode(id)[0]
         if serializer.is_valid():
             serializer.save(id=user_id, **serializer.validated_data)
             LOGGER.info('User data updated')
@@ -384,12 +370,11 @@ class UserEmail(APIView):
                     # Send confirmation email
                     LOGGER.info(f'User with id: {id} changed his email')
                     return Response(status=status.HTTP_200_OK)
-                else:
-                    LOGGER.error('Confirmation email has not been delivered')
-                    return Response({
-                        'message': 'The mail has not been delivered'
-                                   ' due to connection reasons'
-                    }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                LOGGER.error('Confirmation email has not been delivered')
+                return Response({
+                    'message': 'The mail has not been delivered'
+                               ' due to connection reasons'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
@@ -419,26 +404,41 @@ class UserPassword(APIView):
                 LOGGER.error(
                     'Received wrong old password while changing password'
                 )
-                return Response({'message': 'Wrong password.'},
+                return Response({'message': 'Wrong password'},
                                 status=status.HTTP_400_BAD_REQUEST)
 
             serializer.update(user, serializer.data)
+
+            token_key = request.META['HTTP_AUTHORIZATION'][6:]
+            Token.objects.get(key=token_key).delete()
+
             LOGGER.info('Updated user password')
-            return Response({'message': 'Password was updated.'},
-                            status=status.HTTP_200_OK)
+            LOGGER.info('User has been logged out')
+
+            return Response({
+                'message':
+                    'Password was updated.'
+                    'Please re-login to renew your session'
+            }, status=status.HTTP_200_OK)
 
         LOGGER.error(
-            f'Serializer error {serializer.errors} while changing password'
-        )
+            f'Serializer error {serializer.errors} while changing password')
         return Response(serializer.errors,
                         status=status.HTTP_400_BAD_REQUEST)
 
 
 class TokenValidation(APIView):
+    """
+    Token validation
+    """
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request):
+        """
+        :param request: HTTP request
+        :return: Response(status)
+        """
         token_key = request.META['HTTP_AUTHORIZATION'][6:]
         try:
             token = Token.objects.get(key=token_key)

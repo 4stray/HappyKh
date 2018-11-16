@@ -28,9 +28,8 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { getUserData } from '../axios-requests';
 
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
 const GENDER_CHOICES = {
   M: 'Man',
   W: 'Woman',
@@ -62,12 +61,7 @@ export default {
   },
   methods: {
     fetchUserCredentials() {
-      axios.get(
-        `${UserAPI + this.$route.params.id}`,
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      ).then((response) => {
+      getUserData(this.$route.params.id).then((response) => {
         this.userFirstName = response.data.first_name;
         this.userLastName = response.data.last_name;
         this.userAge = response.data.age;

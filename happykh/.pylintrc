@@ -9,8 +9,7 @@ extension-pkg-whitelist=
 # paths.
 ignore=CVS,
         migrations,
-        logs,
-        __init__.py
+        logs
 
 
 # Add files or directories matching the regex patterns to the blacklist. The
@@ -144,7 +143,13 @@ disable=print-statement,
         deprecated-sys-function,
         exception-escape,
         comprehension-escape,
-        logging-fstring-interpolation
+        unused-argument,
+        logging-fstring-interpolation,
+        no-self-use,
+        redefined-builtin,
+        invalid-name,
+        no-member,
+        too-many-instance-attributes,
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -317,7 +322,7 @@ indent-after-paren=4
 indent-string='    '
 
 # Maximum number of characters on a single line.
-max-line-length=100
+max-line-length=80
 
 # Maximum number of lines in a module.
 max-module-lines=1000

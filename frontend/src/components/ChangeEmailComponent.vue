@@ -16,12 +16,17 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+import { mapGetters } from 'vuex';
+import { axiosInstance } from '../axios-requests';
 
 export default {
   name: 'ChangeEmailComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       valid: false,
@@ -40,21 +45,16 @@ export default {
         return;
       }
       const newEmail = { email: this.email };
-      axios.patch(
-        `${UserAPI + this.$cookies.get('user_id')}/email`,
-        newEmail,
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      ).then(() => {
-        this.$awn.success('Please check your mailbox for confirmation email');
-      }).catch((error) => {
-        if (error.response === undefined) {
-          this.$awn.alert('A server error has occurred, try again later');
-        } else if (error.response.data.message) {
-          this.$awn.warning(error.response.data.message);
-        }
-      });
+      axiosInstance.patch(`/api/users/${this.userID}/email`, newEmail)
+        .then(() => {
+          this.$awn.success('Please check your mailbox for confirmation email');
+        }).catch((error) => {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
+        });
       this.$refs.form.reset();
     },
   },

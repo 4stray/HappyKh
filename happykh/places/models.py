@@ -1,8 +1,9 @@
 """Creation model for place and addresses"""
 import logging
 from django.db import models
-from users.models import User
+from django.utils import timezone
 from stdimage import models as std_models
+from users.models import (User, CommentAbstract)
 from utils import make_media_file_path
 
 LOGGER = logging.getLogger('happy_logger')
@@ -60,12 +61,17 @@ class Place(models.Model):
         default='',
         variations=VARIATIONS_LOGO,
     )
+    created = models.DateTimeField(editable=False, default=timezone.now)
 
     @staticmethod
     def get_place(place_id):
+        """
+        :param  place_id: place id
+        :return: instance of Place or None
+        """
         try:
             return Place.objects.get(pk=place_id)
-        except Place.DoesNotExist:  # pylint: disable = no-member
+        except Place.DoesNotExist:
             LOGGER.error(
                 f'Can`t get place because of invalid id,'
                 f' place_id: {place_id}'
@@ -74,3 +80,23 @@ class Place(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class CommentPlace(CommentAbstract):
+    """
+    Class which adds ForeignKey to the Place for which
+    standard comment was created.
+    """
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)
+
+
+class PlaceRating(models.Model):
+    """
+    Create model for place rating
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    place = models.ForeignKey(Place, on_delete=models.CASCADE)
+    rating = models.FloatField(blank=False)
+
+    def __str__(self):
+        return self.place.name

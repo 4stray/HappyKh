@@ -1,19 +1,18 @@
 """Custom serializers for users app"""
-# pylint: disable = logging-fstring-interpolation
 import logging
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from rest_framework import exceptions
-from rest_framework import serializers
-from utils import UploadedImageField
-from utils import delete_std_images_from_media
-from utils import HashIdField
+from rest_framework import exceptions, serializers
+from utils import (UploadedImageField, delete_std_images_from_media,
+                   HashIdField)
 
-from ..models import User
+from ..models import User, CommentAbstract
 
 LOGGER = logging.getLogger('happy_logger')
+
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
@@ -21,7 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
     profile_image = UploadedImageField(max_length=None, )
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         exclude = ('email', 'password')
 
@@ -116,7 +114,6 @@ class PasswordSerializer(serializers.ModelSerializer):
     new_password = serializers.CharField(required=True)
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = ('old_password', 'new_password')
 
@@ -137,7 +134,6 @@ class EmailSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = ('email',)
 
@@ -168,3 +164,29 @@ class EmailSerializer(serializers.ModelSerializer):
             instance.save()
 
         return instance
+
+
+class CommentAbstractSerializer(serializers.ModelSerializer):
+    """
+    Full ModelSerializer for model CommentAbstract.
+    Represents with creator's data.
+    """
+
+    class Meta:
+        model = CommentAbstract
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        """Representation data of comment and extended data of user"""
+        ret = super().to_representation(instance)
+        user_context = {
+            'variation': User.thumbnail,
+            'domain': self.context['domain']
+        }
+        comment_creator = User.objects.get(pk=instance.creator_id)
+        creator_serializer = UserSerializer(comment_creator,
+                                            context=user_context)
+        ret['creator_image'] = creator_serializer.data['profile_image']
+        ret['creator_fullname'] = comment_creator.get_full_name()
+        ret['creator'] = settings.HASH_IDS.encode(ret['creator'])
+        return ret
