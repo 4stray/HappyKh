@@ -152,6 +152,19 @@ class TestPlacePage(BaseTestCase, APITestCase):
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
+    def test_changing_place_address_for_empty_one(self):
+        """Test update place's address for invalid"""
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 0,
+            'latitude': 0,
+            'address': '',
+        })
+        test_data['user'] = self.hashed_user_id
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
 
 class TestCommentsAPI(BaseTestCase, APITestCase):
     """Test comments for places"""
@@ -174,7 +187,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
                              }
         self.COMMENT_URL = '/api/places/' + str(self.place.id) + '/comments'
         self.comment = CommentPlace.objects.create(
-            #pylint: disable=duplicate-code
+            # pylint: disable=duplicate-code
             creator=self.comment_info['creator'],
             text=self.comment_info['text'],
             place=self.comment_info['place'],
@@ -226,6 +239,10 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+        wrong_get_url = self.COMMENT_URL + '?objects_per_page=0'
+        response = self.client.get(wrong_get_url)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
         wrong_get_url = self.COMMENT_URL + '?page=1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
@@ -256,10 +273,10 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
 
         data['creator'] = 'KLK'
         response = self.client.post(self.COMMENT_URL, data)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
         self.assertEqual(2, CommentPlace.objects.count())
 
         data['text'] = None
         response = self.client.post(self.COMMENT_URL, data)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
         self.assertEqual(2, CommentPlace.objects.count())

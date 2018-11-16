@@ -22,7 +22,7 @@ def make_media_file_path(model_name, attr_name, original_filename):
     if original_filename:
         ext = original_filename.split('.')[-1]
         filename = uuid.uuid4()
-        full_filename = "%s.%s" % (filename, ext)
+        full_filename = f"{filename}.{ext}"
         return f'{model_name}/{attr_name}/{filename}/{full_filename}'
     return None
 
@@ -50,11 +50,13 @@ def delete_std_images_from_media(std_image_file, variations):
                 os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
-def is_user_owner(request, id):
-    token_key = request.META['HTTP_AUTHORIZATION'][6:]
+def is_user_owner(token_key, id):
     token_user_id = Token.objects.get(key=token_key).user.id
-    user_id = settings.HASH_IDS.decode(id)[0]
-    return user_id == token_user_id
+    try:
+        user_id = settings.HASH_IDS.decode(id)[0]
+        return user_id == token_user_id
+    except IndexError:
+        return False
 
 
 def get_changed_uri(request, param_name, val):
