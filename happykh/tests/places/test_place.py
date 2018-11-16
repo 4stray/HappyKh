@@ -172,7 +172,6 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
                              'text': 'Lol_test',
                              'place': self.place,
                              }
-        self.COMMENT_URL = '/api/places/' + str(self.place.id) + '/comments'
         self.comment = CommentPlace.objects.create(
             #pylint: disable=duplicate-code
             creator=self.comment_info['creator'],
@@ -181,6 +180,9 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         )
         self.pk = CommentPlace.objects.last().pk
         self.comment_count = CommentPlace.objects.count()
+        self.COMMENT_URL = '/api/places/' + str(self.place.id) + '/comments'
+        self.SINGLE_COMMENT_URL = \
+            f'/api/places/{str(self.place.id)}/comments/{self.pk}'
 
     def test_successful_get(self):
         comment = CommentPlace.objects.create(
@@ -274,19 +276,12 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.assertEqual(self.comment_count, CommentPlace.objects.count())
 
     def test_successful_delete(self):
-        pk = CommentPlace.objects.create(
-            creator=self.comment_info['creator'],
-            text='com2',
-            place=self.comment_info['place'],
-        ).pk
-        self.comment_info.update(id=pk)
-        response = self.client.delete(self.COMMENT_URL, self.comment_info)
+        response = self.client.delete(self.SINGLE_COMMENT_URL)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_failed_delete(self):
-        data = self.comment_info.copy()
-        data.update(id=self.pk+1)
-        response = self.client.delete(self.COMMENT_URL, data)
+        url = self.COMMENT_URL + '/' + str(self.pk + 40)
+        response = self.client.delete(url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_successful_update(self):
@@ -294,16 +289,16 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         data.update(creator=self.hashed_user_id)
         data.update(id=self.pk)
         data.update(text=self.comment_info.get('text') + 'test')
-        response = self.client.put(self.COMMENT_URL, data)
+        response = self.client.put(self.SINGLE_COMMENT_URL, data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(True, response.data['edited'])
         self.assertEqual(data['text'], response.data['text'])
 
     def test_update_with_wrong_id(self):
+        url = self.COMMENT_URL + '/' + str(self.pk + 40)
         data = self.comment_info.copy()
         data.update(creator=self.hashed_user_id)
-        data.update(id=self.pk + 1)
-        response = self.client.put(self.COMMENT_URL, data)
+        response = self.client.put(url, data)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_update_with_invalid_text(self):
@@ -311,5 +306,5 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         data.update(creator=self.hashed_user_id)
         data.update(id=self.pk)
         data.update(text='')
-        response = self.client.put(self.COMMENT_URL, data)
+        response = self.client.put(self.SINGLE_COMMENT_URL, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
