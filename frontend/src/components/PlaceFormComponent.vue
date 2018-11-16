@@ -104,7 +104,6 @@ export default {
         return;
       }
 
-      const placeId = this.$route.params.placeId;
       const formData = new FormData();
 
       formData.set('user', this.$store.getters.getUserID);
