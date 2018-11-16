@@ -70,7 +70,7 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  if (store.getters.getAuthenticated) {
+  if (to.name !== 'login' && store.getters.getAuthenticated) {
     axiosInstance.get('api/users/token-validation').then((response) => {
       next();
     }).catch((error) => {

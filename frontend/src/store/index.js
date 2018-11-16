@@ -24,11 +24,12 @@ const getters = {
 
 const actions = {
   signOut(state) {
-    state.commit('signOut');
     axiosInstance.post('/api/users/logout').then((response) => {
       console.log('Signed out');
     }).catch((error) => {
       console.log(error);
+    }).finally(() => {
+      state.commit('signOut');
     });
   },
 };
