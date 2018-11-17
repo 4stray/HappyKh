@@ -44,6 +44,9 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         self.address = Address.objects.create(**TEST_ADDRESS_DATA)
         self.place = Place.objects.create(user=self.user, address=self.address,
                                           **TEST_PLACE_DATA)
+        self.new_place = Place.objects.create(user=self.user,
+                                              address=self.address,
+                                              **TEST_PLACE_DATA)
         user_token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
         self.rating = PlaceRating.objects.create(user=self.user,
@@ -79,8 +82,11 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         expected = 0
         self.assertEqual(expected, response)
 
-
-
+    def test_no_average(self):
+        """Test response for average of place with no rating"""
+        response = {'average': 0, 'amount': 0}
+        expected = PlaceRatingView.get_average(self.new_place.pk)
+        self.assertDictEqual(response, expected)
 
     def test_get_empty_rating(self):
         """Test rating with invalid place id"""
@@ -92,18 +98,15 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         """
         Test post request for rating update
         """
-        amount = PlaceRatingView.get_average(self.place.pk)['amount']
         data = {
             'place': self.place.pk,
             'user': self.hashed_user_id,
             'rating': 2,
-            'amount': amount,
         }
         response = self.client.post(RATING_URL % self.place.pk, data)
         expected = {'place': self.place.pk,
                     'user': self.hashed_user_id,
-                    'rating': data['rating'],
-                    'amount': data['amount']}
+                    'rating': data['rating']}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         self.assertDictEqual(expected, response.data)
@@ -126,18 +129,15 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         """
         Test post request for rating creation
         """
-        amount = PlaceRatingView.get_average(self.place.pk)['amount']
         data = {
             'place': self.place.pk,
             'user': self.hashed_new_user_id,
             'rating': TEST_RATING_DATA['rating'],
-            'amount': amount,
         }
         response = self.client.post(RATING_URL % self.place.pk, data)
         expected = {'place': self.place.pk,
                     'user': self.hashed_new_user_id,
-                    'rating': data['rating'],
-                    'amount': data['amount']}
+                    'rating': data['rating']}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertDictEqual(expected, response.data)
 

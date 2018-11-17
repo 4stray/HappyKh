@@ -326,16 +326,13 @@ class PlaceRatingView(APIView):
 
         request_data = {'user': user.id,
                         'place': place_id,
-                        'rating': request.data.get('rating'),
-                        'amount': amount['amount']}
+                        'rating': request.data.get('rating')}
         serializer = PlaceRatingSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
             response = {'user': request.data.get('user'),
                         'place': serializer.data['place'],
-                        'rating': serializer.data['rating'],
-                        'amount': amount['amount']}
-
+                        'rating': serializer.data['rating']}
             return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
