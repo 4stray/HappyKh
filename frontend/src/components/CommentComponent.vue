@@ -20,7 +20,9 @@
                         </v-layout>
                     </v-flex>
                     <p class="text-sm-left body-2 pt-2">{{comment.text}}</p>
-                    <v-layout class="commentControl" align-start justify-end row>
+                    <v-layout class="commentControl"
+                              v-if="comment.creator === this.$store.getters.getUserID"
+                              align-start justify-end row>
                         <span class="caption" v-if="comment.edited">(edited)</span>
                         <v-btn class="commentEdit"
                                fab flat small bottom v-on:click="updateComment">
