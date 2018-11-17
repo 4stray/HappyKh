@@ -6,6 +6,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -306,8 +307,13 @@ class SingleCommentAPI(APIView):
         :param comment_id if of comment being delete
         :return: Response with status
         """
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        user = Token.objects.get(key=token_key).user
         try:
-            CommentPlace.objects.get(pk=comment_id).delete()
+            comment = CommentPlace.objects.get(pk=comment_id)
+            if comment.creator != user:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            comment.delete()
             return Response(status=status.HTTP_200_OK)
         except CommentPlace.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
