@@ -3,6 +3,7 @@ import logging
 
 from django.conf import settings
 from rest_framework import serializers
+from rest_framework import exceptions
 from users.models import User
 
 LOGGER = logging.getLogger('happy_logger')
@@ -65,4 +66,7 @@ class UserAuthentication:
                 f'Can`t get user profile because of invalid id,'
                 f' user_id: {id}'
             )
-            return None
+        except IndexError:
+            LOGGER.error('Invalid hashed_user_id')
+
+        raise exceptions.NotFound(detail='User does not exist')
