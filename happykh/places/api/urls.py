@@ -12,6 +12,10 @@ urlpatterns = [
             '<int:place_id>/editing_permission',
             views.PlacesEditingPermissions.as_view()
         ),
+        path(
+            '<int:place_id>/editing_permission_activation',
+            views.PlacesEditingPermissionActivation.as_view()
+        ),
         path('rating/<int:place_id>', views.PlaceRatingView.as_view()),
     ])),
 ]

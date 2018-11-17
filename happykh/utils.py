@@ -51,12 +51,12 @@ def delete_std_images_from_media(std_image_file, variations):
 
 
 def is_user_owner(request, id):
-    token_user_id = get_token_user_id(request)
+    token_user = get_token_user(request)
     user_id = settings.HASH_IDS.decode(id)[0]
-    return user_id == token_user_id
+    return user_id == token_user.id
 
 
-def get_token_user_id(request):
+def get_token_user(request):
     """
     Get user's id from token
     :param request: HTTP request
@@ -64,7 +64,7 @@ def get_token_user_id(request):
     """
     token_key = request.META.get('HTTP_AUTHORIZATION')[6:]
     token = Token.objects.get(key=token_key)
-    return token.user_id
+    return token.user
 
 
 def get_changed_uri(request, param_name, val):

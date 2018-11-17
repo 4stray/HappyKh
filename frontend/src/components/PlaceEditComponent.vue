@@ -44,16 +44,16 @@ export default {
     fetchPlaceEditPermission() {
       getPlaceEditingPermission(this.$route.params.placeId)
         .then((response) => {
-        if (!response.data.is_place_editing_permitted) {
-          this.rejectInEditingAccess();
-        }
-      }).catch((error) => {
-        if (!error.response) {
-          this.$awn.alert('A server error has occurred, try again later');
-        } else {
-          this.$awn.alert(error);
-        }
-      });
+          if (!response.data.is_place_editing_permitted) {
+            this.rejectInEditingAccess();
+          }
+        }).catch((error) => {
+          if (!error.response) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.alert(error);
+          }
+        });
     },
     fetchPlaceData() {
       const placeId = this.$route.params.placeId;

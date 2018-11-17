@@ -35,6 +35,7 @@
           </v-btn>
 
           <v-btn v-else fab dark absolute bottom right color="red"
+                 v-on:click="requestPlaceEditingPermission"
                  title="Request Access to Edit">
 
             <v-icon>lock_open</v-icon>
@@ -47,7 +48,10 @@
 
 <script>
 import PlaceRatingComponent from '@/components/PlaceRatingComponent.vue';
-import { getPlaceData, getPlaceEditingPermission } from '../axios-requests';
+import {
+  axiosInstance, getPlaceData,
+  getPlaceEditingPermission,
+} from '../axios-requests';
 
 
 export default {
@@ -76,6 +80,17 @@ export default {
     this.fetchPlaceData();
   },
   methods: {
+    requestPlaceEditingPermission() {
+      axiosInstance.post(`api/places/${this.place.id}/editing_permission_activation`)
+        .then((response) => {
+          this.$awn.success(
+            'Place editing request was sent successfully.' +
+            'Admins will get in touch with you within 30 minutes'
+          );
+        }).catch((error) => {
+          this.$awn.alert('Request was not sent');
+        });
+    },
     fetchPlaceEditingPermission() {
       getPlaceEditingPermission(this.$route.params.id).then((response) => {
         this.place.is_editing_permitted =

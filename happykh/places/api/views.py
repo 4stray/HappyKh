@@ -1,8 +1,10 @@
 """ Views for places """
 import json
 import logging
+from smtplib import SMTPException
 
 from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import Paginator
 from rest_framework import status
@@ -11,7 +13,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils import get_changed_uri, get_token_user_id
+from utils import get_changed_uri, get_token_user
 from users.backends import UserAuthentication
 
 from .serializers import (PlaceSerializer, AddressSerializer,
@@ -186,7 +188,7 @@ class PlacesEditingPermissions(APIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, place_id):
-        current_user_id = get_token_user_id(request)
+        current_user = get_token_user(request)
         single_place = Place.get_place(place_id)
 
         if single_place is None:
@@ -197,10 +199,47 @@ class PlacesEditingPermissions(APIView):
             'is_place_editing_permitted': True,
         }
 
-        if not single_place.is_editing_permitted(current_user_id):
+        if not single_place.is_editing_permitted(current_user.id):
             response_data['is_place_editing_permitted'] = False
 
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+class PlacesEditingPermissionActivation(APIView):
+    """ Request a permission from the admin in order to be able
+    to edit place """
+
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, place_id):
+        """
+        Sends an email with editing place request
+        :param user: User
+        :param email: target email to send confirmation
+        :return: Boolean
+        """
+        requesting_user = get_token_user(request)
+        sender = requesting_user.email
+        receivers = [settings.EMAIL_HOST_USER]
+
+        try:
+            send_mail(
+                f'User {sender} requesting place editing permission',
+                f'User {sender} requesting editing permission for '
+                f'the place with id of {place_id}',
+                sender,
+                receivers
+            )
+            LOGGER.info(
+                f'Place editing permission access mail has been sent'
+            )
+
+            return Response(status=status.HTTP_201_CREATED)
+        except SMTPException:
+            LOGGER.error('Error occurred while sending mail')
+
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CommentsAPI(APIView):
