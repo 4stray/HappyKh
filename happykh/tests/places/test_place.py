@@ -57,8 +57,11 @@ class TestPlacePage(BaseTestCase, APITestCase):
         self.user = User.objects.create_user(**CORRECT_USER_DATA)
         self.hashed_user_id = self.HASH_IDS.encode(self.user.pk)
         self.address = Address.objects.create(**TEST_ADDRESS_DATA)
-        self.place = Place.objects.create(user=self.user, address=self.address,
+        self.place = Place.objects.create(address=self.address,
                                           **TEST_PLACE_DATA)
+
+        self.place.edit_permitted_users.add(self.user)
+
         self.places = Place.objects.all()
         user_token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
@@ -132,7 +135,6 @@ class TestPlacePage(BaseTestCase, APITestCase):
             'latitude': 49.99,
             'address': 'New Test Address',
         })
-        test_data['user'] = self.hashed_user_id
 
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
@@ -146,16 +148,17 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.user = User.objects.create_user(**CORRECT_USER_DATA)
         self.hashed_user_id = self.HASH_IDS.encode(self.user.pk)
         self.address = Address.objects.create(**TEST_ADDRESS_DATA)
-        self.place = Place.objects.create(user=self.user, address=self.address,
+        self.place = Place.objects.create(address=self.address,
                                           **TEST_PLACE_DATA)
         self.places = Place.objects.all()
         user_token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
 
-        self.comment_info = {'creator': self.user,
-                             'text': 'Lol_test',
-                             'place': self.place,
-                             }
+        self.comment_info = {
+            'creator': self.user,
+            'text': 'Lol_test',
+            'place': self.place,
+        }
         self.COMMENT_URL = '/api/places/' + str(self.place.id) + '/comments'
         self.comment = CommentPlace.objects.create(
             creator=self.comment_info['creator'],

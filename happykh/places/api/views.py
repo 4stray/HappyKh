@@ -136,31 +136,40 @@ class PlaceSinglePage(APIView):
         :param place_id: place's id
         :return: status code
         """
+        current_user = get_token_user(request)
+
         single_place = Place.get_place(place_id)
-
-        request_data = request.data.copy()
-        address_data = json.loads(request_data.get('address'))
-        request_data['address'] = PlacePage.get_address_pk(data=address_data)
-
-        place_serializer = PlaceSerializer(data=request_data)
-
         if not single_place:
             LOGGER.error(f'Place with id {place_id} does not exist')
             return Response(status=status.HTTP_404_NOT_FOUND)
-        elif not place_serializer.is_valid():
-            LOGGER.error(
-                f'Place is not valid due to validation errors: '
-                f'{place_serializer.errors}'
+
+        if single_place.is_editing_permitted(current_user.id):
+            request_data = request.data.copy()
+            address_data = json.loads(request_data.get('address'))
+            request_data['address'] = PlacePage.get_address_pk(data=address_data)
+
+            place_serializer = PlaceSerializer(data=request_data)
+
+            if not place_serializer.is_valid():
+                LOGGER.error(
+                    f'Place is not valid due to validation errors: '
+                    f'{place_serializer.errors}'
+                )
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            LOGGER.info(f'Place with id {place_id} was successfully updated')
+
+            place_serializer.update(
+                single_place,
+                place_serializer.validated_data
             )
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_200_OK)
 
-        LOGGER.info(f'Place with id {place_id} was successfully updated')
-
-        place_serializer.update(
-            single_place,
-            place_serializer.validated_data
+        LOGGER.info(
+            f'Editing place permission denied for the user '
+            f'with id {current_user.id}'
         )
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, place_id):
         """
