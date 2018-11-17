@@ -1,27 +1,29 @@
 """Functions and classes which are used in different apps"""
-
 import os
 import uuid
 
 from django.conf import settings
-from django.core.files.uploadedfile import UploadedFile
 from django.core.files.base import ContentFile
-from rest_framework.authtoken.models import Token
+from django.core.files.uploadedfile import UploadedFile
 from rest_framework import serializers
+from rest_framework.authtoken.models import Token
+from stdimage.models import StdImageFieldFile
 
 
-def make_upload_image(filename, path):
+def make_media_file_path(model_name, attr_name, original_filename):
     """
     Function which creates path for user's file in media folder using uuid.
 
-    :param filename: name of the user's file, ex. 'image.png'
-    :param path: where to save file in media folder, ex. 'model/attr'
-    :return: path to file or None if filename is empty
+    :param model_name: class of instance
+    :param attr_name: attribute for which image is saved
+    :param original_filename: original filename of the image, ex. 'image.jpg'
+    :return: path from MEDIA_ROOT to file or None if filename is empty
     """
-    if filename:
-        ext = filename.split('.')[-1]
-        filename = "%s.%s" % (uuid.uuid4(), ext)
-        return f'{path}/{filename[0]}/{filename[2]}/{filename}'
+    if original_filename:
+        ext = original_filename.split('.')[-1]
+        filename = uuid.uuid4()
+        full_filename = "%s.%s" % (filename, ext)
+        return f'{model_name}/{attr_name}/{filename}/{full_filename}'
     return None
 
 
@@ -34,21 +36,41 @@ def delete_std_images_from_media(std_image_file, variations):
                         std_image_file
     :return: None
     """
-    path = std_image_file.path.split('media/')[-1]
-    os.remove(
-        os.path.join(settings.MEDIA_ROOT, path))
-    for variant in variations:
-        extension = path.split('.')[-1]
-        filename = path.split('.')[0]
-        path_to_variant_file = f'{filename}.{variant}.{extension}'
+    if std_image_file and \
+            isinstance(std_image_file, StdImageFieldFile) and \
+            os.path.isfile(std_image_file.path):
+        path = std_image_file.path.split(settings.MEDIA_DIR + '/')[-1]
         os.remove(
-            os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
+            os.path.join(settings.MEDIA_ROOT, path))
+        for variant in variations:
+            extension = path.split('.')[-1]
+            filename = path.split('.')[-2]
+            path_to_variant_file = f'{filename}.{variant}.{extension}'
+            os.remove(
+                os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
-def is_user_owner(request, user_id):
+def is_user_owner(request, id):
     token_key = request.META['HTTP_AUTHORIZATION'][6:]
     token_user_id = Token.objects.get(key=token_key).user.id
+    user_id = settings.HASH_IDS.decode(id)[0]
     return user_id == token_user_id
+
+
+def get_changed_uri(request, param_name, val):
+    """
+    Changes value of url parameter in url from request.
+
+    :param request: rest_framework.request.Request object
+    :param param_name: string with name of parameter in url to be changed
+    :param val: new value to be set to parameter
+    :return: url from request with changed parameter value
+    """
+    params = request.GET.copy()
+    params[param_name] = val
+    request_uri = request.build_absolute_uri()
+    return request_uri.split('?')[0] + '?' + params.urlencode()
+
 
 class UploadedImageField(serializers.ImageField):
     """
@@ -77,3 +99,16 @@ class UploadedImageField(serializers.ImageField):
                 image_url = f"{domain}{original_url}"
             return image_url
         return ''
+
+
+class HashIdField(serializers.Field):
+    """
+    Field for id for serializer
+    """
+
+    def to_representation(self, data):
+        return settings.HASH_IDS.encode(data)
+
+    def to_internal_value(self, data):
+        user_id = settings.HASH_IDS.decode(data)[0]
+        return super(HashIdField, self).to_internal_value(user_id)

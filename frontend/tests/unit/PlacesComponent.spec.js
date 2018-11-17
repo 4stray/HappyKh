@@ -1,11 +1,15 @@
-import { shallowMount, config, RouterLinkStub } from '@vue/test-utils';
+import { shallowMount, config, RouterLinkStub, createLocalVue } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import PlacesComponent from '../../src/components/PlacesComponent.vue';
 
 
 const expect = require('chai').expect;
-const should = require('chai').should();
+
+const localVue = createLocalVue();
+localVue.use(Vuetify);
 
 config.stubs['router-link'] = RouterLinkStub;
+config.mocks.$awn = { alert: () => {} };
 config.mocks.$store = {
   state: {
     Authenticated: 'test token value',
@@ -17,17 +21,18 @@ config.mocks.$store = {
 config.methods.getAllPlaces = () => {};
 
 describe('PlacesComponent', () => {
-  const wrapper = shallowMount(PlacesComponent, config);
-  it('has places container', () => {
-    expect(wrapper.contains('[class="places-container"]')).to.be.equal(true);
+  const wrapper = shallowMount(PlacesComponent, { localVue, config });
+
+  it('has container for create place button and filter', () => {
+    expect(wrapper.contains('[name="menu-container"]')).to.be.equal(true);
   });
 
   it('has button for adding place', () => {
-    expect(wrapper.contains('[class="add-place-button"]')).to.be.equal(true);
+    expect(wrapper.contains('[name="create-place-button"]')).to.be.equal(true);
   });
 
   it('has container for place components', () => {
-    expect(wrapper.contains('[class="place-components-container"]'))
+    expect(wrapper.contains('[name="place-container"]'))
       .to.be.equal(true);
   });
 });

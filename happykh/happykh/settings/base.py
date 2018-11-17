@@ -11,20 +11,18 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import hashids
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '+$@f&k@)3t#@#3en0#1tatgb1draxr_34*q_g-@l56utjbkunc'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = '*'
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -94,20 +92,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'happykh.wsgi.application'
-
-# Database
-# https://docs.djangoproject.com/en/2.1/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'happykh',
-        'USER': 'localadmin',
-        'PASSWORD': 'localpassword',
-        'HOST': 'localhost',
-        'PORT': '',
-    }
-}
 
 # Logger settings
 # https://docs.djangoproject.com/en/2.1/topics/logging/
@@ -188,17 +172,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_DIR = 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, MEDIA_DIR)
 MEDIA_URL = '/media/'
-
-CORS_ORIGIN_REGEX_WHITELIST = (
-    # For Client
-    r'http://localhost*',
-    r'http://127.0.0.1:*',
-    # For Testing Environment
-    r'null',
-)
 
 # Email API setup
 
@@ -206,3 +184,12 @@ SENDGRID_SANDBOX_MODE_IN_DEBUG = False
 SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+
+# DES Key
+
+ENCODING_DES_KEY = os.environ.get('EMAIL_ENCODING_KEY')
+
+# Salt for hashid
+
+HASHID_FIELD_SALT = os.environ.get('HASHID_FIELD_SALT')
+HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)

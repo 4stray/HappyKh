@@ -17,7 +17,11 @@
                     v-model="confirmationPassword"
                     :rules="passwordRules"
                     label="Confirm new password"></v-text-field>
-      <v-btn type="submit" :disabled="!valid" color="success" block>
+      <v-btn type="submit"
+             v-on:click.native="saveNewPassword"
+             :disabled="!valid"
+             :to="{name: 'login'}"
+             color="success" block>
         submit
       </v-btn>
     </v-form>
@@ -25,12 +29,17 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+import { mapGetters, store } from 'vuex';
+import { axiosInstance } from '../axios-requests';
 
 export default {
   name: 'PasswordComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       valid: false,
@@ -38,7 +47,7 @@ export default {
       newPassword: '',
       confirmationPassword: '',
       passwordRules: [
-        value => !!value || 'This field is required.',
+        value => Boolean(value) || 'This field is required.',
         value => (value && value.length >= 8)
           || 'Your password must be at least 8 characters.',
         value => /^[0-9a-zA-Z]+$/.test(value)
@@ -48,6 +57,11 @@ export default {
     };
   },
   methods: {
+    signOut() {
+      this.$awn.success('Password was successfully changed.' +
+                          'Please re-login to renew your session');
+      store.dispatch('signOut');
+    },
     saveNewPassword() {
       if (!this.$refs.form.validate()) {
         this.$refs.form.reset();
@@ -61,18 +75,17 @@ export default {
         old_password: this.oldPassword,
         new_password: this.newPassword,
       };
-      axios.patch(
-        `${UserAPI + this.$cookies.get('user_id')}/password`, userCredentials,
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      ).then(() => {
-        this.$awn.success('Password was successfully changed.');
-      }).catch((error) => {
-        if (error.response.data.message) {
-          this.$awn.warning(error.response.data.message);
-        }
-      });
+
+      axiosInstance.patch(`/api/users/${this.userID}/password`, userCredentials)
+        .then(() => {
+          this.signOut();
+        }).catch((error) => {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
+        });
       this.$refs.form.reset();
     },
   },

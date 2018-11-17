@@ -1,7 +1,7 @@
 <template>
   <v-card class="v-card pa-5 mb-5">
     <v-card-title primary-title>
-      <h3 class="headline mb-0">Edit your profile:</h3>
+      <h3 class="headline mb-0">Edit your profile</h3>
     </v-card-title>
     <v-form ref="form" v-model="valid" @submit.prevent="save"
             enctype="multipart/form-data">
@@ -16,26 +16,35 @@
                     :rules="ageRules"></v-text-field>
       <v-radio-group v-model="userGender" label="Gender">
         <v-radio label="Woman" color="primary" value="W"></v-radio>
-        <v-radio label="Male" color="primary" value="M"></v-radio>
+        <v-radio label="Man" color="primary" value="M"></v-radio>
+        <v-radio label="Other" color="primary" value="O"></v-radio>
       </v-radio-group>
-      <img v-if="userImage" v-bind:src=userImage alt="No image"/>
-      <img v-else id="profile_image" src="../assets/default_user.png" alt="No user avatar"/>
+      <div>
+        <img v-if="userImage" v-bind:src=userImage alt="No image"/>
+        <img v-else id="profile_image" src="../assets/default_user.png"
+             alt="No user avatar"/>
+      </div>
       <input type="file"
              id="imageInput"
              v-on:change="changeImage()"
              accept="image/*"/>
-      <v-btn class="success" type="submit" block>Save</v-btn>
+      <v-btn class="success mt-3" type="submit" block>Save</v-btn>
     </v-form>
   </v-card>
 </template>
 
 <script>
-import axios from 'axios';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+import { mapGetters } from 'vuex';
+import { axiosInstance, getUserData } from '../axios-requests';
 
 export default {
   name: 'ProfileEditComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       userFirstName: '',
@@ -45,21 +54,16 @@ export default {
       userImage: '',
       valid: true,
       ageRules: [
-        age => (age >= 10 && age <= 140) || (age === null) || 'Invalid age value',
+        age => (age >= 1 && age <= 140) || !age || 'Invalid age value',
       ],
     };
   },
   created() {
-    this.fetchformData();
+    this.fetchFormData();
   },
   methods: {
-    fetchformData() {
-      axios.get(
-        UserAPI + this.$cookies.get('user_id'),
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      ).then((response) => {
+    fetchFormData() {
+      getUserData(this.userID).then((response) => {
         if (response.data.first_name === 'undefined') {
           this.userFirstName = '';
         } else {
@@ -74,7 +78,9 @@ export default {
         this.userGender = response.data.gender;
         this.userImage = response.data.profile_image;
       }).catch((error) => {
-        if (error.response.data.message) {
+        if (error.response === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else if (error.response.data.message) {
           this.$awn.warning(error.response.data.message);
         }
       });
@@ -90,11 +96,10 @@ export default {
         const imageFile = document.querySelector('#imageInput');
         formData.append('profile_image', imageFile.files[0]);
 
-        axios.patch(
-          `${UserAPI + this.$cookies.get('user_id')}/data`, formData,
+        axiosInstance.patch(
+          `/api/users/${this.userID}/data`, formData,
           {
             headers: {
-              Authorization: `Token ${this.$cookies.get('token')}`,
               'Content-Type': 'multipart/form-data',
             },
           },
@@ -106,7 +111,9 @@ export default {
           this.userImage = response.data.profile_image;
           this.$awn.success('Your profile was successfully updated.');
         }).catch((error) => {
-          if (error.response.data.message) {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
             this.$awn.warning(error.response.data.message);
           }
         });
@@ -132,5 +139,4 @@ img {
   width: 300px;
   margin: auto;
 }
-
 </style>

@@ -1,14 +1,5 @@
 <template>
-  <v-layout v-if="isEmptyProfile()" justify-space-around row fill-height>
-    <v-card id="default" class="px-5 py-3 fill-height">
-      <img src="../assets/default_user.png" alt="user avatar"/>
-      <h3 class="headline mb-0 mb-5">
-        Your profile is empty. You can edit it.
-      </h3>
-      <v-btn :to="{name: 'settings'}" class="justify-self-end">Edit</v-btn>
-    </v-card>
-  </v-layout>
-  <v-layout v-else justify-space-around row fill-height>
+  <v-layout justify-space-around row fill-height>
     <v-flex md4 xs12>
       <img v-if="userImage" v-bind:src=userImage alt="No image" width="80%"
            id="userImage"/>
@@ -16,15 +7,16 @@
     </v-flex>
     <v-flex md6 xs12>
       <v-layout justify-start column fill-height>
-        <v-card id="main" class="px-5 py-3">
-          <v-btn :to="{name: 'settings'}"
+        <v-card id="main" class="px-5 py-3 title">
+          <v-btn v-if=enableEditingProfile :to="{name: 'settings'}"
                  fab dark absolute bottom right color="green">
             <v-icon>edit</v-icon>
           </v-btn>
-          <h3 class="headline mb-2"> {{fullName}}</h3>
-          <v-label v-if="userAge" class="">Age</v-label>
+          <h3 class="headline mb-2 font-weight-bold">{{fullName}}</h3>
+          <v-label v-if="userAge" id="userAgeLabel">Age</v-label>
           <p id="userAge" v-if="userAge">{{userAge}}</p>
-          <p id="userGender" class="text--secondary">{{userGender}}</p>
+          <v-label id="userGenderLabel">Gender</v-label>
+          <p id="userGender">{{userGender}}</p>
         </v-card>
       </v-layout>
     </v-flex>
@@ -32,10 +24,13 @@
 </template>
 
 <script>
-import axios from 'axios';
+import { getUserData } from '../axios-requests';
 
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
-const GENDER_CHOICES = { M: 'Man', W: 'Woman' };
+const GENDER_CHOICES = {
+  M: 'Man',
+  W: 'Woman',
+  O: 'Other',
+};
 
 export default {
   name: 'ProfileComponent',
@@ -46,6 +41,7 @@ export default {
       userAge: 0,
       userGender: 'M',
       userImage: '',
+      enableEditingProfile: false,
     };
   },
   created() {
@@ -53,30 +49,25 @@ export default {
   },
   computed: {
     fullName() {
-      if (this.userFirstName && this.userLastName) {
+      if (this.userFirstName) {
         return `${this.userFirstName} ${this.userLastName}`;
       }
       return '';
     },
   },
   methods: {
-    isEmptyProfile() {
-      return !(!!this.fullName || this.userAge || this.userImage);
-    },
     fetchUserCredentials() {
-      axios.get(
-        `${UserAPI + this.$cookies.get('user_id')}`,
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      ).then((response) => {
+      getUserData(this.$route.params.id).then((response) => {
         this.userFirstName = response.data.first_name;
         this.userLastName = response.data.last_name;
         this.userAge = response.data.age;
         this.userGender = GENDER_CHOICES[response.data.gender];
         this.userImage = response.data.profile_image;
+        this.enableEditingProfile = response.data.enable_editing_profile;
       }).catch((error) => {
-        if (error.response.data.message) {
+        if (error.response === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else if (error.response.data.message) {
           this.$awn.warning(error.response.data.message);
         }
       });

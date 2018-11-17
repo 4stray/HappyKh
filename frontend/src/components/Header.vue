@@ -1,16 +1,18 @@
 <template>
-  <v-toolbar>
+  <v-toolbar fixed app>
     <v-btn :to="{ name: 'home'}" flat exact>Home</v-btn>
-    <v-btn v-if="isAuthenticated" :to="{ name: 'profile'}" flat exact>Profile
+    <v-btn v-if="isAuthenticated"
+           :to="{ name: 'profile', params: { id: userID } }"
+           flat exact>Profile
     </v-btn>
     <v-btn v-if="!isAuthenticated" :to="{ name: 'login'}" flat exact>Login
     </v-btn>
     <v-spacer></v-spacer>
     <v-btn
-      v-if="isAuthenticated"
-      v-on:click.native="signOut()"
-      :to="{name: 'login'}"
-      flat color="error" exact>Sign out
+        v-if="isAuthenticated"
+        v-on:click.native="signOut()"
+        :to="{name: 'login'}"
+        flat color="error" exact>Sign out
     </v-btn>
   </v-toolbar>
 </template>
@@ -19,12 +21,12 @@
 import { mapGetters } from 'vuex';
 import store from '../store';
 
-
 export default {
   name: 'Header',
   computed: {
     ...mapGetters({
       isAuthenticated: 'getAuthenticated',
+      userID: 'getUserID',
     }),
   },
   methods: {

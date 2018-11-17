@@ -1,9 +1,15 @@
 import Cookies from 'js-cookie';
+import VueRouter from 'vue-router';
+import Vuetify from 'vuetify';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ProfileComponent from '../../src/components/ProfileComponent.vue';
 
+const localVue = createLocalVue();
+localVue.use(VueRouter);
+localVue.use(Vuetify);
+
+const router = new VueRouter();
 const expect = require('chai').expect;
-const should = require('chai').should();
 
 const config = {
   mocks: {
@@ -39,7 +45,16 @@ describe('ProfileComponent data()', () => {
 });
 
 describe('ProfileComponent for empty profile', () => {
-  const wrapper = shallowMount(ProfileComponent, config);
+  const wrapper = shallowMount(ProfileComponent, {
+    localVue,
+    router,
+    mocks: {
+      $cookies: Cookies,
+    },
+    methods: {
+      fetchUserCredentials: () => {},
+    },
+  });
 
   wrapper.setData({
     userFirstName: '',
@@ -55,13 +70,23 @@ describe('ProfileComponent for empty profile', () => {
 });
 
 describe('ProfileComponent for profile with data', () => {
-  const wrapper = shallowMount(ProfileComponent, config);
+  const wrapper = shallowMount(ProfileComponent, {
+    localVue,
+    router,
+    mocks: {
+      $cookies: Cookies,
+    },
+    methods: {
+      fetchUserCredentials: () => {},
+    },
+  });
   const testUserData = {
     userFirstName: 'User',
     userLastName: 'Name',
     userAge: 18,
     userGender: 'W',
     userImage: 'userAvatar.png',
+    enableEditingProfile: true,
   };
   wrapper.setData(testUserData);
 
@@ -70,7 +95,6 @@ describe('ProfileComponent for profile with data', () => {
   });
 
   it('has userAge', () => {
-    expect(wrapper.find('v-label').text()).to.be.equal('Age');
     expect(wrapper.find('#userAge').text()).to.be.equal(testUserData.userAge.toString());
   });
 
@@ -83,6 +107,6 @@ describe('ProfileComponent for profile with data', () => {
   });
 
   it('has edit button', () => {
-    expect(wrapper.contains('v-btn')).to.be.equal(true);
+    expect(wrapper.contains('[type=submit]')).to.be.equal(false);
   });
 });

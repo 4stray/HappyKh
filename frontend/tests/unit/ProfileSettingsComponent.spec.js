@@ -9,7 +9,6 @@ import ChangeEmailComponent
   from '../../src/components/ChangeEmailComponent.vue';
 
 const expect = require('chai').expect;
-const should = require('chai').should();
 
 const localVue = createLocalVue();
 localVue.use(Vuetify);
@@ -19,13 +18,17 @@ Cookies.set('user_id', 'value_');
 
 describe('ProfileSettings check', () => {
   const wrapper = shallowMount(ProfileSettings, {
+    localVue,
     mocks: {
       $cookies: Cookies,
+    },
+    methods: {
+      fetchFormData: () => {},
     },
   });
 
   it('has 3 tabs for change', () => {
-    expect(wrapper.findAll('v-list-tile').length).to.be.equal(3);
+    expect(wrapper.findAll('.v-card').length).to.be.equal(3);
   });
 
   it('has ProfileEditComponent component', () => {
@@ -35,8 +38,12 @@ describe('ProfileSettings check', () => {
 
 describe('ProfileSettings interactions', () => {
   const wrapper = shallowMount(ProfileSettings, {
+    localVue,
     mocks: {
       $cookies: Cookies,
+    },
+    methods: {
+      fetchFormData: () => {},
     },
   });
   const tabs = wrapper.findAll('v-list-tile');

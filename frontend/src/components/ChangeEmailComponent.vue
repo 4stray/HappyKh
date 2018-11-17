@@ -7,7 +7,8 @@
       <v-text-field v-model="email"
                     :rules="emailRules"
                     label="New email"
-                    required></v-text-field>
+                    required
+                    id="emailInput"></v-text-field>
       <v-btn type="submit" :disabled="!valid" color="success" block
       >submit
       </v-btn>
@@ -16,18 +17,23 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+import { mapGetters } from 'vuex';
+import { axiosInstance } from '../axios-requests';
 
 export default {
   name: 'ChangeEmailComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       valid: false,
       email: '',
       emailRules: [
-        v => !!v || 'E-mail is required',
+        v => Boolean(v) || 'E-mail is required',
         v => /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(v)
           || 'E-mail must be valid',
       ],
@@ -40,19 +46,16 @@ export default {
         return;
       }
       const newEmail = { email: this.email };
-      axios.patch(
-        `${UserAPI + this.$cookies.get('user_id')}/email`,
-        newEmail,
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      ).then(() => {
-        this.$awn.success('Please check your mailbox for confirmation email');
-      }).catch((error) => {
-        if (error.response.data.message) {
-          this.$awn.warning(error.response.data.message);
-        }
-      });
+      axiosInstance.patch(`/api/users/${this.userID}/email`, newEmail)
+        .then(() => {
+          this.$awn.success('Please check your mailbox for confirmation email');
+        }).catch((error) => {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
+        });
       this.$refs.form.reset();
     },
   },

@@ -1,13 +1,15 @@
 import Vue from 'vue';
-import axios from 'axios';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import Login from './views/Login.vue';
 import ConfirmRegistration from './views/ConfirmRegistration.vue';
 import CreatePlace from './views/CreatePlace.vue';
+import PlaceEdit from './views/PlaceEdit.vue';
+import PlaceDetail from './views/Place.vue';
 import Profile from './views/Profile.vue';
 import ProfileSettings from './views/ProfileSettings.vue';
 import store from './store';
+import { axiosInstance } from './axios-requests';
 
 const ifAuthenticated = (to, from, next) => {
   if (store.getters.getAuthenticated) {
@@ -30,12 +32,18 @@ const router = new Router({
       component: Login,
     },
     {
-      path: '/confirm_registration/:userId/:emailToken',
+      path: '/confirm_registration/:email/:emailToken',
       name: 'confirm_registration',
       component: ConfirmRegistration,
     },
     {
-      path: '/profile',
+      path: '/profile/settings',
+      name: 'settings',
+      component: ProfileSettings,
+      beforeEnter: ifAuthenticated,
+    },
+    {
+      path: '/profile/:id',
       name: 'profile',
       component: Profile,
       beforeEnter: ifAuthenticated,
@@ -47,9 +55,15 @@ const router = new Router({
       beforeEnter: ifAuthenticated,
     },
     {
-      path: '/profile/settings',
-      name: 'settings',
-      component: ProfileSettings,
+      path: '/places/edit/:placeId',
+      name: 'placeEdit',
+      component: PlaceEdit,
+      beforeEnter: ifAuthenticated,
+    },
+    {
+      path: '/places/:id',
+      name: 'placeDetail',
+      component: PlaceDetail,
       beforeEnter: ifAuthenticated,
     },
   ],
@@ -57,23 +71,10 @@ const router = new Router({
 
 router.beforeEach((to, from, next) => {
   if (store.getters.getAuthenticated) {
-    const urlTokenValidation =
-      'http://127.0.0.1:8000/api/users/token-validation';
-
-    const headers = {
-      Authorization: `Token ${store.getters.getToken}`,
-    };
-
-    axios.get(
-      urlTokenValidation,
-      {
-        headers,
-      },
-    ).then((response) => {
+    axiosInstance.get('api/users/token-validation').then((response) => {
       next();
     }).catch((error) => {
       store.dispatch('signOut');
-
       next({ name: 'login' });
     });
   } else {

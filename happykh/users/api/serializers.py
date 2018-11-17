@@ -1,40 +1,41 @@
 """Custom serializers for users app"""
-# pylint: disable = logging-fstring-interpolation
 import logging
 
+from django.conf import settings
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from rest_framework import exceptions
-from rest_framework import serializers
+from rest_framework import exceptions, serializers
+from utils import (UploadedImageField, delete_std_images_from_media,
+                   HashIdField)
 
-from utils import UploadedImageField
-from utils import delete_std_images_from_media
-from ..models import User
+from ..models import User, CommentAbstract
 
 LOGGER = logging.getLogger('happy_logger')
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Serializer for custom user model"""
-
+    id = HashIdField()
     profile_image = UploadedImageField(max_length=None, )
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         exclude = ('email', 'password')
 
     def update(self, instance, validated_data):
-        if instance.profile_image:
+        new_image = validated_data.get('profile_image')
+        old_image = instance.profile_image
+        if new_image is not None and old_image:
             # delete old images
             delete_std_images_from_media(
-                instance.profile_image,
+                old_image,
                 User.VARIATIONS_PROFILE_IMAGE
             )
 
         for attr, value in validated_data.items():
-            setattr(instance, attr, value)
+            if attr != 'profile_image' or value is not None:
+                setattr(instance, attr, value)
         instance.save()
 
         return instance
@@ -113,7 +114,6 @@ class PasswordSerializer(serializers.ModelSerializer):
     new_password = serializers.CharField(required=True)
 
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
         fields = ('old_password', 'new_password')
 
@@ -132,10 +132,10 @@ class EmailSerializer(serializers.ModelSerializer):
     """
     Serializer for email change
     """
+
     class Meta:
-        # pylint: disable=too-few-public-methods, missing-docstring
         model = User
-        fields = ('email', )
+        fields = ('email',)
 
     def validate(self, attrs):
         new_email = attrs.get('email')
@@ -164,3 +164,29 @@ class EmailSerializer(serializers.ModelSerializer):
             instance.save()
 
         return instance
+
+
+class CommentAbstractSerializer(serializers.ModelSerializer):
+    """
+    Full ModelSerializer for model CommentAbstract.
+    Represents with creator's data.
+    """
+
+    class Meta:
+        model = CommentAbstract
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        """Representation data of comment and extended data of user"""
+        ret = super().to_representation(instance)
+        user_context = {
+            'variation': User.thumbnail,
+            'domain': self.context['domain']
+        }
+        comment_creator = User.objects.get(pk=instance.creator_id)
+        creator_serializer = UserSerializer(comment_creator,
+                                            context=user_context)
+        ret['creator_image'] = creator_serializer.data['profile_image']
+        ret['creator_fullname'] = comment_creator.get_full_name()
+        ret['creator'] = settings.HASH_IDS.encode(ret['creator'])
+        return ret

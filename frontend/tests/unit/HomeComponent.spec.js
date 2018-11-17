@@ -1,9 +1,12 @@
-import { shallowMount, mount, config, RouterLinkStub } from '@vue/test-utils';
+import { config, RouterLinkStub, createLocalVue } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import HomeComponent from '@/components/HomeComponent.vue';
-import PlacesComponent from '@/components/PlacesComponent.vue';
+
+
+const localVue = createLocalVue();
+localVue.use(Vuetify);
 
 const expect = require('chai').expect;
-const should = require('chai').should();
 
 config.stubs['router-link'] = RouterLinkStub;
 config.stubs.PlacesComponent = '<div/>';
@@ -17,12 +20,7 @@ config.mocks.$store = {
 };
 
 describe('HomeComponent', () => {
-  const wrapper = mount(HomeComponent, config);
   it('has property msg', () => {
     expect(HomeComponent.props).to.have.key('msg');
-  });
-
-  it('has PlacesComponent', () => {
-    expect(wrapper.contains(PlacesComponent)).to.be.equal(true);
   });
 });
