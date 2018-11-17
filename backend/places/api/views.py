@@ -260,6 +260,7 @@ class CommentsAPI(APIView):
 
 
 class SingleCommentAPI(APIView):
+    """Update or delet comment for a place"""
 
     def put(self, request, place_id, comment_id):
         """
@@ -271,7 +272,8 @@ class SingleCommentAPI(APIView):
         :return: Response with status
         """
         data = request.data.copy()
-        data.update(creator=settings.HASH_IDS.decode(data['creator'])[0])
+        user = UserAuthentication.get_user(request.data.get('creator'))
+        data.update(creator=user.id)
         data.update(place=place_id)
 
         comment = CommentPlace.objects.filter(pk=comment_id).first()
