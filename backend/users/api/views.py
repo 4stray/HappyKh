@@ -29,6 +29,18 @@ from ..models import User
 LOGGER = logging.getLogger('happy_logger')
 
 
+def token_is_active(token):
+    """
+    Check if token isn't None and hasn't expired yet.
+
+    :param token: DRF Token object
+    :return: True if token hasn't expired yet. False otherwise
+    """
+    if token and timezone.now() <= token.created + datetime.timedelta(days=1):
+        return True
+    return False
+
+
 class UserLogin(APIView):
     """"
     Login existing user to the system
@@ -53,6 +65,9 @@ class UserLogin(APIView):
 
         user = serializer.validated_data['user']
         user_token, _ = Token.objects.get_or_create(user=user)
+        if not token_is_active(user_token):
+            user_token.delete()
+            user_token = Token.objects.create(user=user)
         user_id = settings.HASH_IDS.encode(user.pk)
 
         LOGGER.info('User has been logged in')
@@ -374,9 +389,6 @@ class UserPassword(APIView):
 
         serializer.update(user, serializer.data)
 
-        token_key = request.META['HTTP_AUTHORIZATION'][6:]
-        Token.objects.get(key=token_key).delete()
-
         LOGGER.info('Updated user password. User has been logged out')
         return Response({
             'message': 'Password was updated. '
@@ -398,8 +410,7 @@ class TokenValidation(APIView):
         """
         token_key = request.META.get('HTTP_AUTHORIZATION')[6:]
         token = Token.objects.get(key=token_key)
-        if token and (timezone.now() <= token.created
-                      + datetime.timedelta(days=1)):
+        if token_is_active(token):
             return Response(status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_401_UNAUTHORIZED)
