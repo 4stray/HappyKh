@@ -27,8 +27,8 @@ describe('ProfileSettings check', () => {
     },
   });
 
-  it('has 3 tabs for change', () => {
-    expect(wrapper.findAll('.v-card').length).to.be.equal(3);
+  it('has 2 tabs for change', () => {
+    expect(wrapper.findAll('.v-card').length).to.be.equal(2);
   });
 
   it('has ProfileEditComponent component', () => {
@@ -46,7 +46,7 @@ describe('ProfileSettings interactions', () => {
       fetchFormData: () => {},
     },
   });
-  const tabs = wrapper.findAll('v-list-tile');
+  const tabs = wrapper.findAll('.settingsTabs');
   it('has 1 component ProfileEditComponent after click on the first tab', () => {
     tabs.at(0).trigger('click');
     expect(wrapper.contains(ProfileEditComponent)).to.be.equal(true);

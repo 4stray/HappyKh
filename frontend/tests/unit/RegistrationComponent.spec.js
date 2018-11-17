@@ -28,7 +28,7 @@ describe('RegistrationComponent data', () => {
   });
 
   it('has default confirmPassword', () => {
-    expect(data).to.have.property('confirmPassword', '');
+    expect(data).to.have.property('confirmationPassword', '');
   });
 });
 

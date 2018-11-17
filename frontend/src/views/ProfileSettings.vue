@@ -3,7 +3,7 @@
     <GoBackComponent/>
     <v-flex md4>
       <v-list class="mx-4 v-card">
-        <v-list-tile
+        <v-list-tile class="settingsTabs"
             v-for="tab in tabs"
             :key="tab.title"
             @click="currentTab = tab.component"
