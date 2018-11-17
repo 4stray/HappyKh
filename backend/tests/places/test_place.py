@@ -51,6 +51,7 @@ CORRECT_USER_DATA = {
 
 
 class TestPlacePageWithPermission(BaseTestCase, APITestCase):
+    """Test user CRUD place with editing place permission """
 
     def setUp(self):
         """Create user and place objects"""
@@ -167,6 +168,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_having_permission_for_place_editing(self):
+        """Test user on having permission for editing place """
         test_data = TEST_PLACE_DATA_PUT.copy()
         response = self.client.get(
             f'{PLACE_URL}{self.place.id}/editing_permission',
