@@ -15,6 +15,7 @@
                     <v-form enctype="multipart/form-data"
                             @submit.prevent="leaveComment">
                         <v-textarea
+                                ref="commentText"
                                 id="newCommentInput"
                                 row-height="20"
                                 rows="4"
@@ -54,7 +55,8 @@ export default {
   },
   methods: {
     leaveComment() {
-      if (this.newComment.length >= 4) {
+      if (this.commentToUpdate) this.updateComment();
+      else if (this.newComment.length >= 4) {
         const formData = new FormData();
         const id = this.$route.params.id;
         formData.set('creator', this.$store.getters.getUserID);
@@ -77,6 +79,57 @@ export default {
           } else {
             this.$awn.warning(this.error.message);
           }
+        });
+      }
+    },
+    deleteComment(comment) {
+      const id = this.$route.params.id;
+      axiosInstance.delete(
+        `/api/places/${id}/comments/${comment.id}`,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      ).then(() => {
+        this.$awn.success('Your comment was deleted.');
+        const index = this.allComments.indexOf(comment);
+        if (index !== -1) this.allComments.splice(index, 1);
+      }).catch((error) => {
+        if (error.message === undefined) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else {
+          this.$awn.warning(this.error.message);
+        }
+      });
+    },
+    updateComment() {
+      if (this.newComment.length >= 4) {
+        const formData = new FormData();
+        const id = this.$route.params.id;
+        formData.set('creator', this.$store.getters.getUserID);
+        formData.set('place', id);
+        formData.set('text', this.newComment);
+        this.newComment = '';
+        axiosInstance.put(
+          `/api/places/${id}/comments/${this.commentToUpdate.id}`, formData,
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          },
+        ).then((response) => {
+          this.$awn.success('Your comment was updated.');
+          const index = this.allComments.indexOf(this.commentToUpdate);
+          this.allComments.splice(index, 1, response.data);
+          this.commentToUpdate = '';
+        }).catch((error) => {
+          if (error.message === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.warning(this.error.message);
+          }
+          this.commentToUpdate = '';
         });
       }
     },
@@ -126,9 +179,15 @@ export default {
           }
         });
     },
+    setFocus(comment) {
+      this.commentToUpdate = comment;
+      this.$refs.commentText.value = comment.text;
+      this.$refs.commentText.focus();
+    },
   },
   data() {
     return {
+      commentToUpdate: '',
       allComments: [],
       page: 1,
       count: 0,
@@ -139,6 +198,8 @@ export default {
   },
   created() {
     this.fetchCommentsCollectionData();
+    this.$on('deleteComment', this.deleteComment);
+    this.$on('updateComment', this.setFocus);
   },
 };
 </script>
