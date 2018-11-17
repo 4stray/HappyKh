@@ -79,6 +79,11 @@ class Place(models.Model):
             return None
 
     def is_editing_permitted(self, user_id):
+        """
+        Returns user permission for editing place
+        :param user_id: Integer
+        :return: Boolean
+        """
         try:
             self.edit_permitted_users.get(id=user_id)
             return True

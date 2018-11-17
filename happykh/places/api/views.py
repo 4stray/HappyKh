@@ -133,8 +133,8 @@ class PlaceSinglePage(APIView):
         """
         Updates place by the given id
         :param request: HTTP Request
-        :param place_id: place's id
-        :return: status code
+        :param place_id: Integer
+        :return: HTTP Response
         """
         current_user = get_token_user(request)
 
@@ -175,28 +175,48 @@ class PlaceSinglePage(APIView):
         """
         Deletes place by the given id
         :param request: HTTP request
-        :param place_id: place's id
-        :return: status code
+        :param place_id: Integer
+        :return: HTTP Response
         """
-        try:
-            single_place = Place.objects.get(id=place_id)
-            single_place.delete()
+        current_user = get_token_user(request)
 
-            LOGGER.info(f'Place with id {place_id} was deleted')
-
-            return Response(status=status.HTTP_200_OK)
-        except Place.DoesNotExist:
-            LOGGER.info(f'Place with id {place_id} was not deleted')
-
+        single_place = Place.get_place(place_id)
+        if not single_place:
+            LOGGER.error(f'Place with id {place_id} does not exist')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        if single_place.is_editing_permitted(current_user.id):
+            try:
+                single_place = Place.objects.get(id=place_id)
+                single_place.delete()
 
-class PlacesEditingPermissions(APIView):
-    """Get place edit privilege"""
+                LOGGER.info(f'Place with id {place_id} was deleted')
+
+                return Response(status=status.HTTP_200_OK)
+            except Place.DoesNotExist:
+                LOGGER.info(f'Place with id {place_id} was not deleted')
+
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        LOGGER.info(
+            f'Deleting place permission denied for the user '
+            f'with id {current_user.id}'
+        )
+        return Response(status=status.HTTP_403_FORBIDDEN)
+
+
+class PlacesEditingPermission(APIView):
+    """Get place editing privilege"""
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, place_id):
+        """
+        Returns True if the user has privilege to edit the place
+        :param request: HTTP Request
+        :param place_id: Integer
+        :return: HTTP Response
+        """
         current_user = get_token_user(request)
         single_place = Place.get_place(place_id)
 
@@ -214,7 +234,7 @@ class PlacesEditingPermissions(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class PlacesEditingPermissionActivation(APIView):
+class PlacesEditingPermissionRequest(APIView):
     """ Request a permission from the admin in order to be able
     to edit place """
 
@@ -223,10 +243,9 @@ class PlacesEditingPermissionActivation(APIView):
 
     def post(self, request, place_id):
         """
-        Sends an email with editing place request
-        :param user: User
-        :param email: target email to send confirmation
-        :return: Boolean
+        Sends an email with place editing request
+        :param place_id: Integer
+        :return: HTTP Response
         """
         requesting_user = get_token_user(request)
         sender = requesting_user.email

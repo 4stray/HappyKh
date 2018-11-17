@@ -10,11 +10,11 @@ urlpatterns = [
         path('<int:place_id>/comments', views.CommentsAPI.as_view()),
         path(
             '<int:place_id>/editing_permission',
-            views.PlacesEditingPermissions.as_view()
+            views.PlacesEditingPermission.as_view()
         ),
         path(
-            '<int:place_id>/editing_permission_activation',
-            views.PlacesEditingPermissionActivation.as_view()
+            '<int:place_id>/editing_permission_request',
+            views.PlacesEditingPermissionRequest.as_view()
         ),
         path('rating/<int:place_id>', views.PlaceRatingView.as_view()),
     ])),

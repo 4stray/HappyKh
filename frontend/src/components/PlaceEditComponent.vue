@@ -3,7 +3,7 @@
     <v-flex xs12 md6>
       <v-card class="v-card pa-5 mb-5" id="placeEditComponent">
         <v-btn v-on:click.native="deletePlace"
-                 fab dark absolute bottom right color="red" title="Delete Place">
+               fab dark absolute bottom right color="red" title="Delete Place">
           <v-icon>delete</v-icon>
         </v-btn>
 

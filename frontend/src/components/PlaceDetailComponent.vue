@@ -81,12 +81,11 @@ export default {
   },
   methods: {
     requestPlaceEditingPermission() {
-      axiosInstance.post(`api/places/${this.place.id}/editing_permission_activation`)
+      axiosInstance
+        .post(`api/places/${this.place.id}/editing_permission_request`)
         .then((response) => {
-          this.$awn.success(
-            'Place editing request was sent successfully.' +
-            'Admins will get in touch with you within 30 minutes'
-          );
+          this.$awn.success('Place editing request was sent successfully.' +
+            'Admins will get in touch with you within 30 minutes');
         }).catch((error) => {
           this.$awn.alert('Request was not sent');
         });

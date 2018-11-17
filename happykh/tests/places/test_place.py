@@ -49,7 +49,7 @@ CORRECT_USER_DATA = {
 }
 
 
-class TestPlacePage(BaseTestCase, APITestCase):
+class TestPlacePageWithPermission(BaseTestCase, APITestCase):
 
     def setUp(self):
         """Create user and place objects"""
@@ -138,6 +138,72 @@ class TestPlacePage(BaseTestCase, APITestCase):
 
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_having_permission_for_place_editing(self):
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        response = self.client.get(
+            f'{PLACE_URL}{self.place.id}/editing_permission',
+            test_data
+        )
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(True, response.data.get('is_place_editing_permitted'))
+
+
+class TestPlacePageWithoutEditingPermission(APITestCase):
+    """ Test changing place without having permission for it """
+
+    def setUp(self):
+        super().setUp()
+        self.user = User.objects.create_user(**CORRECT_USER_DATA)
+
+        self.address = Address.objects.create(**TEST_ADDRESS_DATA)
+        self.place = Place.objects.create(address=self.address,
+                                          **TEST_PLACE_DATA)
+
+        self.places = Place.objects.all()
+        user_token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
+
+    def test_getting_no_permission_for_place_editing(self):
+        """ Check getting the response without editing place permission
+        for the test user """
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        response = self.client.get(
+            f'{PLACE_URL}{self.place.id}/editing_permission',
+            test_data
+        )
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(False,
+                         response.data.get('is_place_editing_permitted'))
+
+    def test_changing_place_address(self):
+        """ Attempt to change place without having a permission for it """
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 50,
+            'latitude': 49.99,
+            'address': 'New Test Address',
+        })
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_deleting_place(self):
+        """ Attempt to delete place without having a permission for it """
+        test_data = TEST_PLACE_DATA_PUT.copy()
+
+        response = self.client.delete(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
+
+    def test_requesting_editing_permission(self):
+        """ Send an email to admin with request to get a permission for editing
+        place"""
+        response = self.client.post(
+            f'{PLACE_URL}{self.place.id}/editing_permission_request'
+        )
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
 
 class TestCommentsAPI(BaseTestCase, APITestCase):
