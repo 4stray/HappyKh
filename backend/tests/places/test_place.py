@@ -179,7 +179,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.address = Address.objects.create(**TEST_ADDRESS_DATA)
         self.place = Place.objects.create(user=self.user, address=self.address,
                                           **TEST_PLACE_DATA)
-        self.places = Place.objects.all()# pylint: disable=access-member-before-definition
+        self.places = Place.objects.all()
         user_token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
 
@@ -305,7 +305,6 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
     def test_successful_delete(self):
         """Test successful delete request"""
         comment = CommentPlace.objects.create(
-            # pylint: disable=duplicate-code
             creator=self.comment_info['creator'],
             text=self.comment_info['text'],
             place=self.comment_info['place'],

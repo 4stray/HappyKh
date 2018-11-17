@@ -64,12 +64,19 @@ class CommentPlaceSerializer(CommentAbstractSerializer):
     class Meta:
         model = CommentPlace
         fields = '__all__'
-        extra_kwargs = {'creator': {'required': True},
-                        'place': {'required': True}}
+        extra_kwargs = {
+            'creator': {
+                'required': True
+            },
+            'place': {
+                'required': True
+            }
+        }
 
 
 class PlaceRatingSerializer(serializers.ModelSerializer):
     """Full ModelSerializer for model PlaceRating"""
+
     class Meta:
         model = PlaceRating
         fields = '__all__'
