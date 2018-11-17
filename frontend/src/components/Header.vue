@@ -18,7 +18,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import store from '../store';
 
 export default {
   name: 'Header',
@@ -30,7 +29,7 @@ export default {
   },
   methods: {
     signOut() {
-      store.dispatch('signOut').finally(() => {
+      this.$store.dispatch('signOut').finally(() => {
         this.$awn.success('You have been signed out');
         this.$router.push({ name: 'login' });
       });

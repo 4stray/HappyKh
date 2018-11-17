@@ -24,7 +24,7 @@ const getters = {
 
 const actions = {
   async signOut(state) {
-    await axiosInstance.post('/api/users/logout').then((response) => {
+    await axiosInstance.post('/api/users/logout').then(() => {
       console.log('Signed out');
     }).catch((error) => {
       console.log(error);

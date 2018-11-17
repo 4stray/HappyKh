@@ -30,7 +30,6 @@
 <script>
 import { mapGetters } from 'vuex';
 import { axiosInstance } from '../axios-requests';
-import store from '../store';
 
 export default {
   name: 'PasswordComponent',
@@ -58,7 +57,7 @@ export default {
   },
   methods: {
     signOut() {
-      store.dispatch('signOut').finally(() => {
+      this.$store.dispatch('signOut').finally(() => {
         this.$awn.success('You have successfully changed your password.');
         this.$router.push({ name: 'login' });
       });
@@ -80,7 +79,7 @@ export default {
       };
 
       axiosInstance.patch(`/api/users/${this.userID}/password`, userCredentials)
-        .then((response) => {
+        .then(() => {
           this.signOut();
         })
         .catch((error) => {
