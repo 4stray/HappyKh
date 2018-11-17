@@ -170,17 +170,11 @@ class PlaceSinglePage(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if single_place.is_editing_permitted(current_user.id):
-            try:
-                single_place = Place.objects.get(id=place_id)
-                single_place.delete()
+            single_place.delete()
 
-                LOGGER.info(f'Place with id {place_id} was deleted')
+            LOGGER.info(f'Place with id {place_id} was deleted')
 
-                return Response(status=status.HTTP_200_OK)
-            except Place.DoesNotExist:
-                LOGGER.info(f'Place with id {place_id} was not deleted')
-
-                return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_200_OK)
 
         LOGGER.info(
             f'Deleting place permission denied for the user '

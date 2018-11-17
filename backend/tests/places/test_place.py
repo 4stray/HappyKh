@@ -172,6 +172,14 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(True, response.data.get('is_place_editing_permitted'))
 
+    def test_getting_permission_of_nonexisting_place(self):
+        """Test getting user permission of unexisting place"""
+        response = self.client.get(
+            f'{PLACE_URL}{0}/editing_permission'
+        )
+
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
 
 class TestPlacePageWithoutEditingPermission(APITestCase):
     """ Test changing place without having permission for it """
