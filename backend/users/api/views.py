@@ -27,6 +27,7 @@ from ..cryptography import decode, encode
 from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
+token_life_duration = 1
 
 
 def token_is_active(token):
@@ -36,7 +37,8 @@ def token_is_active(token):
     :param token: DRF Token object
     :return: True if token hasn't expired yet. False otherwise
     """
-    if token and timezone.now() <= token.created + datetime.timedelta(days=1):
+    if token and timezone.now() <= token.created + datetime.timedelta(
+            days=token_life_duration):
         return True
     return False
 
