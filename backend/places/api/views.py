@@ -281,6 +281,9 @@ class SingleCommentAPI(APIView):
             LOGGER.warning(f'Comment #{comment_id} not found')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        if user != comment.creator:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
         comment_context = {'domain': get_current_site(request)}
         data.update(edited=True)
         comment_serializer = CommentPlaceSerializer(comment,
