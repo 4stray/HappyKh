@@ -57,7 +57,8 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         response = self.client.get(RATING_URL % self.place.pk)
         average_rating = PlaceRatingView.get_average(self.place.pk)
         expected = {'place': self.place.pk,
-                    'rating': average_rating}
+                    'rating': average_rating['average'],
+                    'amount': average_rating['amount']}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         self.assertDictEqual(expected, response.data)
@@ -72,15 +73,18 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         """
         Test post request for rating update
         """
+        amount = PlaceRatingView.get_average(self.place.pk)['amount']
         data = {
             'place': self.place.pk,
             'user': self.hashed_user_id,
             'rating': 2,
+            'amount': amount,
         }
         response = self.client.post(RATING_URL % self.place.pk, data)
         expected = {'place': self.place.pk,
                     'user': self.hashed_user_id,
-                    'rating': data['rating']}
+                    'rating': data['rating'],
+                    'amount': data['amount']}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
         self.assertDictEqual(expected, response.data)
@@ -103,15 +107,18 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         """
         Test post request for rating creation
         """
+        amount = PlaceRatingView.get_average(self.place.pk)['amount']
         data = {
             'place': self.place.pk,
             'user': self.hashed_new_user_id,
             'rating': TEST_RATING_DATA['rating'],
+            'amount': amount,
         }
         response = self.client.post(RATING_URL % self.place.pk, data)
         expected = {'place': self.place.pk,
                     'user': self.hashed_new_user_id,
-                    'rating': data['rating']}
+                    'rating': data['rating'],
+                    'amount': data['amount']}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertDictEqual(expected, response.data)
 

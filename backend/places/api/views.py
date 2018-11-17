@@ -270,7 +270,7 @@ class PlaceRatingView(APIView):
         """
         calculate average rating for place
         :param place_id: integer place_id
-        :return: float average or 0 if there are not ratings for this place
+        :return: dict
         """
         ratings = PlaceRating.objects.filter(place=place_id)
         if not ratings.count():

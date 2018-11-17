@@ -70,8 +70,7 @@ export default {
       };
       axiosInstance.post(`/api/places/rating/${this.$route.params.id}`, ratingData)
         .then((response) => {
-          this.rating = response.data.rating;
-          this.amount = response.data.amount;
+          this.fetchRating();
           this.display_rating = this.rating + " / " + this.amount;
           this.$awn.success('The place was successfully rated.');
         }).catch((error) => {
