@@ -179,7 +179,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.address = Address.objects.create(**TEST_ADDRESS_DATA)
         self.place = Place.objects.create(user=self.user, address=self.address,
                                           **TEST_PLACE_DATA)
-        self.places = Place.objects.all()
+        self.places = Place.objects.all()# pylint: disable=access-member-before-definition
         user_token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
 
@@ -195,7 +195,8 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         )
         self.pk = CommentPlace.objects.last().pk
         self.comment_count = CommentPlace.objects.count()
-        self.COMMENT_URL = f'/api/places/{self.places.last().pk}/comments'
+        self.place_pk = self.places.last().pk
+        self.COMMENT_URL = f'/api/places/{self.place_pk}/comments'
         self.SINGLE_COMMENT_URL = f'{self.COMMENT_URL}/{self.pk}'
 
     def test_successful_get(self):
