@@ -83,16 +83,13 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         Test post request for places
         """
         data = TEST_PLACE_DATA_POST
-        data['user'] = self.hashed_user_id
         data['address'] = json.dumps(TEST_ADDRESS_DATA)
         response = self.client.post(PLACE_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
     def test_delete_existing_place(self):
         """Test response for place deletion"""
-        place = Place.objects.create(user=self.user, address=self.address,
-                                     **TEST_PLACE_DATA)
-        response = self.client.delete(f'{PLACE_URL}{place.id}')
+        response = self.client.delete(f'{PLACE_URL}{self.place.id}')
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_delete_nonexisting_place(self):
@@ -112,7 +109,6 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
     def test_changing_place_without_any_change(self):
         """Test response for changing place without changes"""
         test_data = TEST_PLACE_DATA_PUT.copy()
-        test_data['user'] = self.hashed_user_id
 
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
@@ -120,7 +116,6 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
     def test_changing_place_with_invalid_id(self):
         """Test response for changing place with invalid id"""
         test_data = TEST_PLACE_DATA_PUT.copy()
-        test_data['user'] = self.hashed_user_id
 
         response = self.client.put(f'{PLACE_URL}{0}', test_data)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
@@ -128,7 +123,6 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
     def test_changing_place_with_blank_name(self):
         """Test response for changing place with no name"""
         test_data = TEST_PLACE_DATA_PUT.copy()
-        test_data['user'] = self.hashed_user_id
         test_data['name'] = ''
 
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
@@ -137,7 +131,6 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
     def test_changing_place_text_fields(self):
         """Test response for changing place"""
         test_data = TEST_PLACE_DATA_PUT.copy()
-        test_data['user'] = self.hashed_user_id
         test_data['name'] = 'New name'
         test_data['description'] = 'New description'
 
@@ -164,7 +157,6 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
             'latitude': 0,
             'address': '',
         })
-        test_data['user'] = self.hashed_user_id
 
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
