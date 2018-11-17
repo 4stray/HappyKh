@@ -4,7 +4,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
 from tests.utils import BaseTestCase
-from users.api.views import token_life_duration
+from users.api.views import token_life_duration_days
 from users.models import User
 
 CORRECT_EMAIL = 'test_mail@mail.com'
@@ -75,7 +75,7 @@ class LoginViewTestCase(BaseTestCase, APITestCase):
         """
         token = Token.objects.create(user=self.active_user)
         token.created = timezone.now() - timezone.timedelta(
-            days=token_life_duration * 2)
+            days=token_life_duration_days * 2)
         token.save()
         response = self.client.post(LOGIN_URL, ACTIVATED_USER_DATA)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
