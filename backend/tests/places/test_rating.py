@@ -65,6 +65,23 @@ class TestPlaceRating(BaseTestCase, APITestCase):
 
         self.assertDictEqual(expected, response.data)
 
+    def test_get_user_rating(self):
+        """Test user's rating"""
+        response = PlaceRatingView.get_user_rating(self.user.pk,
+                                                   self.place.pk)
+        expected = self.rating.rating
+        self.assertEqual(expected, response)
+
+    def test_get_invalid_user_rating(self):
+        """Test invalid user's rating"""
+        response = PlaceRatingView.get_user_rating(self.new_user.pk,
+                                                   self.place.pk)
+        expected = 0
+        self.assertEqual(expected, response)
+
+
+
+
     def test_get_empty_rating(self):
         """Test rating with invalid place id"""
         place_id = 100
