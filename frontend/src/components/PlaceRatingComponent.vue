@@ -3,7 +3,7 @@
     <v-flex md6>
       <v-layout justify-start column>
           <v-label class="d-block" id="labelRating">Rate this place:</v-label>
-          <h6 class="subheading" id="displayRating"> {{ display_rating }}</h6>
+          <v-label class="subheading mt-2"  id="displayRating"> {{ display_rating }}</v-label>
           <v-rating
               id="placeRating"
               v-model="rating"
@@ -41,17 +41,29 @@ export default {
       rating: 0,
       amount: 0,
       display_rating: '',
+      average_rating: 0,
     };
   },
   created() {
     this.fetchRating();
   },
   methods: {
+    getRequestParams() {
+      return {
+        params: {
+          user: this.userID,
+        },
+      };
+    },
     fetchRating() {
-      getPlaceRating(this.$route.params.id).then((response) => {
+      const params = this.getRequestParams();
+      getPlaceRating(this.$route.params.id, params).then((response) => {
         this.rating = response.data.rating;
         this.amount = response.data.amount;
-        this.display_rating = `${this.rating} / ${this.amount}`;
+        this.average_rating = response.data.data;
+        const ratesAmount = (this.amount === 1) ? 'rate' : 'rates';
+        this.display_rating = `Average rating is ${this.average_rating} based on
+          ${this.amount} ${ratesAmount}`;
       }).catch((error) => {
         if (error.response === undefined) {
           this.$awn.alert('A server is currently unavailable');
@@ -71,7 +83,7 @@ export default {
       axiosInstance.post(`/api/places/rating/${this.$route.params.id}`, ratingData)
         .then((response) => {
           this.fetchRating();
-          this.display_rating = `${this.rating} / ${this.amount}`;
+          this.rating = response.data.rating;
           this.$awn.success('The place was successfully rated.');
         }).catch((error) => {
           if (error.response === undefined) {
