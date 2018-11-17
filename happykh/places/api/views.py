@@ -11,7 +11,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils import get_changed_uri
+from utils import get_changed_uri, get_token_user_id
 from users.backends import UserAuthentication
 
 from .serializers import (PlaceSerializer, AddressSerializer,
@@ -180,6 +180,29 @@ class PlaceSinglePage(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
 
+class PlacesEditingPermissions(APIView):
+    """Get place edit privilege"""
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, place_id):
+        current_user_id = get_token_user_id(request)
+        single_place = Place.get_place(place_id)
+
+        if single_place is None:
+            LOGGER.warning(f'Place #{place_id} not found')
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        response_data = {
+            'is_place_editing_permitted': True,
+        }
+
+        if not single_place.is_editing_permitted(current_user_id):
+            response_data['is_place_editing_permitted'] = False
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
 class CommentsAPI(APIView):
     """Get comments for a place or create new one for place"""
     authentication_classes = (TokenAuthentication,)
@@ -281,19 +304,6 @@ class PlaceRatingView(APIView):
     """
     Display and create place's rating
     """
-
-    @staticmethod
-    def get_user_from_token(request):
-        """
-        Get user's id from token
-        :param request: HTTP request
-        :return: integer user_id
-        """
-        token = request.META.get('HTTP_AUTHORIZATION').split(' ')
-        token_key = str(token[1])
-        user_token = Token.objects.get(key=token_key)
-        user_id = user_token.user_id
-        return user_id
 
     @staticmethod
     def get_valid_request_data(request):

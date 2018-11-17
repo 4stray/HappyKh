@@ -18,7 +18,8 @@
 
 <script>
 import PlaceFormComponent from '../components/PlaceFormComponent.vue';
-import { axiosInstance, getPlaceData } from '../axios-requests';
+import { axiosInstance, getPlaceData, getPlaceEditingPermission }
+  from '../axios-requests';
 
 export default {
   name: 'PlaceEditComponent',
@@ -29,22 +30,44 @@ export default {
     place: '',
   },
   created() {
-    const placeId = this.$route.params.placeId;
-    getPlaceData(placeId).then((response) => {
-      this.place = {
-        name: response.data.name,
-        logo: response.data.logo,
-        description: response.data.description,
-        address: response.data.address,
-      };
-    }).catch((error) => {
-      this.$awn.alert('User access denied for editing the place');
+    this.fetchPlaceEditPermission();
+    this.fetchPlaceData();
+  },
+  methods: {
+    rejectInEditingAccess() {
+      this.$awn
+        .alert('You have to get a permission in order to edit the place');
       this.$router.push({
         name: 'home',
       });
-    });
-  },
-  methods: {
+    },
+    fetchPlaceEditPermission() {
+      getPlaceEditingPermission(this.$route.params.placeId)
+        .then((response) => {
+        if (!response.data.is_place_editing_permitted) {
+          this.rejectInEditingAccess();
+        }
+      }).catch((error) => {
+        if (!error.response) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else {
+          this.$awn.alert(error);
+        }
+      });
+    },
+    fetchPlaceData() {
+      const placeId = this.$route.params.placeId;
+      getPlaceData(placeId).then((response) => {
+        this.place = {
+          name: response.data.name,
+          logo: response.data.logo,
+          description: response.data.description,
+          address: response.data.address,
+        };
+      }).catch((error) => {
+        this.rejectInEditingAccess();
+      });
+    },
     updatePlace(formData) {
       const placeId = this.$route.params.placeId;
 

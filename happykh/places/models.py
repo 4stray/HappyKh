@@ -50,7 +50,7 @@ class Place(models.Model):
             original_filename=filename
         )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    edit_permitted_users = models.ManyToManyField(User)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -77,6 +77,13 @@ class Place(models.Model):
                 f' place_id: {place_id}'
             )
             return None
+
+    def is_editing_permitted(self, user_id):
+        try:
+            self.edit_permitted_users.get(id=user_id)
+            return True
+        except User.DoesNotExist:
+            return False
 
     def __str__(self):
         return self.name

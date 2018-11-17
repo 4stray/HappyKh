@@ -1,14 +1,6 @@
 <template>
-  <v-layout :class="{'row': $vuetify.breakpoint.mdAndUp,
-                     'column': $vuetify.breakpoint.smAndDown}"
-            justify-space-around fill-height>
-    <v-flex md3 order-md2 xs12>
-      <v-btn :class="{'v-btn--block mt-4': $vuetify.breakpoint.smAndDown}"
-             color="info" class="left">
-        Request access to edit
-      </v-btn>
-    </v-flex>
-    <v-flex offset-md3 md6 xs12>
+  <v-layout justify-space-around fill-height>
+    <v-flex md6 xs12>
       <v-layout column>
         <v-card id="main" class="px-5 py-3">
           <v-img :src="place.logo || require('@/assets/default_place.png')"
@@ -36,9 +28,16 @@
 
           <PlaceRatingComponent/>
 
-          <v-btn :to="{name: 'placeEdit', params: {placeId: place.id}}"
+          <v-btn v-if="place.is_editing_permitted"
+                 :to="{name: 'placeEdit', params: {placeId: place.id}}"
                  fab dark absolute bottom right color="green">
             <v-icon>edit</v-icon>
+          </v-btn>
+
+          <v-btn v-else fab dark absolute bottom right color="red"
+                 title="Request Access to Edit">
+
+            <v-icon>lock_open</v-icon>
           </v-btn>
         </v-card>
       </v-layout>
@@ -48,7 +47,7 @@
 
 <script>
 import PlaceRatingComponent from '@/components/PlaceRatingComponent.vue';
-import { getPlaceData } from '../axios-requests';
+import { getPlaceData, getPlaceEditingPermission } from '../axios-requests';
 
 
 export default {
@@ -68,13 +67,27 @@ export default {
           latitude: '',
           address: '',
         },
+        is_editing_permitted: false,
       },
     };
   },
   created() {
+    this.fetchPlaceEditingPermission();
     this.fetchPlaceData();
   },
   methods: {
+    fetchPlaceEditingPermission() {
+      getPlaceEditingPermission(this.$route.params.id).then((response) => {
+        this.place.is_editing_permitted =
+          response.data.is_place_editing_permitted;
+      }).catch((error) => {
+        if (!error.response) {
+          this.$awn.alert('A server error has occurred, try again later');
+        } else {
+          this.$awn.alert(error);
+        }
+      });
+    },
     fetchPlaceData() {
       const alertText = 'A server error has occurred, try again later';
       getPlaceData(this.$route.params.id).then((response) => {
@@ -84,6 +97,7 @@ export default {
           name: response.data.name,
           address: response.data.address,
           description: response.data.description,
+          is_editing_permitted: this.place.is_editing_permitted,
         };
 
         if (this.place.name === '') {

@@ -33,6 +33,10 @@ export function getPlaceData(id) {
   return axiosInstance.get(`/api/places/${id}`);
 }
 
+export function getPlaceEditingPermission(id) {
+  return axiosInstance.get(`/api/places/${id}/editing_permission`);
+}
+
 export function getPlaceRating(id) {
   return axiosInstance.get(`/api/places/rating/${id}`);
 }
