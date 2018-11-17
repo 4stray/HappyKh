@@ -22,10 +22,12 @@
                     <p class="text-sm-left body-2 pt-2">{{comment.text}}</p>
                     <v-layout class="commentControl" align-start justify-end row>
                         <span class="caption" v-if="comment.edited">(edited)</span>
-                        <v-btn class="commentEdit" fab flat small bottom v-on:click="updateComment">
+                        <v-btn class="commentEdit"
+                               fab flat small bottom v-on:click="updateComment">
                         <v-icon size="1.3em" dark>edit</v-icon>
                     </v-btn>
-                        <v-btn class="commentDelete" fab flat small bottom v-on:click="deleteComment">
+                        <v-btn class="commentDelete"
+                               fab flat small bottom v-on:click="deleteComment">
                         <v-icon size="1.3em" dark>delete</v-icon>
                     </v-btn>
                     </v-layout>

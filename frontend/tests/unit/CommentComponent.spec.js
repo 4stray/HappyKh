@@ -29,5 +29,4 @@ describe('CommentComponent', () => {
   it('contains control commentDelete button', () => {
     expect(wrapper.contains('.commentDelete')).to.be.equal(true);
   });
-
 });
