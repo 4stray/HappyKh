@@ -104,7 +104,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=30, blank=True)
     age = models.PositiveSmallIntegerField(blank=True, null=True)
     gender = models.CharField(choices=GENDER_CHOICES, max_length=2,
-                              default=woman)
+                              default=unknown)
     profile_image = std_models.StdImageField(
         upload_to=_make_upload_profile_image,
         blank=True,
