@@ -1,10 +1,11 @@
 """Test users api views"""
 from rest_framework import status
 from rest_framework.test import APITestCase
-from tests.utils import BaseTestCase
+
 from users.api.tokens import account_activation_token
-from users.models import User
 from users.cryptography import encode
+from users.models import User
+from tests.utils import BaseTestCase
 
 TEST_USER_DATA = {
     'user_email': 'test@mail.com',
@@ -45,3 +46,25 @@ class RegistrationViewTestCase(BaseTestCase, APITestCase):
         )
 
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+    def test_empty_credentials(self):
+        """Test user registration without some fields"""
+        empty_data = {
+            'user_email': '',
+            'user_password': '',
+            'first_name': ''
+        }
+        expected = {'message': 'Some credentials were not provided'}
+        response = self.client.post(REGISTRATION_URL, empty_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(expected, response.data)
+
+        empty_data['first_name'] = 'user'
+        response = self.client.post(REGISTRATION_URL, empty_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(expected, response.data)
+
+        empty_data['user_email'] = 'user@email.com'
+        response = self.client.post(REGISTRATION_URL, empty_data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(expected, response.data)

@@ -1,6 +1,6 @@
 <template>
-  <v-layout justify-space-around row fill-height>
-    <v-flex xs12 mt-4>
+  <v-layout justify-space-around class="pt-2">
+    <v-flex md6>
       <v-layout justify-start column>
           <v-label class="d-block" id="labelRating">Rate this place:</v-label>
           <v-rating
@@ -79,3 +79,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+  v-card{
+    border: transparent;
+  }
+</style>

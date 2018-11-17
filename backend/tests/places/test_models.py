@@ -34,7 +34,7 @@ class PlaceTestCase(BaseTestCase):
         )
 
     def test_place_creation(self):
-        """Testing default place attributes"""
+        """Test default place attributes"""
         place = self.place
         self.assertIsInstance(place, Place)
         self.assertEqual(self.place_info['name'], place.name)
@@ -57,6 +57,9 @@ class AddressTestCase(BaseTestCase):
         )
 
     def test_successful_creation(self):
+        """
+        Test view response after successful address creation
+        """
         self.assertIsInstance(self.successful_created_address, Address)
         self.assertEqual(self.address_info['address'],
                          self.successful_created_address.address)
@@ -66,11 +69,17 @@ class AddressTestCase(BaseTestCase):
                          self.successful_created_address.longitude)
 
     def test_creation_without_location(self):
+        """
+        Test creation of address without location
+        """
         with self.assertRaises(IntegrityError) as error:
             Address.objects.create(address=self.address_info['address'])
         self.assertEqual(type(error.exception), IntegrityError)
 
     def test_creation_without_address_string(self):
+        """
+        Test creation of address without address string
+        """
         with self.assertRaises(IntegrityError) as error:
             Address.objects.create(latitude=self.address_info['latitude'],
                                    longitude=self.address_info['longitude'])

@@ -22,7 +22,7 @@ def make_media_file_path(model_name, attr_name, original_filename):
     if original_filename:
         ext = original_filename.split('.')[-1]
         filename = uuid.uuid4()
-        full_filename = "%s.%s" % (filename, ext)
+        full_filename = f"{filename}.{ext}"
         return f'{model_name}/{attr_name}/{filename}/{full_filename}'
     return None
 

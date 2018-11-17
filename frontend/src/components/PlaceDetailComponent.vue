@@ -21,12 +21,12 @@
             Place has no description.</p>
 
           <v-label class="d-block" id="labelAddress">Address</v-label>
-
           <h3 class="subheading" id="placeAddress">
             {{place.address.address}}
           </h3>
 
           <PlaceRatingComponent/>
+          <CommentsCollectionComponent/>
 
           <v-btn v-if="place.is_editing_permitted"
                  :to="{name: 'placeEdit', params: {placeId: place.id}}"
@@ -34,7 +34,7 @@
             <v-icon>edit</v-icon>
           </v-btn>
 
-          <v-btn v-else fab dark absolute bottom right color="red"
+          <v-btn v-else fab dark absolute bottom right color="blue"
                  v-on:click="requestPlaceEditingPermission"
                  title="Request Access to Edit">
 
@@ -48,17 +48,14 @@
 
 <script>
 import PlaceRatingComponent from '@/components/PlaceRatingComponent.vue';
-import {
-  axiosInstance, getPlaceData,
-  getPlaceEditingPermission,
-} from '../axios-requests';
+import { axiosInstance, getPlaceData, getPlaceEditingPermission }
+  from '../axios-requests';
+import CommentsCollectionComponent from './CommentsCollectionComponent';
 
 
 export default {
   name: 'ProfileComponent',
-  components: {
-    PlaceRatingComponent,
-  },
+  components: { PlaceRatingComponent, CommentsCollectionComponent },
   data() {
     return {
       place: {
@@ -118,7 +115,7 @@ export default {
           this.$awn.alert(alertText);
         }
       }).catch((error) => {
-        if (error.response === undefined || error.response.status !== 200) {
+        if (error.response || error.response.status !== 200) {
           this.$awn.alert(alertText);
           this.$router.go(-1);
         } else if (error.response.data.message) {

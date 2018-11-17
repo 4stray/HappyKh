@@ -63,6 +63,9 @@ class Place(models.Model):
     )
     created = models.DateTimeField(editable=False, default=timezone.now)
 
+    def __str__(self):
+        return self.name
+
     @staticmethod
     def get_place(place_id):
         """
@@ -89,9 +92,6 @@ class Place(models.Model):
             return True
         except User.DoesNotExist:
             return False
-
-    def __str__(self):
-        return self.name
 
 
 class CommentPlace(CommentAbstract):

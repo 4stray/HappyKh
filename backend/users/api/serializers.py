@@ -26,7 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         new_image = validated_data.get('profile_image')
         old_image = instance.profile_image
-        if new_image is not None and old_image:
+        if new_image and old_image:
             # delete old images
             delete_std_images_from_media(
                 old_image,
@@ -34,7 +34,7 @@ class UserSerializer(serializers.ModelSerializer):
             )
 
         for attr, value in validated_data.items():
-            if attr != 'profile_image' or value is not None:
+            if attr != 'profile_image' or value:
                 setattr(instance, attr, value)
         instance.save()
 
@@ -57,7 +57,6 @@ class LoginSerializer(serializers.Serializer):
             validate_email(user_email)
         except ValidationError:
             email_validation_error = exceptions.ValidationError
-
             email_validation_error.default_detail = \
                 'Invalid user email format.'
             LOGGER.error(
@@ -67,34 +66,7 @@ class LoginSerializer(serializers.Serializer):
             )
             raise email_validation_error
 
-        if user_email and user_password:
-            user = authenticate(user_email=user_email,
-                                user_password=user_password)
-            if user:
-                if user.is_active:
-                    attrs['user'] = user
-                else:
-                    account_activation_error = exceptions.ValidationError
-                    account_activation_error.default_detail = \
-                        'Please, check you mailbox in order ' \
-                        'to activate your account'
-                    LOGGER.warning(
-                        'Serializer: Validation warning,'
-                        ' need to activate account'
-                    )
-                    raise account_activation_error
-            else:
-                account_exists_error = exceptions.ValidationError
-                account_exists_error.default_detail = \
-                    'Account with such credentials does not exist'
-
-                LOGGER.warning(
-                    f'Serializer: Validation warning, '
-                    f'{account_exists_error.default_detail},'
-                    f' user_email: {user_email}'
-                )
-                raise account_exists_error
-        else:
+        if not (user_email and user_password):
             authorization_error = exceptions.ValidationError
             authorization_error.default_detail = \
                 'Must provide user email and password'
@@ -103,6 +75,32 @@ class LoginSerializer(serializers.Serializer):
                 f'{authorization_error.default_detail}'
             )
             raise authorization_error
+
+        user = authenticate(user_email=user_email,
+                            user_password=user_password)
+        if not user:
+            account_exists_error = exceptions.ValidationError
+            account_exists_error.default_detail = \
+                'Account with such credentials does not exist'
+            LOGGER.warning(
+                f'Serializer: Validation warning, '
+                f'{account_exists_error.default_detail},'
+                f' user_email: {user_email}'
+            )
+            raise account_exists_error
+
+        if not user.is_active:
+            activation_error = exceptions.ValidationError
+            activation_error.default_detail = \
+                'Please, check you mailbox in order ' \
+                'to activate your account'
+            LOGGER.warning(
+                f'Serializer: Validation warning, '
+                f'{activation_error.default_detail}'
+            )
+            raise activation_error
+
+        attrs['user'] = user
         return attrs
 
 
@@ -118,13 +116,8 @@ class PasswordSerializer(serializers.ModelSerializer):
         fields = ('old_password', 'new_password')
 
     def update(self, instance, validated_data):
-        password = validated_data.pop("new_password")
-        instance.__dict__.update(validated_data)
-
-        if password:
-            instance.set_password(password)
+        instance.set_password(validated_data.get('new_password'))
         instance.save()
-
         return instance
 
 
@@ -144,7 +137,6 @@ class EmailSerializer(serializers.ModelSerializer):
             validate_email(new_email)
         except ValidationError:
             email_validation_error = exceptions.ValidationError
-
             email_validation_error.default_detail = \
                 'Invalid user email format.'
             LOGGER.error(
@@ -153,15 +145,14 @@ class EmailSerializer(serializers.ModelSerializer):
                 f'invalid email format, Email: {new_email}'
             )
             raise email_validation_error
+
         return attrs
 
     def update(self, instance, validated_data):
         new_email = validated_data.get('email')
-
-        if new_email:
-            instance.is_active = False
-            instance.email = new_email
-            instance.save()
+        instance.is_active = False
+        instance.email = new_email
+        instance.save()
 
         return instance
 

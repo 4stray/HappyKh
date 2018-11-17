@@ -1,3 +1,4 @@
+"""Tests for places"""
 import json
 
 from django.core.paginator import Paginator
@@ -67,6 +68,9 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
 
     def test_get(self):
+        """
+        Test get request for places
+        """
         response = self.client.get(PLACE_URL)
         serializer = PlaceSerializer(self.places, many=True)
         expected = serializer.data
@@ -74,6 +78,9 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertEqual(expected, response.data)
 
     def test_post(self):
+        """
+        Test post request for places
+        """
         data = TEST_PLACE_DATA_POST
         data['user'] = self.hashed_user_id
         data['address'] = json.dumps(TEST_ADDRESS_DATA)
@@ -81,15 +88,17 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
     def test_delete_existing_place(self):
+        """Test response for place deletion"""
         response = self.client.delete(f'{PLACE_URL}{self.place.id}')
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_delete_nonexisting_place(self):
+        """Test response for deletion of place that doesn't exist"""
         response = self.client.delete(f'{PLACE_URL}0')
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_get_single_place(self):
-        """Gets single place data"""
+        """Test get request for single place data"""
         response = self.client.get(SINGLE_PLACE_URL % self.place.pk)
         serializer = PlaceSerializer(self.place)
         expected = serializer.data
@@ -98,6 +107,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertDictEqual(expected, response.data)
 
     def test_changing_place_without_any_change(self):
+        """Test response for changing place without changes"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['user'] = self.hashed_user_id
 
@@ -105,6 +115,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_changing_place_with_invalid_id(self):
+        """Test response for changing place with invalid id"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['user'] = self.hashed_user_id
 
@@ -112,6 +123,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_changing_place_with_blank_name(self):
+        """Test response for changing place with no name"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['user'] = self.hashed_user_id
         test_data['name'] = ''
@@ -120,6 +132,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_changing_place_text_fields(self):
+        """Test response for changing place"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['user'] = self.hashed_user_id
         test_data['name'] = 'New name'
@@ -129,6 +142,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_changing_place_address(self):
+        """Test response for changing place's address"""
         test_data = TEST_PLACE_DATA_PUT.copy()
         test_data['address'] = json.dumps({
             'longitude': 50,
@@ -138,6 +152,19 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
 
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_changing_place_address_for_empty_one(self):
+        """Test update place's address for invalid"""
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 0,
+            'latitude': 0,
+            'address': '',
+        })
+        test_data['user'] = self.hashed_user_id
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_having_permission_for_place_editing(self):
         test_data = TEST_PLACE_DATA_PUT.copy()
@@ -207,6 +234,7 @@ class TestPlacePageWithoutEditingPermission(APITestCase):
 
 
 class TestCommentsAPI(BaseTestCase, APITestCase):
+    """Test comments for places"""
 
     def setUp(self):
         """Create user, place and comment objects"""
@@ -227,12 +255,16 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         }
         self.COMMENT_URL = '/api/places/' + str(self.place.id) + '/comments'
         self.comment = CommentPlace.objects.create(
+            # pylint: disable=duplicate-code
             creator=self.comment_info['creator'],
             text=self.comment_info['text'],
             place=self.comment_info['place'],
         )
 
     def test_get(self):
+        """
+        Test get request for comments
+        """
         comment = CommentPlace.objects.create(
             creator=self.comment_info['creator'],
             text='com2',
@@ -275,6 +307,10 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+        wrong_get_url = self.COMMENT_URL + '?objects_per_page=0'
+        response = self.client.get(wrong_get_url)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
         wrong_get_url = self.COMMENT_URL + '?page=1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
@@ -285,9 +321,12 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
 
         CommentPlace.objects.all().delete()
         response = self.client.get(get_url)
-        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_post(self):
+        """
+        Test post request for comments
+        """
         data = self.comment_info
         data['creator'] = self.hashed_user_id
 
@@ -302,10 +341,10 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
 
         data['creator'] = 'KLK'
         response = self.client.post(self.COMMENT_URL, data)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
         self.assertEqual(2, CommentPlace.objects.count())
 
         data['text'] = None
         response = self.client.post(self.COMMENT_URL, data)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
         self.assertEqual(2, CommentPlace.objects.count())
