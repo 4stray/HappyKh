@@ -102,6 +102,8 @@ class PlacePage(APIView):
                 'message': 'Parsing address from Json failed',
             }
 
+            LOGGER.error(parsing_address_error['message'])
+
             return Response(data=parsing_address_error,
                             status=status.HTTP_400_BAD_REQUEST)
 

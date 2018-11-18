@@ -123,9 +123,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
     def test_changing_place_with_wrong_address(self):
         """Test response when changing place with wrong address format"""
         test_data = TEST_PLACE_DATA_PUT.copy()
-        test_data['address'] = json.dumps({
-            'test': 'test'
-        })
+        test_data['address'] = 'nonjson format'
 
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
