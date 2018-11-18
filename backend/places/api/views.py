@@ -326,7 +326,6 @@ class PlaceRatingView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         user = UserAuthentication.get_user(user_id)
-        amount = self.get_average(place_id)
 
         request_data = {'user': user.id,
                         'place': place_id,
