@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -283,6 +284,20 @@ class PlaceRatingView(APIView):
         return response
 
     @staticmethod
+    def get_user_from_token(request):
+        """
+        get user's id from token
+        :param request: HTTP request
+        :return: integer user_id
+        """
+        token = request.META.get('HTTP_AUTHORIZATION').split(' ')
+        token_key = str(token[1])
+        user_token = Token.objects.get(key=token_key)
+
+        user_id = user_token.user_id
+        return user_id
+
+    @staticmethod
     def get_user_rating(user_id, place_id):
         """
         return user's rating for the place
@@ -304,9 +319,8 @@ class PlaceRatingView(APIView):
         :param place_id: integer place_id
         :return: Response with data and status
         """
-        user_id = request.GET.get('user')
-        user = UserAuthentication.get_user(user_id)
-        user_rating = self.get_user_rating(user, place_id)
+        user_id = self.get_user_from_token(request)
+        user_rating = self.get_user_rating(user_id, place_id)
         average_rating = self.get_average(place_id)
         response = {'place': place_id,
                     'data': average_rating['average'],

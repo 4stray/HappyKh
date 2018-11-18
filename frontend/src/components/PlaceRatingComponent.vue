@@ -48,16 +48,8 @@ export default {
     this.fetchRating();
   },
   methods: {
-    getRequestParams() {
-      return {
-        params: {
-          user: this.userID,
-        },
-      };
-    },
     fetchRating() {
-      const params = this.getRequestParams();
-      getPlaceRating(this.$route.params.id, params).then((response) => {
+      getPlaceRating(this.$route.params.id).then((response) => {
         this.rating = response.data.rating;
         this.amount = response.data.amount;
         this.average_rating = response.data.data;

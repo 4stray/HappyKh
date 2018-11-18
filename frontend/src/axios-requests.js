@@ -33,8 +33,8 @@ export function getPlaceData(id) {
   return axiosInstance.get(`/api/places/${id}`);
 }
 
-export function getPlaceRating(id, params) {
-  return axiosInstance.get(`/api/places/rating/${id}`, params);
+export function getPlaceRating(id) {
+  return axiosInstance.get(`/api/places/rating/${id}`);
 }
 
 export function getComments(id, params) {

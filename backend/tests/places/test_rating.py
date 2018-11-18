@@ -92,7 +92,7 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         """Test rating with invalid place id"""
         place_id = 100
         response = self.client.get(RATING_URL % place_id)
-        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_post_update(self):
         """
