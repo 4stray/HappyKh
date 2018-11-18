@@ -22,7 +22,7 @@ class UserTestCase(BaseTestCase):
         self.assertEqual('', user.first_name)
         self.assertEqual('', user.last_name)
         self.assertIsNone(user.age)
-        self.assertEqual('W', user.gender)
+        self.assertEqual('U', user.gender)
         self.assertEqual('', user.profile_image)
         self.assertEqual('any@mail.com', user.email)
         self.assertEqual(True, user.check_password('password'))

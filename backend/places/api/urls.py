@@ -8,6 +8,8 @@ urlpatterns = [
         path('', views.PlacePage.as_view()),
         path('<int:place_id>', views.PlaceSinglePage.as_view()),
         path('<int:place_id>/comments', views.CommentsAPI.as_view()),
+        path('<int:place_id>/comments/<int:comment_id>',
+             views.SingleCommentAPI.as_view()),
         path('rating/<int:place_id>', views.PlaceRatingView.as_view()),
     ])),
 ]

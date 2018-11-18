@@ -2,30 +2,23 @@
 import json
 import logging
 
-from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-# pylint: disable = no-name-in-module, import-error
-from rest_framework.pagination import DjangoPaginator
-from django.core.paginator import EmptyPage, PageNotAnInteger
-from utils import get_changed_uri
 from users.backends import UserAuthentication
 
+from utils import get_changed_uri
 from .serializers import (PlaceSerializer, AddressSerializer,
                           CommentPlaceSerializer, PlaceRatingSerializer)
 from ..models import Place, Address, CommentPlace, PlaceRating
 
 LOGGER = logging.getLogger('happy_logger')
-
-
-class CustomValidationError(Exception):
-    pass
 
 
 class PlacePage(APIView):
@@ -41,39 +34,30 @@ class PlacePage(APIView):
         :param request: HTTP Request
         :return: list of all places
         """
-        try:
-            order = request.query_params['order']
-            order_by = request.query_params['orderBy']
-            if order is not None and order_by is not None:
-                places = Place.objects.order_by(
-                    f"{order}{request.query_params['orderBy']}"
-                )
-        except KeyError:
-            places = Place.objects.all()
+        order = request.GET.get('order', '')
+        order_by = request.GET.get('orderBy', 'name')
+        places = Place.objects.order_by(f"{order}{order_by}")
 
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
         }
-        search_option = request.query_params.get('s', None)
+
+        search_option = request.GET.get('s', None)
         if search_option is not None:
             places = places.filter(name__icontains=search_option)
 
-        limit = request.query_params.get('lim', None)
-        if limit is None:
-            limit = 15
-        paginator = DjangoPaginator(places, limit)
+        objects_limit = request.GET.get('lim', 15)
+        paginator = Paginator(places, objects_limit)
 
-        page = request.query_params.get('p', None)
-        if page is None:
+        page = request.GET.get('p', 1)
+
+        try:
+            places = paginator.page(page)
+        except PageNotAnInteger:
             places = paginator.page(1)
-        else:
-            try:
-                places = paginator.page(page)
-            except PageNotAnInteger:
-                places = paginator.page(1)
-            except EmptyPage:
-                places = paginator.page(paginator.num_pages)
+        except EmptyPage:
+            places = paginator.page(paginator.num_pages)
 
         serializer = PlaceSerializer(places, many=True, context=context)
         return Response({"places": serializer.data, "pages": paginator.num_pages},
@@ -102,6 +86,7 @@ class PlacePage(APIView):
             LOGGER.info(f'Created place #{pk}')
             return Response({'message': 'place was created'},
                             status=status.HTTP_201_CREATED)
+
         LOGGER.error(f'Serializer errors: {serializer.errors}')
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -112,17 +97,13 @@ class PlacePage(APIView):
         :param data: dict consists of latitude, longitude, address string
         :return: int address primary key
         """
-        try:
-            address = Address.objects.get(address=data['address'],
-                                          latitude=data['latitude'],
-                                          longitude=data['longitude'])
-        except Address.DoesNotExist:
-            address_serializer = AddressSerializer(data=data)
-            if address_serializer.is_valid():
-                return address_serializer.save().pk
-            LOGGER.error(f'Serializer errors: {address_serializer.errors}')
-            return False
-        return address.pk
+        address_serializer = AddressSerializer(data=data)
+        if address_serializer.is_valid():
+            address, _ = Address.objects.get_or_create(**data)
+            return address.pk
+
+        LOGGER.error(f'Serializer errors: {address_serializer.errors}')
+        return None
 
 
 class PlaceSinglePage(APIView):
@@ -138,12 +119,8 @@ class PlaceSinglePage(APIView):
         :param place_id: place's id
         :return: place's data, status code
         """
-        single_place = Place.get_place(place_id)
 
-        if single_place is None:
-            LOGGER.warning(f'Place #{place_id} not found')
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
+        single_place = get_object_or_404(Place, pk=place_id)
         place_context = {
             'variation': self.place_variation,
             'domain': get_current_site(request)
@@ -158,8 +135,7 @@ class PlaceSinglePage(APIView):
         :param place_id: place's id
         :return: status code
         """
-        single_place = Place.get_place(place_id)
-
+        single_place = get_object_or_404(Place, pk=place_id)
         request_data = request.data.copy()
         address_data = json.loads(request_data.get('address'))
         request_data['address'] = PlacePage.get_address_pk(data=address_data)
@@ -169,7 +145,7 @@ class PlaceSinglePage(APIView):
         if not single_place:
             LOGGER.error(f'Place with id {place_id} does not exist')
             return Response(status=status.HTTP_404_NOT_FOUND)
-        elif not place_serializer.is_valid():
+        if not place_serializer.is_valid():
             LOGGER.error(
                 f'Place is not valid due to validation errors: '
                 f'{place_serializer.errors}'
@@ -219,32 +195,34 @@ class CommentsAPI(APIView):
         :return: Response with data of comment and it's creator or
                  Response with error status
         """
-        place = Place.get_place(place_id)
-        objects_per_page = request.GET.get('objects_per_page')
-        page = request.GET.get('page')
 
-        if place is None:
-            LOGGER.warning(f'Place #{place_id} not found')
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        get_object_or_404(Place, pk=place_id)
+        objects_per_page = request.GET.get('objects_per_page', '')
+        page = request.GET.get('page', '')
 
         all_comments = CommentPlace.objects.filter(
             place=place_id).order_by('-creation_time')
 
-        if all_comments is None or not all_comments:
+        if not all_comments:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        try:
-            objects_per_page = int(objects_per_page)
-            page = int(page)
-            assert (page > 0)
-            assert (objects_per_page > 0)
-        except (TypeError, AssertionError, ValueError):
-            LOGGER.warning(f'Wrong objects_per_page={objects_per_page} or '
-                           f'page={page} arguments.')
+        if not objects_per_page.isdigit():
+            LOGGER.warning(f'Wrong objects_per_page={objects_per_page}'
+                           f' argument.')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if int(objects_per_page) == 0:
+            LOGGER.warning(f"Objects_per_page argument can't be 0")
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        paginator = Paginator(all_comments, objects_per_page)
-        comments_page = paginator.get_page(page)
+        if not page.isdigit():
+            LOGGER.warning(f'Wrong page={page} argument.')
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if int(page) == 0:
+            LOGGER.warning(f"Page argument can't be 0")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        paginator = Paginator(all_comments, int(objects_per_page))
+        comments_page = paginator.get_page(int(page))
         comments_for_page = comments_page.object_list
 
         comment_context = {'domain': get_current_site(request), }
@@ -258,6 +236,7 @@ class CommentsAPI(APIView):
                 'page',
                 comments_page.next_page_number()
             )
+
         previous_page_link = None
         if comments_page.has_previous():
             previous_page_link = get_changed_uri(
@@ -273,7 +252,6 @@ class CommentsAPI(APIView):
             "previous": previous_page_link,
             "comments": comment_serializer.data,
         }
-
         return Response(response_dict, status=status.HTTP_200_OK)
 
     def post(self, request, place_id):
@@ -284,23 +262,79 @@ class CommentsAPI(APIView):
         :param place_id: id of place for which comment was written
         :return: Response with status
         """
-        place = Place.get_place(place_id)
+        place = get_object_or_404(Place, pk=place_id)
+        data = request.data.copy()
+        user = UserAuthentication.get_user(request.data.get('creator'))
 
-        if place is None:
-            LOGGER.warning(f'Place #{place_id} not found')
+        data['creator'] = user.id
+        data['place'] = place.id
+        comment_context = {'domain': get_current_site(request), }
+        comment_serializer = CommentPlaceSerializer(data=data,
+                                                    context=comment_context)
+        if comment_serializer.is_valid():
+            comment_serializer.save()
+            return Response(comment_serializer.data,
+                            status=status.HTTP_201_CREATED)
+
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class SingleCommentAPI(APIView):
+    """Update or delet comment for a place"""
+
+    def put(self, request, place_id, comment_id):
+        """
+        Update CommentPlace object.
+
+        :param request: HTTP Request
+        :param place_id: id of place for which comment was written
+        :param comment_id id of comment being updated
+        :return: Response with status
+        """
+        data = request.data.copy()
+        user = UserAuthentication.get_user(request.data.get('creator'))
+        data.update(creator=user.id)
+        data.update(place=place_id)
+
+        comment = CommentPlace.objects.filter(pk=comment_id).first()
+        if not comment:
+            LOGGER.warning(f'Comment #{comment_id} not found')
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        data = request.data.copy()
+        if user != comment.creator:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        comment_context = {'domain': get_current_site(request)}
+        data.update(edited=True)
+        comment_serializer = CommentPlaceSerializer(comment,
+                                                    data=data,
+                                                    context=comment_context)
+        if comment_serializer.is_valid():
+            comment_serializer.save()
+            return Response(comment_serializer.data, status=status.HTTP_200_OK)
+
+        LOGGER.warning(
+            f'Comment serialization errors {comment_serializer.errors}')
+        return Response(comment_serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, place_id, comment_id):
+        """
+        Delete CommentPlace object.
+
+        :param request: HTTP Request
+        :param comment_id if of comment being delete
+        :return: Response with status
+        """
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        user = Token.objects.get(key=token_key).user
         try:
-            data['creator'] = settings.HASH_IDS.decode(data['creator'])[0]
-            data['place'] = place_id
-            comment_context = {'domain': get_current_site(request), }
-            comment_serializer = CommentPlaceSerializer(data=data, context=comment_context,)
-            if comment_serializer.is_valid():
-                comment_serializer.save()
-                return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
-            raise CustomValidationError
-        except (IndexError, CustomValidationError):
+            comment = CommentPlace.objects.get(pk=comment_id)
+            if comment.creator != user:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            comment.delete()
+            return Response(status=status.HTTP_200_OK)
+        except CommentPlace.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -310,45 +344,18 @@ class PlaceRatingView(APIView):
     """
 
     @staticmethod
-    def get_user_from_token(request):
-        """
-        Get user's id from token
-        :param request: HTTP request
-        :return: integer user_id
-        """
-        token = request.META.get('HTTP_AUTHORIZATION').split(' ')
-        token_key = str(token[1])
-        user_token = Token.objects.get(key=token_key)
-        user_id = user_token.user_id
-        return user_id
-
-    @staticmethod
-    def get_valid_request_data(request):
-        """
-        decode user's id and return request data with decoded if
-        :param request: HTTP request
-        :return: dict valid_data
-        """
-        user = UserAuthentication.get_user(request.data['user']).id
-        valid_data = {'user': user,
-                      'place': request.data['place'],
-                      'rating': request.data['rating'],
-                      }
-        return valid_data
-
-    @staticmethod
     def get_average(place_id):
         """
         calculate average rating for place
         :param place_id: integer place_id
-        :return: float average
+        :return: float average or 0 if there are not ratings for this place
         """
         ratings = PlaceRating.objects.filter(place=place_id)
-        amount = 0
-        rating = 0
-        for rate in ratings:
-            amount += 1
-            rating += rate.rating
+        if not ratings.count():
+            return 0
+
+        amount = ratings.count()
+        rating = sum([rate.rating for rate in ratings])
         average = round(rating / amount, 1)
         return average
 
@@ -359,15 +366,10 @@ class PlaceRatingView(APIView):
         :param place_id: integer place_id
         :return: Response with data and status
         """
-        try:
-            average_rating = self.get_average(place_id)
-            response = {'place': place_id,
-                        'rating': average_rating}
-            return Response(response, status=status.HTTP_200_OK)
-        except (PlaceRating.DoesNotExist, ZeroDivisionError):
-            response = {'place': place_id,
-                        'rating': 0}
-            return Response(response, status=status.HTTP_200_OK)
+        average_rating = self.get_average(place_id)
+        response = {'place': place_id,
+                    'rating': average_rating}
+        return Response(response, status=status.HTTP_200_OK)
 
     def post(self, request, place_id):
         """
@@ -376,34 +378,22 @@ class PlaceRatingView(APIView):
         :param place_id: integer place_id
         :return: Response with data and status
         """
-        user = UserAuthentication.get_user(request.data['user'])
-        user_id = user.id
-        request = self.get_valid_request_data(request)
-        try:
-            """ if rating already exists, update it """
-            rate = PlaceRating.objects.get(place=place_id, user=user_id)
-            rating = PlaceRating.objects.get(pk=rate.id)
-            serializer = PlaceRatingSerializer(data=request)
-            if serializer.is_valid():
-                serializer.update(rating, serializer.validated_data)
-                user_id = serializer.data['user']
-                user_id_encrypted = settings.HASH_IDS.encode(user_id)
-                response = {'place': serializer.data['place'],
-                            'user': user_id_encrypted,
-                            'rating': serializer.data['rating']}
-                return Response(response, status=status.HTTP_200_OK)
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+        user_id = request.data.get('user')
+        if not user_id:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        except PlaceRating.DoesNotExist:
-            """ if rating doesn't exist, create a new one """
-        serializer = PlaceRatingSerializer(data=request)
+        user = UserAuthentication.get_user(user_id)
+
+        request_data = {'user': user.id,
+                        'place': place_id,
+                        'rating': request.data.get('rating')}
+        serializer = PlaceRatingSerializer(data=request_data)
         if serializer.is_valid():
             serializer.save()
-            user_id = serializer.data['user']
-            user_id_encrypted = settings.HASH_IDS.encode(user_id)
-            response = {'place': serializer.data['place'],
-                        'user': user_id_encrypted,
+            response = {'user': request.data.get('user'),
+                        'place': serializer.data['place'],
                         'rating': serializer.data['rating']}
-            return Response(response, status=status.HTTP_201_CREATED)
+
+            return Response(response, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

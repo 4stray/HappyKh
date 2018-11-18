@@ -20,6 +20,7 @@
         <v-radio label="Woman" color="primary" value="W"></v-radio>
         <v-radio label="Man" color="primary" value="M"></v-radio>
         <v-radio label="Other" color="primary" value="O"></v-radio>
+        <v-radio label="Unknown" color="primary" value="U"></v-radio>
       </v-radio-group>
       <div>
         <img v-if="userImage" v-bind:src=userImage alt="No image"/>
@@ -114,7 +115,7 @@ export default {
         const formData = new FormData();
         formData.set('first_name', this.userFirstName);
         formData.set('last_name', this.userLastName);
-        formData.set('age', this.userAge);
+        formData.set('age', this.userAge || '');
         formData.set('gender', this.userGender);
 
         const imageFile = document.querySelector('#imageInput');

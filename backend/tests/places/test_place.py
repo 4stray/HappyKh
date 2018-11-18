@@ -87,7 +87,9 @@ class TestPlacePage(BaseTestCase, APITestCase):
 
     def test_delete_existing_place(self):
         """Test response for place deletion"""
-        response = self.client.delete(f'{PLACE_URL}{self.place.id}')
+        place = Place.objects.create(user=self.user, address=self.address,
+                                     **TEST_PLACE_DATA)
+        response = self.client.delete(f'{PLACE_URL}{place.id}')
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
     def test_delete_nonexisting_place(self):
@@ -152,6 +154,19 @@ class TestPlacePage(BaseTestCase, APITestCase):
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
+    def test_changing_place_address_for_empty_one(self):
+        """Test update place's address for invalid"""
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 0,
+            'latitude': 0,
+            'address': '',
+        })
+        test_data['user'] = self.hashed_user_id
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
 
 class TestCommentsAPI(BaseTestCase, APITestCase):
     """Test comments for places"""
@@ -172,18 +187,20 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
                              'text': 'Lol_test',
                              'place': self.place,
                              }
-        self.COMMENT_URL = '/api/places/' + str(self.place.id) + '/comments'
         self.comment = CommentPlace.objects.create(
-            #pylint: disable=duplicate-code
+            # pylint: disable=duplicate-code
             creator=self.comment_info['creator'],
             text=self.comment_info['text'],
             place=self.comment_info['place'],
         )
+        self.pk = CommentPlace.objects.last().pk
+        self.comment_count = CommentPlace.objects.count()
+        self.place_pk = self.places.last().pk
+        self.COMMENT_URL = f'/api/places/{self.place_pk}/comments'
+        self.SINGLE_COMMENT_URL = f'{self.COMMENT_URL}/{self.pk}'
 
-    def test_get(self):
-        """
-        Test get request for comments
-        """
+    def test_successful_get(self):
+        """Test response for successful get"""
         comment = CommentPlace.objects.create(
             creator=self.comment_info['creator'],
             text='com2',
@@ -214,52 +231,118 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.assertEqual(1, len(response.data['comments']))
         self.assertEqual(comment.text, response.data['comments'][0]['text'])
 
+    def test_get_with_wrong_page_attr(self):
+        """Test response for get with wrong page attribute"""
         wrong_get_url = self.COMMENT_URL + '?page=0&objects_per_page=1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+    def test_get_with_wrong_object_per_page_attr(self):
+        """Test response for get with wrong object per page attribute"""
         wrong_get_url = self.COMMENT_URL + '?page=1&objects_per_page=-1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+    def test_get_with_missing_page_attr(self):
+        """Test get with missing page attribute"""
         wrong_get_url = self.COMMENT_URL + '?objects_per_page=1'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
-        wrong_get_url = self.COMMENT_URL + '?page=1'
+    def test_get_with_missing_object_per_page_attr(self):
+        """Test get with missing object per page attribute"""
+        wrong_get_url = self.COMMENT_URL + '?objects_per_page=0'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
+    def test_get_with_wrong_place(self):
+        """Test get request with wrong place id"""
         wrong_get_url = '/api/places/0/comments'
         response = self.client.get(wrong_get_url)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
+    def test_get_without_comments_in_db(self):
+        """Test get response to empty comment table"""
+        get_url = self.COMMENT_URL + '?page=2&objects_per_page=1'
         CommentPlace.objects.all().delete()
         response = self.client.get(get_url)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
-    def test_post(self):
-        """
-        Test post request for comments
-        """
+    def test_successful_post(self):
+        """Test successful post request"""
         data = self.comment_info
         data['creator'] = self.hashed_user_id
-
         response = self.client.post(self.COMMENT_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
-        self.assertEqual(2, CommentPlace.objects.count())
+        self.assertEqual(self.comment_count+1, CommentPlace.objects.count())
 
+    def test_post_with_wrong_place(self):
+        """Test post request with wrong place id"""
         comment_url = '/api/places/0/comments'
+        data = self.comment_info
         response = self.client.post(comment_url, data)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
-        self.assertEqual(2, CommentPlace.objects.count())
+        self.assertEqual(self.comment_count, CommentPlace.objects.count())
 
+    def test_post_with_wrong_user(self):
+        """Test post request with wrong user id"""
+        data = self.comment_info
         data['creator'] = 'KLK'
-        response = self.client.post(self.COMMENT_URL, data)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-        self.assertEqual(2, CommentPlace.objects.count())
 
-        data['text'] = None
+        response = self.client.post(self.COMMENT_URL, data)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+        self.assertEqual(self.comment_count, CommentPlace.objects.count())
+
+    def test_post_with_invalid_text(self):
+        """Test post request with invalid comment text"""
+        data = self.comment_info
+        data['creator'] = self.hashed_user_id
+        data['text'] = ''
         response = self.client.post(self.COMMENT_URL, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
-        self.assertEqual(2, CommentPlace.objects.count())
+        self.assertEqual(self.comment_count, CommentPlace.objects.count())
+
+    def test_successful_delete(self):
+        """Test successful delete request"""
+        comment = CommentPlace.objects.create(
+            creator=self.comment_info['creator'],
+            text=self.comment_info['text'],
+            place=self.comment_info['place'],
+        )
+        url = f'{self.COMMENT_URL}/{comment.pk}'
+        response = self.client.delete(url)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_failed_delete(self):
+        """Test delete request with wrong comment id"""
+        url = self.COMMENT_URL + '/' + str(self.pk + 40)
+        response = self.client.delete(url)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_successful_update(self):
+        """Test successful put request"""
+        data = self.comment_info.copy()
+        data.update(creator=self.hashed_user_id)
+        data.update(id=self.pk)
+        data.update(text=self.comment_info.get('text') + 'test')
+        response = self.client.put(self.SINGLE_COMMENT_URL, data)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(True, response.data['edited'])
+        self.assertEqual(data['text'], response.data['text'])
+
+    def test_update_with_wrong_id(self):
+        """Test put request with wrong comment id"""
+        url = self.COMMENT_URL + '/' + str(self.pk + 40)
+        data = self.comment_info.copy()
+        data.update(creator=self.hashed_user_id)
+        response = self.client.put(url, data)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
+
+    def test_update_with_invalid_text(self):
+        """Test put request with invalid comment text"""
+        data = self.comment_info.copy()
+        data.update(creator=self.hashed_user_id)
+        data.update(id=self.pk)
+        data.update(text='')
+        response = self.client.put(self.SINGLE_COMMENT_URL, data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
