@@ -248,7 +248,7 @@ class TestPlacePageWithoutEditingPermission(APITestCase):
         """ Send an email to admin with request to get a permission for editing
         place"""
         response = self.client.post(
-            f'{PLACE_URL}{self.place.id}/editing_permission_request'
+            f'{PLACE_URL}{self.place.id}/editing_permission'
         )
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 

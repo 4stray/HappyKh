@@ -12,10 +12,6 @@ urlpatterns = [
             '<int:place_id>/editing_permission',
             views.PlacesEditingPermission.as_view()
         ),
-        path(
-            '<int:place_id>/editing_permission_request',
-            views.PlacesEditingPermissionRequest.as_view()
-        ),
         path('<int:place_id>/comments/<int:comment_id>',
              views.SingleCommentAPI.as_view()),
         path('rating/<int:place_id>', views.PlaceRatingView.as_view()),

@@ -79,7 +79,7 @@ export default {
   methods: {
     requestPlaceEditingPermission() {
       axiosInstance
-        .post(`api/places/${this.place.id}/editing_permission_request`)
+        .post(`api/places/${this.place.id}/editing_permission`)
         .then((response) => {
           this.$awn.success('Place editing request was sent successfully.' +
             'Admins will get in touch with you within 30 minutes');

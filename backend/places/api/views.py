@@ -6,6 +6,7 @@ from smtplib import SMTPException
 from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -209,6 +210,15 @@ class PlacesEditingPermission(APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
+    @staticmethod
+    def get_staff_users():
+        User = get_user_model()
+        return list(
+            User.objects.filter(is_staff=True).values_list('email', flat=True)
+        )
+
+    from django.contrib.auth import get_user_model
+
     def get(self, request, place_id):
         """
         Returns True if the user has privilege to edit the place
@@ -227,14 +237,6 @@ class PlacesEditingPermission(APIView):
             status=status.HTTP_200_OK
         )
 
-
-class PlacesEditingPermissionRequest(APIView):
-    """ Request a permission from the admin in order to get a
-    permission to edit place """
-
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-
     def post(self, request, place_id):
         """
         Sends an email with place editing request
@@ -243,7 +245,7 @@ class PlacesEditingPermissionRequest(APIView):
         """
         requesting_user = get_token_user(request)
         sender = requesting_user.email
-        receivers = [settings.EMAIL_HOST_USER]
+        receivers = PlacesEditingPermission.get_staff_users()
 
         try:
             send_mail(
