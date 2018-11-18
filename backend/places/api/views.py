@@ -210,15 +210,6 @@ class PlacesEditingPermission(APIView):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
-    @staticmethod
-    def get_staff_users():
-        User = get_user_model()
-        return list(
-            User.objects.filter(is_staff=True).values_list('email', flat=True)
-        )
-
-    from django.contrib.auth import get_user_model
-
     def get(self, request, place_id):
         """
         Returns True if the user has privilege to edit the place
@@ -267,6 +258,13 @@ class PlacesEditingPermission(APIView):
 
             return Response(data=smtp_error,
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @staticmethod
+    def get_staff_users():
+        User = get_user_model()
+        return list(
+            User.objects.filter(is_staff=True).values_list('email', flat=True)
+        )
 
 
 class CommentsAPI(APIView):
