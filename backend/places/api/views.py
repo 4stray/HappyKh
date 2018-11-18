@@ -54,18 +54,17 @@ class PlacePage(APIView):
         :param request: HTTP Request
         :return: message, status_code
         """
-        data = request.data.copy()
-        address_data = json.loads(data['address'])
-        data['address'] = self.get_address_pk(address_data)
-        if not data['address']:
-            return Response('Address serializer error',
-                            status=status.HTTP_400_BAD_REQUEST)
+        place_data = PlacePage.parse_place_address(request.data.copy())
+
+        if isinstance(place_data, Response):
+            return place_data
+
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
         }
 
-        serializer = PlaceSerializer(data=data, context=context)
+        serializer = PlaceSerializer(data=place_data, context=context)
         if serializer.is_valid():
             pk = serializer.save()
             LOGGER.info(f'Created place #{pk}')
@@ -89,6 +88,31 @@ class PlacePage(APIView):
 
         LOGGER.error(f'Serializer errors: {address_serializer.errors}')
         return None
+
+    @classmethod
+    def parse_place_address(cls, place_data):
+        """
+        Parses place address from JSON to native Python type
+        :param place_data: dict
+        :return: Response | dict
+        """
+        try:
+            address_data = json.loads(place_data.get('address'))
+        except json.decoder.JSONDecodeError:
+            LOGGER.error('Parsing address from Json failed')
+
+            parsing_address_error = {
+                'error_message': 'Parsing address from Json failed',
+            }
+            return Response(data=parsing_address_error,
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        place_data['address'] = cls.get_address_pk(address_data)
+        if not place_data['address']:
+            return Response(data='Address serializer error',
+                            status=status.HTTP_400_BAD_REQUEST)
+
+        return place_data
 
 
 class PlaceSinglePage(APIView):
@@ -128,11 +152,12 @@ class PlaceSinglePage(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         if single_place.is_editing_permitted(current_user.id):
-            request_data = request.data.copy()
-            address_data = json.loads(request_data.get('address'))
-            request_data['address'] = PlacePage.get_address_pk(data=address_data)
+            place_data = PlacePage.parse_place_address(request.data.copy())
 
-            place_serializer = PlaceSerializer(data=request_data)
+            if isinstance(place_data, Response):
+                return place_data
+
+            place_serializer = PlaceSerializer(data=place_data)
 
             if not place_serializer.is_valid():
                 LOGGER.error(
