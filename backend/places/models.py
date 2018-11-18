@@ -72,8 +72,8 @@ class Place(models.Model):
         :param user_id: Integer
         :return: Boolean
         """
-        return (user_id in
-            self.edit_permitted_users.values_list('id', flat=True)
+        return (
+            user_id in self.edit_permitted_users.values_list('id', flat=True)
         )
 
 
