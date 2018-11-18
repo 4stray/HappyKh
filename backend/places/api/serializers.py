@@ -1,8 +1,6 @@
 """Serializers for model Place"""
-import json
-
+from rest_framework import serializers
 from places.models import Place, Address, CommentPlace, PlaceRating
-from rest_framework import serializers, exceptions
 from users.api.serializers import CommentAbstractSerializer
 from users.backends import UserHashedIdField
 
@@ -44,6 +42,7 @@ class PlaceSerializer(serializers.ModelSerializer):
         return ret
 
     def update(self, instance, validated_data):
+        """Update instance of Place model"""
         validated_data = dict(validated_data)
         if validated_data.get('logo') is None:
             validated_data['logo'] = instance.logo
@@ -55,6 +54,7 @@ class PlaceSerializer(serializers.ModelSerializer):
 
         return instance
 
+
 class CommentPlaceSerializer(CommentAbstractSerializer):
     """
     ModelSerializer for CommentPlace model, which extends
@@ -64,14 +64,25 @@ class CommentPlaceSerializer(CommentAbstractSerializer):
     class Meta:
         model = CommentPlace
         fields = '__all__'
+        extra_kwargs = {
+            'creator': {
+                'required': True
+            },
+            'place': {
+                'required': True
+            }
+        }
 
 
 class PlaceRatingSerializer(serializers.ModelSerializer):
+    """Full ModelSerializer for model PlaceRating"""
+
     class Meta:
         model = PlaceRating
         fields = '__all__'
 
     def create(self, validated_data):
+        """Creates new instance of PlaceRating"""
         rating = {'rating': validated_data.get('rating')}
         user = validated_data.get('user')
         place = validated_data.get('place')

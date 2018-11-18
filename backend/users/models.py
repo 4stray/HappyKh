@@ -141,6 +141,7 @@ class CommentAbstract(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     creation_time = models.DateTimeField(default=timezone.now)
     text = models.CharField(max_length=500)
+    edited = models.BooleanField(default=False)
 
     class Meta:
         abstract = True

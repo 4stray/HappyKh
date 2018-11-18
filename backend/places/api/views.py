@@ -6,6 +6,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -232,7 +233,6 @@ class CommentsAPI(APIView):
             "previous": previous_page_link,
             "comments": comment_serializer.data,
         }
-
         return Response(response_dict, status=status.HTTP_200_OK)
 
     def post(self, request, place_id):
@@ -258,6 +258,65 @@ class CommentsAPI(APIView):
                             status=status.HTTP_201_CREATED)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class SingleCommentAPI(APIView):
+    """Update or delet comment for a place"""
+
+    def put(self, request, place_id, comment_id):
+        """
+        Update CommentPlace object.
+
+        :param request: HTTP Request
+        :param place_id: id of place for which comment was written
+        :param comment_id id of comment being updated
+        :return: Response with status
+        """
+        data = request.data.copy()
+        user = UserAuthentication.get_user(request.data.get('creator'))
+        data.update(creator=user.id)
+        data.update(place=place_id)
+
+        comment = CommentPlace.objects.filter(pk=comment_id).first()
+        if not comment:
+            LOGGER.warning(f'Comment #{comment_id} not found')
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        if user != comment.creator:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        comment_context = {'domain': get_current_site(request)}
+        data.update(edited=True)
+        comment_serializer = CommentPlaceSerializer(comment,
+                                                    data=data,
+                                                    context=comment_context)
+        if comment_serializer.is_valid():
+            comment_serializer.save()
+            return Response(comment_serializer.data, status=status.HTTP_200_OK)
+
+        LOGGER.warning(
+            f'Comment serialization errors {comment_serializer.errors}')
+        return Response(comment_serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, place_id, comment_id):
+        """
+        Delete CommentPlace object.
+
+        :param request: HTTP Request
+        :param comment_id if of comment being delete
+        :return: Response with status
+        """
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
+        user = Token.objects.get(key=token_key).user
+        try:
+            comment = CommentPlace.objects.get(pk=comment_id)
+            if comment.creator != user:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            comment.delete()
+            return Response(status=status.HTTP_200_OK)
+        except CommentPlace.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class PlaceRatingView(APIView):
