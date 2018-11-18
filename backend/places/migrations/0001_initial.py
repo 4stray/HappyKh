@@ -33,7 +33,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True)),
                 ('logo', stdimage.models.StdImageField(blank=True, default='', null=True, upload_to=places.models.Place._make_upload_logo)),
                 ('address', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='places.Address')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                ('edit_permitted_users', models.ManyToManyField(to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

@@ -195,21 +195,16 @@ class PlacesEditingPermission(APIView):
         :param place_id: Integer
         :return: HTTP Response
         """
-        current_user = get_token_user(request)
-        single_place = Place.get_place(place_id)
+        user = get_token_user(request)
+        single_place = get_object_or_404(Place, pk=place_id)
 
-        if single_place is None:
-            LOGGER.warning(f'Place #{place_id} not found')
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        response_data = {
-            'is_place_editing_permitted': True,
-        }
-
-        if not single_place.is_editing_permitted(current_user.id):
-            response_data['is_place_editing_permitted'] = False
-
-        return Response(response_data, status=status.HTTP_200_OK)
+        return Response(
+            data={
+                'is_place_editing_permitted':
+                    single_place.is_editing_permitted(user.id)
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 class PlacesEditingPermissionRequest(APIView):

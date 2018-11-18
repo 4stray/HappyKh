@@ -62,7 +62,8 @@ def get_token_user(request):
     :param request: HTTP request
     :return: integer user_id
     """
-    token_key = request.META.get('HTTP_AUTHORIZATION')[6:]
+    token_key_start = 6
+    token_key = request.META.get('HTTP_AUTHORIZATION')[token_key_start:]
     token = Token.objects.get(key=token_key)
     return token.user
 
