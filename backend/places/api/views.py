@@ -3,7 +3,6 @@ import json
 import logging
 from smtplib import SMTPException
 
-from django.conf import settings
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import get_user_model
@@ -12,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.exceptions import (ParseError, ValidationError)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,7 +20,7 @@ from users.backends import UserAuthentication
 
 from .serializers import (PlaceSerializer, AddressSerializer,
                           CommentPlaceSerializer, PlaceRatingSerializer)
-from ..models import Place, Address, CommentPlace, PlaceRating
+from ..models import (Place, Address, CommentPlace, PlaceRating)
 
 LOGGER = logging.getLogger('happy_logger')
 
@@ -82,19 +82,20 @@ class PlacePage(APIView):
         :return: int address primary key
         """
         address_serializer = AddressSerializer(data=data)
-        if address_serializer.is_valid():
-            address, _ = Address.objects.get_or_create(**data)
-            return address.pk
 
-        LOGGER.error(f'Serializer errors: {address_serializer.errors}')
-        return None
+        if not address_serializer.is_valid():
+            LOGGER.error(f'Serializer errors: {address_serializer.errors}')
+            raise ValidationError(detail=address_serializer.errors)
+
+        address, _ = Address.objects.get_or_create(**data)
+        return address.pk
 
     @classmethod
     def parse_place_address(cls, place_data):
         """
         Parses place address from JSON to native Python type
         :param place_data: dict
-        :return: Response | dict
+        :return: dict
         """
         try:
             address_data = json.loads(place_data.get('address'))
@@ -105,13 +106,9 @@ class PlacePage(APIView):
 
             LOGGER.error(parsing_address_error['message'])
 
-            return Response(data=parsing_address_error,
-                            status=status.HTTP_400_BAD_REQUEST)
+            raise ParseError(detail=parsing_address_error['message'])
 
         place_data['address'] = cls.get_address_pk(address_data)
-        if not place_data['address']:
-            return Response(data='Address serializer error',
-                            status=status.HTTP_400_BAD_REQUEST)
 
         return place_data
 
@@ -158,8 +155,6 @@ class PlaceSinglePage(APIView):
             LOGGER.error(access_denied['message'])
             return Response(data=access_denied,
                             status=status.HTTP_403_FORBIDDEN)
-        if isinstance(place_data, Response):
-            return place_data
 
         place_serializer = PlaceSerializer(data=place_data)
         if not place_serializer.is_valid():
@@ -261,6 +256,7 @@ class PlacesEditingPermission(APIView):
 
     @staticmethod
     def get_staff_users():
+        """ Returns all staff users for requesting of place edit"""
         User = get_user_model()
         return list(
             User.objects.filter(is_staff=True).values_list('email', flat=True)

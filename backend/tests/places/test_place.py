@@ -87,10 +87,21 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         response = self.client.post(PLACE_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
-    def test_creating_place_with_wrong_address(self):
+    def test_creating_place_with_nonjson_address(self):
         """Test response when creating place with wrong json address format"""
         test_data = TEST_PLACE_DATA_POST.copy()
         test_data['address'] = 'nonjson format'
+
+        response = self.client.post(f'{PLACE_URL}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_creating_place_with_not_formatted_address(self):
+        """Test response when creating place with wrong address format"""
+        test_data = TEST_PLACE_DATA_POST.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 50,
+            'address': 'New Test Address',
+        })
 
         response = self.client.post(f'{PLACE_URL}', test_data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
@@ -164,6 +175,25 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
 
         response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
+
+    def test_changing_place_with_nonjson_address(self):
+        """Test response when changing place with wrong json address format"""
+        test_data = TEST_PLACE_DATA_POST.copy()
+        test_data['address'] = 'nonjson format'
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_changing_place_with_not_formatted_address(self):
+        """Test response when changing place with wrong address format"""
+        test_data = TEST_PLACE_DATA_POST.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 50,
+            'address': 'New Test Address',
+        })
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_changing_place_address_for_empty_one(self):
         """Test update place's address for invalid"""
