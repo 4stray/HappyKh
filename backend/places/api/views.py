@@ -145,41 +145,37 @@ class PlaceSinglePage(APIView):
         :return: HTTP Response
         """
         user = get_token_user(request)
-
         single_place = get_object_or_404(Place, pk=place_id)
+        place_data = PlacePage.parse_place_address(request.data.copy())
 
-        if single_place.is_editing_permitted(user.id):
-            place_data = PlacePage.parse_place_address(request.data.copy())
+        if not single_place.is_editing_permitted(user.id):
+            access_denied = {
+                'message': f'Editing place permission denied for the user '
+                           f'with id {user.id}'
+            }
 
-            if isinstance(place_data, Response):
-                return place_data
+            LOGGER.error(access_denied['message'])
+            return Response(data=access_denied,
+                            status=status.HTTP_403_FORBIDDEN)
+        if isinstance(place_data, Response):
+            return place_data
 
-            place_serializer = PlaceSerializer(data=place_data)
-
-            if not place_serializer.is_valid():
-                LOGGER.error(
-                    f'Place is not valid due to validation errors: '
-                    f'{place_serializer.errors}'
-                )
-                return Response(data=place_serializer.errors,
-                                status=status.HTTP_400_BAD_REQUEST)
-
-            LOGGER.info(f'Place with id {place_id} was successfully updated')
-
-            place_serializer.update(
-                single_place,
-                place_serializer.validated_data
+        place_serializer = PlaceSerializer(data=place_data)
+        if not place_serializer.is_valid():
+            LOGGER.error(
+                f'Place is not valid due to validation errors: '
+                f'{place_serializer.errors}'
             )
-            return Response(status=status.HTTP_200_OK)
+            return Response(data=place_serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        access_denied = {
-            'message': f'Editing place permission denied for the user '
-                       f'with id {user.id}'
-        }
+        LOGGER.info(f'Place with id {place_id} was successfully updated')
 
-        LOGGER.error(access_denied['message'])
-        return Response(data=access_denied,
-                        status=status.HTTP_403_FORBIDDEN)
+        place_serializer.update(
+            single_place,
+            place_serializer.validated_data
+        )
+        return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, place_id):
         """
@@ -191,21 +187,21 @@ class PlaceSinglePage(APIView):
         user = get_token_user(request)
         single_place = get_object_or_404(Place, pk=place_id)
 
-        if single_place.is_editing_permitted(user.id):
-            single_place.delete()
+        if not single_place.is_editing_permitted(user.id):
+            access_denied = {
+                'message': f'Deleting place permission denied for the user '
+                           f'with id {user.id}'
+            }
+            LOGGER.info(access_denied['message'])
 
-            LOGGER.info(f'Place with id {place_id} was deleted')
+            return Response(data=access_denied,
+                            status=status.HTTP_403_FORBIDDEN)
 
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        single_place.delete()
 
-        access_denied = {
-            'message': f'Deleting place permission denied for the user '
-                       f'with id {user.id}'
-        }
-        LOGGER.info(access_denied['message'])
+        LOGGER.info(f'Place with id {place_id} was deleted')
 
-        return Response(data=access_denied,
-                        status=status.HTTP_403_FORBIDDEN)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class PlacesEditingPermission(APIView):

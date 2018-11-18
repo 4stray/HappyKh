@@ -72,11 +72,9 @@ class Place(models.Model):
         :param user_id: Integer
         :return: Boolean
         """
-        try:
-            self.edit_permitted_users.get(id=user_id)
-            return True
-        except User.DoesNotExist:
-            return False
+        return (user_id in
+            self.edit_permitted_users.values_list('id', flat=True)
+        )
 
 
 class CommentPlace(CommentAbstract):
