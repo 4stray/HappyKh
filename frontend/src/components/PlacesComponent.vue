@@ -1,34 +1,35 @@
 <template>
   <div>
-    <v-container name="menu-container">
-      <v-layout justify-center row>
-        <v-flex xs2 d-inline-flex>
-          <v-select
-              append-icon
-              :items="Object.keys(orderBy)"
-              v-on:change="changeOrderBy"
-              outline
-              class="orderSelect"
-              label="Order by"
-          ></v-select>
-          <v-btn id="orderIcon" :ripple="false" icon flat
-                 v-on:click="changeOrder">
-            <v-icon medium v-if="desc">arrow_downward</v-icon>
-            <v-icon medium v-else>arrow_upward</v-icon>
-          </v-btn>
-        </v-flex>
-        <v-flex xs6>
+    <v-container name="menu-container" id="menuContainer">
+        <v-layout justify-center :class="{'row': $vuetify.breakpoint.mdAndUp,
+                     'column': $vuetify.breakpoint.smAndDown}">
+          <v-flex xs3 d-flex>
+            <v-select
+                    append-icon
+                    :items="Object.keys(orderBy)"
+                    v-on:change="changeOrderBy"
+
+                    class="orderSelect"
+                    label="Order by"
+            ></v-select>
+            <v-btn id="orderIcon" :ripple="false"  flat
+                   v-on:click="changeOrder">
+              <v-icon medium v-if="desc">arrow_downward</v-icon>
+              <v-icon medium v-else>arrow_upward</v-icon>
+            </v-btn>
+          </v-flex>
+          <v-flex xs6>
             <v-text-field placeholder="Search" v-model="search.onFront"
-                    @keypress="pressEnter"></v-text-field>
-        </v-flex>
-        <v-flex xs2>
-          <v-btn class="info" large
-                 :to="{ name: 'createPlace' }"
-                 name="create-place-button">
-            Add Place
-          </v-btn>
-        </v-flex>
-      </v-layout>
+                          @keypress="pressEnter"></v-text-field>
+          </v-flex>
+          <v-flex xs2>
+            <v-btn class="info" large
+                   :to="{ name: 'createPlace' }"
+                   name="create-place-button">
+              Add Place
+            </v-btn>
+          </v-flex>
+        </v-layout>
     </v-container>
     <v-container grid-list-xl name="place-container">
       <v-layout row wrap>
@@ -92,10 +93,12 @@ export default {
     },
     pressEnter(event) {
       if (event.key === 'Enter') {
-        this.search.toSend = this.search.onFront;
+        if (this.search.toSend !== this.search.onFront) {
+          this.search.toSend = this.search.onFront;
+          this.page.number = 1;
+          this.requestPlaces();
+        }
         this.search.onFront = '';
-        this.page.number = 1;
-        this.requestPlaces();
       }
     },
     paginate() {
@@ -128,7 +131,14 @@ export default {
 </script>
 
 <style scoped>
-  .v-input__slot {
-    border-color: blue;
+  #orderIcon{
+    height: 65%;
+  }
+  #menuContainer{
+    border: lightslategrey 2px groove;
+    border-radius: 1em;
+    background-color: #f6f8fc;
+    z-index: 1;
+    box-shadow: blue;
   }
 </style>
