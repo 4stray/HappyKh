@@ -284,6 +284,12 @@ class PlaceRatingView(APIView):
 
     @staticmethod
     def get_user_rating(user_id, place_id):
+        """
+        return user's rating for the place
+        :param user_id: integer user_id
+        :param place_id: integer place_id
+        :return: float user_rating or 0 if rating doesn't exist
+        """
         try:
             rating = PlaceRating.objects.get(user=user_id, place=place_id)
             user_rating = rating.rating
@@ -299,7 +305,6 @@ class PlaceRatingView(APIView):
         :return: Response with data and status
         """
         user_id = request.GET.get('user')
-        print(user_id)
         user = UserAuthentication.get_user(user_id)
         user_rating = self.get_user_rating(user, place_id)
         average_rating = self.get_average(place_id)
