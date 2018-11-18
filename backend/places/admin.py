@@ -6,7 +6,7 @@ from .models import Place, Address, CommentPlace, PlaceRating
 @admin.register(Place)
 class PlaceAdmin(admin.ModelAdmin):
     """"Class for displaying custom place model on admin site"""
-    fields = ['user', 'name', 'address', 'description']
+    fields = ['name', 'address', 'description', 'edit_permitted_users']
     list_display = ('name', 'address', 'created')
     search_fields = ['name']
 

@@ -21,12 +21,11 @@ class PlaceSerializer(serializers.ModelSerializer):
     All data should be passed with the same keys as attributes in the model!
     """
 
-    user = UserHashedIdField()
     logo = UploadedImageField(max_length=None, )
 
     class Meta:
         model = Place
-        fields = '__all__'
+        exclude = ['edit_permitted_users']
 
     def to_representation(self, instance):
         """Represent `address` as a longitude, latitude and string address"""

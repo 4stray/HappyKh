@@ -50,7 +50,7 @@ class Place(models.Model):
             original_filename=filename
         )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    edit_permitted_users = models.ManyToManyField(User)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
@@ -65,6 +65,16 @@ class Place(models.Model):
 
     def __str__(self):
         return self.name
+
+    def is_editing_permitted(self, user_id):
+        """
+        Returns user permission for editing place
+        :param user_id: Integer
+        :return: Boolean
+        """
+        return (
+            user_id in self.edit_permitted_users.values_list('id', flat=True)
+        )
 
 
 class CommentPlace(CommentAbstract):

@@ -1,22 +1,26 @@
 """ Views for places """
 import json
 import logging
+from smtplib import SMTPException
 
+from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.exceptions import (ParseError, ValidationError)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from utils import (get_changed_uri, get_token_user)
 from users.backends import UserAuthentication
 
-from utils import get_changed_uri
 from .serializers import (PlaceSerializer, AddressSerializer,
                           CommentPlaceSerializer, PlaceRatingSerializer)
-from ..models import Place, Address, CommentPlace, PlaceRating
+from ..models import (Place, Address, CommentPlace, PlaceRating)
 
 LOGGER = logging.getLogger('happy_logger')
 
@@ -50,18 +54,17 @@ class PlacePage(APIView):
         :param request: HTTP Request
         :return: message, status_code
         """
-        data = request.data.copy()
-        address_data = json.loads(data['address'])
-        data['address'] = self.get_address_pk(address_data)
-        if not data['address']:
-            return Response('Address serializer error',
-                            status=status.HTTP_400_BAD_REQUEST)
+        place_data = PlacePage.parse_place_address(request.data.copy())
+
+        if isinstance(place_data, Response):
+            return place_data
+
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
         }
 
-        serializer = PlaceSerializer(data=data, context=context)
+        serializer = PlaceSerializer(data=place_data, context=context)
         if serializer.is_valid():
             pk = serializer.save()
             LOGGER.info(f'Created place #{pk}')
@@ -79,12 +82,35 @@ class PlacePage(APIView):
         :return: int address primary key
         """
         address_serializer = AddressSerializer(data=data)
-        if address_serializer.is_valid():
-            address, _ = Address.objects.get_or_create(**data)
-            return address.pk
 
-        LOGGER.error(f'Serializer errors: {address_serializer.errors}')
-        return None
+        if not address_serializer.is_valid():
+            LOGGER.error(f'Serializer errors: {address_serializer.errors}')
+            raise ValidationError(detail=address_serializer.errors)
+
+        address, _ = Address.objects.get_or_create(**data)
+        return address.pk
+
+    @classmethod
+    def parse_place_address(cls, place_data):
+        """
+        Parses place address from JSON to native Python type
+        :param place_data: dict
+        :return: dict
+        """
+        try:
+            address_data = json.loads(place_data.get('address'))
+        except json.decoder.JSONDecodeError:
+            parsing_address_error = {
+                'message': 'Parsing address from Json failed',
+            }
+
+            LOGGER.error(parsing_address_error['message'])
+
+            raise ParseError(detail=parsing_address_error['message'])
+
+        place_data['address'] = cls.get_address_pk(address_data)
+
+        return place_data
 
 
 class PlaceSinglePage(APIView):
@@ -113,25 +139,31 @@ class PlaceSinglePage(APIView):
         """
         Updates place by the given id
         :param request: HTTP Request
-        :param place_id: place's id
-        :return: status code
+        :param place_id: Integer
+        :return: HTTP Response
         """
+        user = get_token_user(request)
         single_place = get_object_or_404(Place, pk=place_id)
-        request_data = request.data.copy()
-        address_data = json.loads(request_data.get('address'))
-        request_data['address'] = PlacePage.get_address_pk(data=address_data)
+        place_data = PlacePage.parse_place_address(request.data.copy())
 
-        place_serializer = PlaceSerializer(data=request_data)
+        if not single_place.is_editing_permitted(user.id):
+            access_denied = {
+                'message': f'Editing place permission denied for the user '
+                           f'with id {user.id}'
+            }
 
-        if not single_place:
-            LOGGER.error(f'Place with id {place_id} does not exist')
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            LOGGER.error(access_denied['message'])
+            return Response(data=access_denied,
+                            status=status.HTTP_403_FORBIDDEN)
+
+        place_serializer = PlaceSerializer(data=place_data)
         if not place_serializer.is_valid():
             LOGGER.error(
                 f'Place is not valid due to validation errors: '
                 f'{place_serializer.errors}'
             )
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response(data=place_serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
         LOGGER.info(f'Place with id {place_id} was successfully updated')
 
@@ -145,20 +177,90 @@ class PlaceSinglePage(APIView):
         """
         Deletes place by the given id
         :param request: HTTP request
-        :param place_id: place's id
-        :return: status code
+        :param place_id: Integer
+        :return: HTTP Response
         """
+        user = get_token_user(request)
+        single_place = get_object_or_404(Place, pk=place_id)
+
+        if not single_place.is_editing_permitted(user.id):
+            access_denied = {
+                'message': f'Deleting place permission denied for the user '
+                           f'with id {user.id}'
+            }
+            LOGGER.info(access_denied['message'])
+
+            return Response(data=access_denied,
+                            status=status.HTTP_403_FORBIDDEN)
+
+        single_place.delete()
+
+        LOGGER.info(f'Place with id {place_id} was deleted')
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class PlacesEditingPermission(APIView):
+    """Get place editing privilege"""
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, place_id):
+        """
+        Returns True if the user has privilege to edit the place
+        :param request: HTTP Request
+        :param place_id: Integer
+        :return: HTTP Response
+        """
+        user = get_token_user(request)
+        single_place = get_object_or_404(Place, pk=place_id)
+
+        return Response(
+            data={
+                'is_place_editing_permitted':
+                    single_place.is_editing_permitted(user.id)
+            },
+            status=status.HTTP_200_OK
+        )
+
+    def post(self, request, place_id):
+        """
+        Sends an email with place editing request
+        :param place_id: Integer
+        :return: HTTP Response
+        """
+        requesting_user = get_token_user(request)
+        sender = requesting_user.email
+        receivers = PlacesEditingPermission.get_staff_users()
+
         try:
-            single_place = Place.objects.get(id=place_id)
-            single_place.delete()
+            send_mail(
+                f'User {sender} requesting place editing permission',
+                f'User {sender} requesting editing permission for '
+                f'the place with id of {place_id}',
+                sender,
+                receivers
+            )
+            LOGGER.info(
+                f'Place editing permission access mail has been sent'
+            )
 
-            LOGGER.info(f'Place with id {place_id} was deleted')
+            return Response(status=status.HTTP_201_CREATED)
+        except SMTPException:
+            smtp_error = {
+                'message': 'Error occurred while sending mail'
+            }
 
-            return Response(status=status.HTTP_200_OK)
-        except Place.DoesNotExist:
-            LOGGER.info(f'Place with id {place_id} was not deleted')
+            return Response(data=smtp_error,
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-            return Response(status=status.HTTP_404_NOT_FOUND)
+    @staticmethod
+    def get_staff_users():
+        """ Returns all staff users for requesting of place edit"""
+        User = get_user_model()
+        return list(
+            User.objects.filter(is_staff=True).values_list('email', flat=True)
+        )
 
 
 class CommentsAPI(APIView):
