@@ -311,8 +311,7 @@ class PlaceRatingView(APIView):
         response = {'place': place_id,
                     'data': average_rating['average'],
                     'amount': average_rating['amount'],
-                    'rating': user_rating,
-                    }
+                    'rating': user_rating}
         return Response(response, status=status.HTTP_200_OK)
 
     def post(self, request, place_id):
