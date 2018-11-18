@@ -87,6 +87,14 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         response = self.client.post(PLACE_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
 
+    def test_creating_place_with_wrong_address(self):
+        """Test response when creating place with wrong json address format"""
+        test_data = TEST_PLACE_DATA_POST.copy()
+        test_data['address'] = 'nonjson format'
+
+        response = self.client.post(f'{PLACE_URL}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
     def test_delete_existing_place(self):
         """Test response for place deletion"""
         response = self.client.delete(f'{PLACE_URL}{self.place.id}')
