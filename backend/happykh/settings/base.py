@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 
 import os
 import hashids
+from django.utils import timezone
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(
@@ -193,3 +194,8 @@ ENCODING_DES_KEY = os.environ.get('EMAIL_ENCODING_KEY')
 
 HASHID_FIELD_SALT = os.environ.get('HASHID_FIELD_SALT')
 HASH_IDS = hashids.Hashids(salt=HASHID_FIELD_SALT)
+
+# DRF TOKEN AUTHENTICATION CONSTANTS
+
+USER_TOKEN_DURATION_DAYS = 1
+USER_TOKEN_LIFETIME = timezone.timedelta(days=USER_TOKEN_DURATION_DAYS)

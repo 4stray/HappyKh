@@ -1,10 +1,10 @@
 """Test users api views"""
+from django.conf import settings
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 from rest_framework import status
 from tests.utils import BaseTestCase
-from users.api.views import token_life_duration_days
 from users.models import User
 
 CORRECT_EMAIL = 'test_mail@mail.com'
@@ -74,8 +74,7 @@ class LoginViewTestCase(BaseTestCase, APITestCase):
         and token in database will be changed for a new one.
         """
         token = Token.objects.create(user=self.active_user)
-        token.created = timezone.now() - timezone.timedelta(
-            days=token_life_duration_days * 2)
+        token.created = timezone.now() - settings.USER_TOKEN_LIFETIME*2
         token.save()
         response = self.client.post(LOGIN_URL, ACTIVATED_USER_DATA)
         self.assertEqual(status.HTTP_200_OK, response.status_code)

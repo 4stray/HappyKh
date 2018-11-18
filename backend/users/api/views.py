@@ -1,5 +1,4 @@
 """Views for app users"""
-import datetime
 import logging
 from smtplib import SMTPException
 
@@ -27,7 +26,6 @@ from ..cryptography import decode, encode
 from ..models import User
 
 LOGGER = logging.getLogger('happy_logger')
-token_life_duration_days = 1
 
 
 def token_is_active(token):
@@ -38,8 +36,7 @@ def token_is_active(token):
     :return: True if token hasn't expired yet. False in any other case
     """
     if token is not None and isinstance(token, Token):
-        token_life_time = datetime.timedelta(days=token_life_duration_days)
-        if timezone.now() <= token.created + token_life_time:
+        if timezone.now() <= token.created + settings.USER_TOKEN_LIFETIME:
             return True
     return False
 
