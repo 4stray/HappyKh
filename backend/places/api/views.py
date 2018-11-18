@@ -101,7 +101,6 @@ class PlacePage(APIView):
             parsing_address_error = {
                 'message': 'Parsing address from Json failed',
             }
-            LOGGER.error(parsing_address_error['message'])
 
             return Response(data=parsing_address_error,
                             status=status.HTTP_400_BAD_REQUEST)
@@ -265,7 +264,6 @@ class PlacesEditingPermissionRequest(APIView):
             smtp_error = {
                 'message': 'Error occurred while sending mail'
             }
-            LOGGER.error(smtp_error['message'])
 
             return Response(data=smtp_error,
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
