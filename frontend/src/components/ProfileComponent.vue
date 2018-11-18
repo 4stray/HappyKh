@@ -30,6 +30,7 @@ const GENDER_CHOICES = {
   M: 'Man',
   W: 'Woman',
   O: 'Other',
+  U: 'Unknown',
 };
 
 export default {

@@ -20,6 +20,7 @@
         <v-radio label="Woman" color="primary" value="W"></v-radio>
         <v-radio label="Man" color="primary" value="M"></v-radio>
         <v-radio label="Other" color="primary" value="O"></v-radio>
+        <v-radio label="Unknown" color="primary" value="U"></v-radio>
       </v-radio-group>
       <div>
         <img v-if="userImage" v-bind:src=userImage alt="No image"/>
