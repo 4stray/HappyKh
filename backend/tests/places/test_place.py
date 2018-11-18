@@ -120,6 +120,18 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         response = self.client.put(f'{PLACE_URL}{0}', test_data)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
+    def test_changing_place_with_invalid_address(self):
+        """Test response when changing place with wrong address"""
+        test_data = TEST_PLACE_DATA_PUT.copy()
+        test_data['address'] = json.dumps({
+            'longitude': 50,
+            'latitude': 49.99,
+            'address': '',
+        })
+
+        response = self.client.put(f'{PLACE_URL}{self.place.id}', test_data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
     def test_changing_place_with_blank_name(self):
         """Test response for changing place with no name"""
         test_data = TEST_PLACE_DATA_PUT.copy()

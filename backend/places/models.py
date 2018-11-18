@@ -66,21 +66,6 @@ class Place(models.Model):
     def __str__(self):
         return self.name
 
-    @staticmethod
-    def get_place(place_id):
-        """
-        :param  place_id: place id
-        :return: instance of Place or None
-        """
-        try:
-            return Place.objects.get(pk=place_id)
-        except Place.DoesNotExist:
-            LOGGER.error(
-                f'Can`t get place because of invalid id,'
-                f' place_id: {place_id}'
-            )
-            return None
-
     def is_editing_permitted(self, user_id):
         """
         Returns user permission for editing place
