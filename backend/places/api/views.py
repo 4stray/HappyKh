@@ -14,10 +14,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils import get_changed_uri, get_token_user
+from utils import (get_changed_uri, get_token_user)
 from users.backends import UserAuthentication
 
-from utils import get_changed_uri
 from .serializers import (PlaceSerializer, AddressSerializer,
                           CommentPlaceSerializer, PlaceRatingSerializer)
 from ..models import Place, Address, CommentPlace, PlaceRating
@@ -99,11 +98,11 @@ class PlacePage(APIView):
         try:
             address_data = json.loads(place_data.get('address'))
         except json.decoder.JSONDecodeError:
-            LOGGER.error('Parsing address from Json failed')
-
             parsing_address_error = {
-                'error_message': 'Parsing address from Json failed',
+                'message': 'Parsing address from Json failed',
             }
+            LOGGER.error(parsing_address_error['message'])
+
             return Response(data=parsing_address_error,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -144,14 +143,11 @@ class PlaceSinglePage(APIView):
         :param place_id: Integer
         :return: HTTP Response
         """
-        current_user = get_token_user(request)
+        user = get_token_user(request)
 
-        single_place = Place.get_place(place_id)
-        if not single_place:
-            LOGGER.error(f'Place with id {place_id} does not exist')
-            return Response(status=status.HTTP_404_NOT_FOUND)
+        single_place = get_object_or_404(Place, pk=place_id)
 
-        if single_place.is_editing_permitted(current_user.id):
+        if single_place.is_editing_permitted(user.id):
             place_data = PlacePage.parse_place_address(request.data.copy())
 
             if isinstance(place_data, Response):
@@ -164,7 +160,8 @@ class PlaceSinglePage(APIView):
                     f'Place is not valid due to validation errors: '
                     f'{place_serializer.errors}'
                 )
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(data=place_serializer.errors,
+                                status=status.HTTP_400_BAD_REQUEST)
 
             LOGGER.info(f'Place with id {place_id} was successfully updated')
 
@@ -174,11 +171,14 @@ class PlaceSinglePage(APIView):
             )
             return Response(status=status.HTTP_200_OK)
 
-        LOGGER.info(
-            f'Editing place permission denied for the user '
-            f'with id {current_user.id}'
-        )
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        access_denied = {
+            'message': f'Editing place permission denied for the user '
+                       f'with id {user.id}'
+        }
+
+        LOGGER.error(access_denied['message'])
+        return Response(data=access_denied,
+                        status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, place_id):
         """
@@ -187,25 +187,24 @@ class PlaceSinglePage(APIView):
         :param place_id: Integer
         :return: HTTP Response
         """
-        current_user = get_token_user(request)
+        user = get_token_user(request)
+        single_place = get_object_or_404(Place, pk=place_id)
 
-        single_place = Place.get_place(place_id)
-        if not single_place:
-            LOGGER.error(f'Place with id {place_id} does not exist')
-            return Response(status=status.HTTP_404_NOT_FOUND)
-
-        if single_place.is_editing_permitted(current_user.id):
+        if single_place.is_editing_permitted(user.id):
             single_place.delete()
 
             LOGGER.info(f'Place with id {place_id} was deleted')
 
-            return Response(status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
-        LOGGER.info(
-            f'Deleting place permission denied for the user '
-            f'with id {current_user.id}'
-        )
-        return Response(status=status.HTTP_403_FORBIDDEN)
+        access_denied = {
+            'message': f'Deleting place permission denied for the user '
+                       f'with id {user.id}'
+        }
+        LOGGER.info(access_denied['message'])
+
+        return Response(data=access_denied,
+                        status=status.HTTP_403_FORBIDDEN)
 
 
 class PlacesEditingPermission(APIView):
@@ -263,9 +262,13 @@ class PlacesEditingPermissionRequest(APIView):
 
             return Response(status=status.HTTP_201_CREATED)
         except SMTPException:
-            LOGGER.error('Error occurred while sending mail')
+            smtp_error = {
+                'message': 'Error occurred while sending mail'
+            }
+            LOGGER.error(smtp_error['message'])
 
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response(data=smtp_error,
+                            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CommentsAPI(APIView):

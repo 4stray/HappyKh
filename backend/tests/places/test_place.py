@@ -90,7 +90,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
     def test_delete_existing_place(self):
         """Test response for place deletion"""
         response = self.client.delete(f'{PLACE_URL}{self.place.id}')
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
 
     def test_delete_nonexisting_place(self):
         """Test response for deletion of place that doesn't exist"""
