@@ -76,6 +76,31 @@ class Place(models.Model):
             user_id in self.edit_permitted_users.values_list('id', flat=True)
         )
 
+    @property
+    def average_rating(self):
+        """
+        Return place's average rating
+        :return: float average
+        """
+        ratings = PlaceRating.objects.filter(place=self.pk)
+        if not ratings.count():
+            return 0
+
+        amount = ratings.count()
+        rating = sum([rate.rating for rate in ratings])
+        average = round(rating / amount, 1)
+        return average
+
+    @property
+    def rating_amount(self):
+        """
+        Returns amount of place's rating
+        :return: int amount
+        """
+        ratings = PlaceRating.objects.filter(place=self.pk)
+        amount = ratings.count()
+        return amount
+
 
 class CommentPlace(CommentAbstract):
     """
