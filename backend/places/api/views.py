@@ -427,20 +427,19 @@ class PlaceRatingView(APIView):
     """
 
     @staticmethod
-    def get_average(place_id):
+    def get_user_rating(user_id, place_id):
         """
-        calculate average rating for place
+        return user's rating for the place
+        :param user_id: integer user_id
         :param place_id: integer place_id
-        :return: float average or 0 if there are not ratings for this place
+        :return: float user_rating or 0 if rating doesn't exist
         """
-        ratings = PlaceRating.objects.filter(place=place_id)
-        if not ratings.count():
+        try:
+            rating = PlaceRating.objects.get(user=user_id, place=place_id)
+            user_rating = rating.rating
+            return user_rating
+        except PlaceRating.DoesNotExist:
             return 0
-
-        amount = ratings.count()
-        rating = sum([rate.rating for rate in ratings])
-        average = round(rating / amount, 1)
-        return average
 
     def get(self, request, place_id):
         """
@@ -449,9 +448,15 @@ class PlaceRatingView(APIView):
         :param place_id: integer place_id
         :return: Response with data and status
         """
-        average_rating = self.get_average(place_id)
+        user_id = get_token_user(request)
+        user_rating = self.get_user_rating(user_id, place_id)
+        place = get_object_or_404(Place, id=place_id)
+        average = place.average_rating
+        amount = place.rating_amount
         response = {'place': place_id,
-                    'rating': average_rating}
+                    'data': average,
+                    'amount': amount,
+                    'rating': user_rating}
         return Response(response, status=status.HTTP_200_OK)
 
     def post(self, request, place_id):
@@ -476,7 +481,6 @@ class PlaceRatingView(APIView):
             response = {'user': request.data.get('user'),
                         'place': serializer.data['place'],
                         'rating': serializer.data['rating']}
-
             return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
