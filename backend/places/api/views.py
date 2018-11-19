@@ -290,10 +290,8 @@ class PlaceRatingView(APIView):
         :param request: HTTP request
         :return: integer user_id
         """
-        token = request.META.get('HTTP_AUTHORIZATION').split(' ')
-        token_key = str(token[1])
+        token_key = request.META['HTTP_AUTHORIZATION'][6:]
         user_token = Token.objects.get(key=token_key)
-
         user_id = user_token.user_id
         return user_id
 
