@@ -1,9 +1,13 @@
-import { shallowMount, config } from '@vue/test-utils';
+import Vuetify from 'vuetify';
+import { shallowMount, config, createLocalVue } from '@vue/test-utils';
 import PlacesComponent from '@/components/PlacesComponent.vue';
 
 
+const localVue = createLocalVue();
 const expect = require('chai').expect;
 const should = require('chai').should();
+
+localVue.use(Vuetify);
 
 config.mocks.$store = {
   state: {
@@ -15,7 +19,7 @@ config.mocks.$store = {
 };
 
 describe('PlacesComponent', () => {
-  const wrapper = shallowMount(PlacesComponent, config);
+  const wrapper = shallowMount(PlacesComponent, { localVue });
 
   it('has container for create place button and filter', () => {
     expect(wrapper.contains('[name="menu-container"]')).to.be.equal(true);

@@ -43,7 +43,7 @@ class PlacePage(APIView):
             'domain': get_current_site(request)
         }
 
-        search_option = request.GET.get('s', None)
+        search_option = request.GET.get('s')
         if search_option is not None:
             places = places.filter(name__icontains=search_option)
 

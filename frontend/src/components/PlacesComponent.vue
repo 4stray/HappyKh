@@ -43,7 +43,6 @@
       v-model="page.number"
       :length="pagesQuantity"
       color="#2c384c"
-      @input="paginate"
     ></v-pagination>
   </div>
 </template>
@@ -101,9 +100,6 @@ export default {
         this.search.onFront = '';
       }
     },
-    paginate() {
-      this.requestPlaces();
-    },
     requestPlaces() {
       const apiConfig = {
         params: {
@@ -126,6 +122,11 @@ export default {
       });
     },
   },
+  watch: {
+    'page.number': function pagination() {
+      this.requestPlaces();
+    },
+  },
 };
 
 </script>
@@ -138,7 +139,6 @@ export default {
     border: lightslategrey 2px groove;
     border-radius: 1em;
     background-color: #f6f8fc;
-    z-index: 1;
     box-shadow: blue;
   }
 </style>
