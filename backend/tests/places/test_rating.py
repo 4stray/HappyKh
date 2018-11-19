@@ -87,6 +87,16 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         response = self.client.get(RATING_URL % place_id)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
+    def test_no_rating(self):
+        """Test rating for place that doesn't have any"""
+        response = self.client.get(RATING_URL % self.new_place.pk)
+        expected = {'place': self.new_place.pk,
+                    'data': 0,
+                    'amount': 0,
+                    'rating': 0}
+        self.assertDictEqual(response.data, expected)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+
     def test_post_update(self):
         """
         Test post request for rating update
@@ -116,7 +126,6 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         response = self.client.post(RATING_URL % self.place.pk, data)
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
         self.assertEqual(expected, response.data['detail'])
-
 
     def test_post_create(self):
         """
