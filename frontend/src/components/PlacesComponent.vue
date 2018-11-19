@@ -9,7 +9,7 @@
                     :items="Object.keys(orderBy)"
                     v-on:change="changeOrderBy"
 
-                    class="orderSelect"
+                    name="order-select"
                     label="Order by"
             ></v-select>
             <v-btn id="orderIcon" :ripple="false"  flat
@@ -20,7 +20,7 @@
           </v-flex>
           <v-flex xs6>
             <v-text-field placeholder="Search" v-model="search.onFront"
-                          @keypress="pressEnter"></v-text-field>
+                          @keypress="pressEnter" name="filter"></v-text-field>
           </v-flex>
           <v-flex xs2>
             <v-btn class="info" large
