@@ -6,6 +6,7 @@
           <v-flex xs3 d-flex>
             <v-select
               append-icon
+              name="order-select"
               item-text="label"
               item-value="orderBy"
               v-model="currentOrder"
@@ -41,9 +42,9 @@
       </v-layout>
     </v-container>
     <v-pagination
-      v-if="pagesQuantity>1"
+      v-if="page.total>1"
       v-model="page.number"
-      :length="pagesQuantity"
+      :length="page.total"
       color="#2c384c"
     ></v-pagination>
   </div>
@@ -62,13 +63,13 @@ export default {
     return {
       allPlaces: [],
 
-      pagesQuantity: 1,
       search: {
         toSend: '',
         onFront: '',
       },
       page: {
         number: 1,
+        total: 1,
         limit: 15,
       },
       items: [
@@ -114,7 +115,7 @@ export default {
       };
       getPlaces(apiConfig).then((response) => {
         this.allPlaces = response.data.places;
-        this.pagesQuantity = response.data.pages;
+        this.page.total = response.data.pages;
       }).catch((error) => {
         if (error.response === undefined) {
           this.$awn.alert('A server error has occurred, try again later');

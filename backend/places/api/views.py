@@ -53,16 +53,18 @@ class PlacePage(APIView):
             places = places.filter(name__icontains=search_option)
 
         objects_limit = request.GET.get('lim', 15)
+
+        try:
+            objects_limit = int(objects_limit)
+            objects_limit = 1 if objects_limit < 1 else objects_limit
+        except ValueError:
+            objects_limit = 15
+
         paginator = Paginator(places, objects_limit)
 
         page = request.GET.get('p', 1)
 
-        try:
-            places = paginator.page(page)
-        except PageNotAnInteger:
-            places = paginator.page(1)
-        except EmptyPage:
-            places = paginator.page(paginator.num_pages)
+        places = paginator.get_page(page)
 
         serializer = PlaceSerializer(places, many=True, context=context)
         return Response({"places": serializer.data, "pages": paginator.num_pages},

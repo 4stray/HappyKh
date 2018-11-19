@@ -226,6 +226,17 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
 
         self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
+    def test_get_multiple_places_specifying_invalid_params(self):
+        """
+        Test get request for multiple specifying couple paginaton params
+        """
+        specified_url = '/api/places/?lim=bad&p=params'
+        response = self.client.get(specified_url)
+        serializer = PlaceSerializer(self.places, many=True)
+        expected = serializer.data
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected, response.data['places'])
+
 
 class TestPlacePageWithoutEditingPermission(APITestCase):
     """ Test changing place without having permission for it """
