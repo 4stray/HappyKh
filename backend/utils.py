@@ -9,6 +9,7 @@ from rest_framework import serializers
 from rest_framework.authtoken.models import Token
 from stdimage.models import StdImageFieldFile
 
+PROTOCOL = 'http'
 
 def make_media_file_path(model_name, attr_name, original_filename):
     """
@@ -19,12 +20,13 @@ def make_media_file_path(model_name, attr_name, original_filename):
     :param original_filename: original filename of the image, ex. 'image.jpg'
     :return: path from MEDIA_ROOT to file or None if filename is empty
     """
-    if original_filename:
-        ext = original_filename.split('.')[-1]
-        filename = uuid.uuid4()
-        full_filename = f"{filename}.{ext}"
-        return f'{model_name}/{attr_name}/{filename}/{full_filename}'
-    return None
+    if not original_filename:
+        return None
+
+    ext = original_filename.split('.')[-1]
+    filename = uuid.uuid4()
+    full_filename = f"{filename}.{ext}"
+    return f'{model_name}/{attr_name}/{filename}/{full_filename}'
 
 
 def delete_std_images_from_media(std_image_file, variations):
@@ -62,8 +64,8 @@ def get_token_user(request):
     :param request: HTTP request
     :return: integer user_id
     """
-    token_key_start = 6
-    token_key = request.META.get('HTTP_AUTHORIZATION')[token_key_start:]
+
+    token_key = request.META.get('HTTP_AUTHORIZATION').split()[1]
     token = Token.objects.get(key=token_key)
     return token.user
 
@@ -85,7 +87,8 @@ def get_changed_uri(request, param_name, val):
 
 class UploadedImageField(serializers.ImageField):
     """
-    Class which converts a base64 string to a file when input and converts image
+    Class which converts a base64 string
+    to a file when input and converts image
     by path to it into base64 string
     """
 
@@ -98,18 +101,21 @@ class UploadedImageField(serializers.ImageField):
 
     def to_representation(self, image_field):
         domain_site = self.context.get('domain')
-        if image_field and domain_site:
-            domain = 'http://' + str(domain_site)
-            original_url = image_field.url
-            variation = self.context['variation']
-            if variation:
-                extension = original_url.split('.')[-1]
-                original_url = original_url.split('.')[0]
-                image_url = f"{domain}{original_url}.{variation}.{extension}"
-            else:
-                image_url = f"{domain}{original_url}"
-            return image_url
-        return ''
+        if not (image_field and domain_site):
+            return ''
+
+        domain = f'{PROTOCOL}://{str(domain_site)}'
+        original_url = image_field.url
+        variation = self.context['variation']
+        if variation:
+            extension = original_url.split('.')[-1]
+            original_url = original_url.split('.')[0]
+            image_url = f"{domain}{original_url}.{variation}.{extension}"
+        else:
+            image_url = f"{domain}{original_url}"
+
+        return image_url
+
 
 
 class HashIdField(serializers.Field):
@@ -121,5 +127,9 @@ class HashIdField(serializers.Field):
         return settings.HASH_IDS.encode(data)
 
     def to_internal_value(self, data):
-        user_id = settings.HASH_IDS.decode(data)[0]
+        try:
+            user_id = settings.HASH_IDS.decode(data)[0]
+        except IndexError:
+            self.fail('incorrect_type', message='Invalid hashed_user_id')
+
         return super(HashIdField, self).to_internal_value(user_id)
