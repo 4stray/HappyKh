@@ -1,5 +1,5 @@
 import Vuetify from 'vuetify';
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { shallowMount, createLocalVue, config } from '@vue/test-utils';
 import CommentComponent from '../../src/components/CommentComponent.vue';
 
 const expect = require('chai').expect;
@@ -7,8 +7,17 @@ const expect = require('chai').expect;
 const localVue = createLocalVue();
 localVue.use(Vuetify);
 
+config.mocks.$store = {
+  state: {
+    UserID: 'user',
+  },
+  getters: {
+    getUserID: state => state.UserID,
+  },
+};
+
 describe('CommentComponent', () => {
-  const wrapper = shallowMount(CommentComponent, { localVue });
+  const wrapper = shallowMount(CommentComponent, { localVue, config });
 
   it('contains avatar image', () => {
     expect(wrapper.contains('.avatar')).to.be.equal(true);

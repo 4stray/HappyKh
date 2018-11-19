@@ -12,7 +12,6 @@ const expect = require('chai').expect;
 
 const localVue = createLocalVue();
 localVue.use(Vuetify);
-
 Cookies.set('token', 'value_');
 Cookies.set('user_id', 'value_');
 

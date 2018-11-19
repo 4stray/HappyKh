@@ -37,6 +37,7 @@ describe('PlaceDetail for empty place', () => {
     localVue,
     router,
     methods: {
+      fetchPlaceEditingPermission: () => {},
       fetchPlaceData: () => {},
     },
   });
@@ -69,6 +70,7 @@ describe('PlaceDetail for place with data', () => {
     router,
     methods: {
       fetchPlaceData: () => {},
+      fetchPlaceEditingPermission: () => {},
     },
   });
   const testUserData = {

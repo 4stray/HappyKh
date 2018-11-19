@@ -17,6 +17,7 @@ describe('mounted PlaceEditComponent', () => {
     localVue,
     router,
     methods: {
+      fetchPlaceEditingPermission: () => {},
       fetchPlaceData: () => {},
     },
   });
