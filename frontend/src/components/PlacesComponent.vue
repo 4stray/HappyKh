@@ -5,8 +5,12 @@
         <v-flex xs2 d-inline-flex>
           <v-select
               append-icon
-              :items="Object.keys(orderBy)"
+              item-text="label"
+              item-value="orderBy"
+              v-model="currentOrder"
+              :items="items"
               v-on:change="changeOrderBy"
+              return-object
               box
               label="Order by"
           ></v-select>
@@ -47,11 +51,11 @@ export default {
   data() {
     return {
       allPlaces: [],
-      orderBy: {
-        Name: 'name',
-        Date: 'created',
-      },
-      currentOrder: 'name',
+      items: [
+        { label: 'Name', orderBy: 'name' },
+        { label: 'Date', orderBy: 'created' },
+      ],
+      currentOrder: { label: 'Name', orderBy: 'name' },
       desc: '',
     };
   },
@@ -59,8 +63,8 @@ export default {
     this.requestPlaces();
   },
   methods: {
-    changeOrderBy(key) {
-      this.currentOrder = this.orderBy[key];
+    changeOrderBy(object) {
+      this.currentOrder = object;
       this.requestPlaces();
     },
     changeOrder() {
@@ -70,7 +74,7 @@ export default {
     requestPlaces() {
       const apiConfig = {
         params: {
-          orderBy: this.currentOrder,
+          orderBy: this.currentOrder.orderBy,
           order: this.desc,
         },
       };

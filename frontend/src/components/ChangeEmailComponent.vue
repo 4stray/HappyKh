@@ -40,6 +40,12 @@ export default {
     };
   },
   methods: {
+    signOut() {
+      this.$store.dispatch('signOut').finally(() => {
+        this.$awn.success('Please check your mailbox for confirmation email');
+        this.$router.push({ name: 'login' });
+      });
+    },
     changeEmail() {
       if (!this.$refs.form.validate()) {
         this.$refs.form.reset();
@@ -48,7 +54,7 @@ export default {
       const newEmail = { email: this.email };
       axiosInstance.patch(`/api/users/${this.userID}/email`, newEmail)
         .then(() => {
-          this.$awn.success('Please check your mailbox for confirmation email');
+          this.signOut();
         }).catch((error) => {
           if (error.response === undefined) {
             this.$awn.alert('A server error has occurred, try again later');

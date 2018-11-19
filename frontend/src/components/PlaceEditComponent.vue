@@ -3,7 +3,7 @@
     <v-flex xs12 md6>
       <v-card class="v-card pa-5 mb-5" id="placeEditComponent">
         <v-btn v-on:click.native="deletePlace"
-                 fab dark absolute bottom right color="red" title="Delete Place">
+               fab dark absolute bottom right color="red" title="Delete Place">
           <v-icon>delete</v-icon>
         </v-btn>
 
@@ -18,7 +18,8 @@
 
 <script>
 import PlaceFormComponent from '../components/PlaceFormComponent.vue';
-import { axiosInstance, getPlaceData } from '../axios-requests';
+import { axiosInstance, getPlaceData, getPlaceEditingPermission }
+  from '../axios-requests';
 
 export default {
   name: 'PlaceEditComponent',
@@ -29,9 +30,31 @@ export default {
     place: '',
   },
   created() {
+    this.fetchPlaceEditPermission();
     this.fetchPlaceData();
   },
   methods: {
+    rejectInEditingAccess() {
+      this.$awn
+        .alert('You have to get a permission in order to edit the place');
+      this.$router.push({
+        name: 'home',
+      });
+    },
+    fetchPlaceEditPermission() {
+      getPlaceEditingPermission(this.$route.params.placeId)
+        .then((response) => {
+          if (!response.data.is_place_editing_permitted) {
+            this.rejectInEditingAccess();
+          }
+        }).catch((error) => {
+          if (!error.response) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else {
+            this.$awn.alert(error);
+          }
+        });
+    },
     fetchPlaceData() {
       const placeId = this.$route.params.placeId;
       getPlaceData(placeId).then((response) => {
@@ -42,10 +65,7 @@ export default {
           address: response.data.address,
         };
       }).catch((error) => {
-        this.$awn.alert('User access denied for editing the place');
-        this.$router.push({
-          name: 'home',
-        });
+        this.rejectInEditingAccess();
       });
     },
     updatePlace(formData) {

@@ -70,13 +70,20 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
-  if (store.getters.getAuthenticated) {
-    axiosInstance.get('api/users/token-validation').then((response) => {
-      next();
-    }).catch((error) => {
-      store.dispatch('signOut');
-      next({ name: 'login' });
-    });
+  const authenticated = store.getters.getAuthenticated;
+  const loginName = 'login';
+  if (authenticated) {
+    if (to.name === loginName) {
+      next({ name: 'home' });
+    } else {
+      axiosInstance.get('api/users/token-validation').then((response) => {
+        next();
+      }).catch((error) => {
+        store.dispatch('signOut').finally(() => {
+          next({ name: loginName });
+        });
+      });
+    }
   } else {
     next();
   }
