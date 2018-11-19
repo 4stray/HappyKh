@@ -3,7 +3,7 @@
     <v-card-title primary-title>
       <h3 class="headline mb-0">Change your password</h3>
     </v-card-title>
-    <v-form ref="form" @submit.prevent="saveNewPassword" v-model="valid">
+    <v-form ref="form" @submit.prevent v-model="valid">
       <v-text-field type="password"
                     v-model="oldPassword"
                     label="Old password"
@@ -20,7 +20,6 @@
       <v-btn type="submit"
              v-on:click.native="saveNewPassword"
              :disabled="!valid"
-             :to="{name: 'login'}"
              color="success" block>
         submit
       </v-btn>
@@ -29,7 +28,7 @@
 </template>
 
 <script>
-import { mapGetters, store } from 'vuex';
+import { mapGetters } from 'vuex';
 import { axiosInstance } from '../axios-requests';
 
 export default {
@@ -58,15 +57,18 @@ export default {
   },
   methods: {
     signOut() {
-      this.$awn.success('Password was successfully changed.' +
-                          'Please re-login to renew your session');
-      store.dispatch('signOut');
+      this.$store.dispatch('signOut').finally(() => {
+        this.$awn.success('You have successfully changed your password.');
+        this.$router.push({ name: 'login' });
+      });
     },
     saveNewPassword() {
-      if (!this.$refs.form.validate()) {
+      if (!this.$refs.form.validate() || this.oldPassword === this.newPassword) {
         this.$refs.form.reset();
+        this.$awn.warning('Some passwords were invalid');
         return;
-      } else if (this.newPassword !== this.confirmationPassword) {
+      }
+      if (this.newPassword !== this.confirmationPassword) {
         this.$awn.warning('Passwords don\'t match');
         this.$refs.form.reset();
         return;
@@ -79,14 +81,15 @@ export default {
       axiosInstance.patch(`/api/users/${this.userID}/password`, userCredentials)
         .then(() => {
           this.signOut();
-        }).catch((error) => {
+        })
+        .catch((error) => {
           if (error.response === undefined) {
             this.$awn.alert('A server error has occurred, try again later');
           } else if (error.response.data.message) {
             this.$awn.warning(error.response.data.message);
           }
+          this.$refs.form.reset();
         });
-      this.$refs.form.reset();
     },
   },
 };

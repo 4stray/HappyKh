@@ -22,13 +22,12 @@ class PlaceTestCase(BaseTestCase):
             latitude=50.12345,
             longitude=45.1345
         )
-        self.place_info = {'user': self.regular_user,
-                           'name': 'name',
-                           'description': 'description',
-                           'address': self.place_address
-                           }
+        self.place_info = {
+            'name': 'name',
+            'description': 'description',
+            'address': self.place_address
+        }
         self.place = Place.objects.create(
-            user=self.place_info['user'],
             name=self.place_info['name'],
             description=self.place_info['description'],
             address=self.place_info['address']
@@ -41,15 +40,6 @@ class PlaceTestCase(BaseTestCase):
         self.assertEqual(self.place_info['name'], place.name)
         self.assertEqual(self.place_info['description'], place.description)
         self.assertEqual(self.place_info['address'], place.address)
-
-    def test_deletion_user(self):
-        """Test Place model behavior after deleting a user"""
-        user_on_delete = self.regular_user
-
-        User.objects.get(email="any@mail.com").delete()
-        with self.assertRaises(Place.DoesNotExist) as dne:
-            Place.objects.get(user=user_on_delete)
-        self.assertEqual(type(dne.exception), Place.DoesNotExist)
 
 
 @pytest.mark.django_db
@@ -115,7 +105,6 @@ class CommentPlaceTestCase(BaseTestCase):
                            'address': self.place_address
                            }
         self.place = Place.objects.create(
-            user=self.place_info['user'],
             name=self.place_info['name'],
             description=self.place_info['description'],
             address=self.place_info['address']

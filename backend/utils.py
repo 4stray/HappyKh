@@ -50,13 +50,22 @@ def delete_std_images_from_media(std_image_file, variations):
                 os.path.join(settings.MEDIA_ROOT, path_to_variant_file))
 
 
-def is_user_owner(token_key, id):
-    token_user_id = Token.objects.get(key=token_key).user.id
-    try:
-        user_id = settings.HASH_IDS.decode(id)[0]
-        return user_id == token_user_id
-    except IndexError:
-        return False
+def is_user_owner(request, id):
+    token_user = get_token_user(request)
+    user_id = settings.HASH_IDS.decode(id)[0]
+    return user_id == token_user.id
+
+
+def get_token_user(request):
+    """
+    Get user's id from token
+    :param request: HTTP request
+    :return: integer user_id
+    """
+    token_key_start = 6
+    token_key = request.META.get('HTTP_AUTHORIZATION')[token_key_start:]
+    token = Token.objects.get(key=token_key)
+    return token.user
 
 
 def get_changed_uri(request, param_name, val):

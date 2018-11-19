@@ -1,16 +1,16 @@
 <template>
   <v-form id="placeForm" ref="placeForm" enctype="multipart/form-data"
           @submit.prevent="savePlace" v-model="valid">
-
+    <p class="text--secondary">* - required fields</p>
     <v-text-field type="text" id="name" v-model="place.name"
                   :rules="[rules.required]"
-                  label="Place name">
+                  label="Place name*">
     </v-text-field>
 
     <v-text-field id="placeAddress"
                   :rules="[rules.required, rules.address(place.address)]"
                   @change="userChangeAddress(place.address)"
-                  label="Place Address"
+                  label="Place Address*"
                   v-model="place.address.address" type="text">
     </v-text-field>
 
@@ -104,10 +104,8 @@ export default {
         return;
       }
 
-      const placeId = this.$route.params.placeId;
       const formData = new FormData();
 
-      formData.set('user', this.$store.getters.getUserID);
       formData.set('name', this.place.name);
       formData.set('description', this.place.description);
       formData.set('address', JSON.stringify(this.place.address));

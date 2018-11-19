@@ -42,10 +42,9 @@ class TestPlaceRating(BaseTestCase, APITestCase):
                                                  **TEST_USER_DATA)
         self.hashed_new_user_id = self.HASH_IDS.encode(self.new_user.pk)
         self.address = Address.objects.create(**TEST_ADDRESS_DATA)
-        self.place = Place.objects.create(user=self.user, address=self.address,
+        self.place = Place.objects.create(address=self.address,
                                           **TEST_PLACE_DATA)
-        self.new_place = Place.objects.create(user=self.user,
-                                              address=self.address,
+        self.new_place = Place.objects.create(address=self.address,
                                               **TEST_PLACE_DATA)
         user_token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
