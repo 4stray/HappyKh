@@ -269,8 +269,7 @@ class UserProfile(APIView):
         serializer = UserSerializer(user, context=context)
         response_data = serializer.data
 
-        token_key = request.META['HTTP_AUTHORIZATION'][6:]
-        enable_editing_profile = is_user_owner(token_key, id)
+        enable_editing_profile = is_user_owner(request, id)
         response_data['enable_editing_profile'] = enable_editing_profile
 
         LOGGER.info(
@@ -287,8 +286,7 @@ class UserProfile(APIView):
         :param id: String
         :return: Response(data, status)
         """
-        token_key = request.META['HTTP_AUTHORIZATION'][6:]
-        if not is_user_owner(token_key, id):
+        if not is_user_owner(request, id):
             LOGGER.error(
                 "User's data were not updated."
                 "user_id must be equal to token user_id"

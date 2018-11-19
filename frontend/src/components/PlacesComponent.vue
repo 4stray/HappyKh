@@ -5,12 +5,14 @@
                      'column': $vuetify.breakpoint.smAndDown}">
           <v-flex xs3 d-flex>
             <v-select
-                    append-icon
-                    :items="Object.keys(orderBy)"
-                    v-on:change="changeOrderBy"
-
-                    name="order-select"
-                    label="Order by"
+              append-icon
+              item-text="label"
+              item-value="orderBy"
+              v-model="currentOrder"
+              :items="items"
+              v-on:change="changeOrderBy"
+              return-object
+              label="Order by"
             ></v-select>
             <v-btn id="orderIcon" :ripple="false"  flat
                    v-on:click="changeOrder">
@@ -69,11 +71,11 @@ export default {
         number: 1,
         limit: 15,
       },
-      orderBy: {
-        Name: 'name',
-        Date: 'created',
-      },
-      currentOrder: 'name',
+      items: [
+        { label: 'Name', orderBy: 'name' },
+        { label: 'Date', orderBy: 'created' },
+      ],
+      currentOrder: { label: 'Name', orderBy: 'name' },
       desc: '',
 
     };
@@ -82,8 +84,8 @@ export default {
     this.requestPlaces();
   },
   methods: {
-    changeOrderBy(key) {
-      this.currentOrder = this.orderBy[key];
+    changeOrderBy(object) {
+      this.currentOrder = object;
       this.requestPlaces();
     },
     changeOrder() {
@@ -103,7 +105,7 @@ export default {
     requestPlaces() {
       const apiConfig = {
         params: {
-          orderBy: this.currentOrder,
+          orderBy: this.currentOrder.orderBy,
           order: this.desc,
           s: this.search.toSend,
           p: this.page.number,
