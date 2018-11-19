@@ -56,12 +56,12 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         """
         Test get request for rating
         """
-        response = self.client.get(RATING_URL % self.place.pk,
-                                   {'user': self.hashed_user_id})
-        average_rating = PlaceRatingView.get_average(self.place.pk)
+        response = self.client.get(RATING_URL % self.place.pk)
+        average = self.place.get_average_rating
+        amount = self.place.get_rating_amount
         expected = {'place': self.place.pk,
-                    'data': average_rating['average'],
-                    'amount': average_rating['amount'],
+                    'data': average,
+                    'amount': amount,
                     'rating': self.rating.rating}
         self.assertEqual(status.HTTP_200_OK, response.status_code)
 
@@ -81,17 +81,11 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         expected = 0
         self.assertEqual(expected, response)
 
-    def test_no_average(self):
-        """Test response for average of place with no rating"""
-        response = {'average': 0, 'amount': 0}
-        expected = PlaceRatingView.get_average(self.new_place.pk)
-        self.assertDictEqual(response, expected)
-
     def test_get_empty_rating(self):
         """Test rating with invalid place id"""
         place_id = 100
         response = self.client.get(RATING_URL % place_id)
-        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_post_update(self):
         """

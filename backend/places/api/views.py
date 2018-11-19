@@ -427,23 +427,6 @@ class PlaceRatingView(APIView):
     """
 
     @staticmethod
-    def get_average(place_id):
-        """
-        calculate average rating for place
-        :param place_id: integer place_id
-        :return: dict
-        """
-        ratings = PlaceRating.objects.filter(place=place_id)
-        if not ratings.count():
-            return {'average': 0, 'amount': 0}
-
-        amount = ratings.count()
-        rating = sum([rate.rating for rate in ratings])
-        average = round(rating / amount, 1)
-        response = {'average': average, 'amount': amount}
-        return response
-
-    @staticmethod
     def get_user_rating(user_id, place_id):
         """
         return user's rating for the place
@@ -467,10 +450,12 @@ class PlaceRatingView(APIView):
         """
         user_id = get_token_user(request)
         user_rating = self.get_user_rating(user_id, place_id)
-        average_rating = self.get_average(place_id)
+        place = get_object_or_404(Place, id=place_id)
+        average = place.get_average_rating
+        amount = place.get_rating_amount
         response = {'place': place_id,
-                    'data': average_rating['average'],
-                    'amount': average_rating['amount'],
+                    'data': average,
+                    'amount': amount,
                     'rating': user_rating}
         return Response(response, status=status.HTTP_200_OK)
 
