@@ -3,23 +3,23 @@ import json
 import logging
 from smtplib import SMTPException
 
-from django.core.mail import send_mail
-from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import get_user_model
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.exceptions import (ParseError, ValidationError)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from utils import (get_changed_uri, get_token_user)
 from users.backends import UserAuthentication
 
+from utils import (get_changed_uri, get_token_user)
 from .serializers import (PlaceSerializer, AddressSerializer,
-                          CommentPlaceSerializer, PlaceRatingSerializer)
+                          CommentPlaceSerializer, PlaceRatingSerializer
+                          )
 from ..models import (Place, Address, CommentPlace, PlaceRating)
 
 LOGGER = logging.getLogger('happy_logger')
@@ -56,23 +56,21 @@ class PlacePage(APIView):
         """
         place_data = PlacePage.parse_place_address(request.data.copy())
 
-        if isinstance(place_data, Response):
-            return place_data
-
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
         }
 
         serializer = PlaceSerializer(data=place_data, context=context)
-        if serializer.is_valid():
-            pk = serializer.save()
-            LOGGER.info(f'Created place #{pk}')
-            return Response({'message': 'place was created'},
-                            status=status.HTTP_201_CREATED)
+        if not serializer.is_valid():
+            LOGGER.error(f'Serializer errors: {serializer.errors}')
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        LOGGER.error(f'Serializer errors: {serializer.errors}')
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        pk = serializer.save()
+        LOGGER.info(f'Created place #{pk}')
+        return Response({'message': 'place was created'},
+                        status=status.HTTP_201_CREATED)
 
     @staticmethod
     def get_address_pk(data):
@@ -103,13 +101,10 @@ class PlacePage(APIView):
             parsing_address_error = {
                 'message': 'Parsing address from Json failed',
             }
-
             LOGGER.error(parsing_address_error['message'])
-
             raise ParseError(detail=parsing_address_error['message'])
 
         place_data['address'] = cls.get_address_pk(address_data)
-
         return place_data
 
 
@@ -151,7 +146,6 @@ class PlaceSinglePage(APIView):
                 'message': f'Editing place permission denied for the user '
                            f'with id {user.id}'
             }
-
             LOGGER.error(access_denied['message'])
             return Response(data=access_denied,
                             status=status.HTTP_403_FORBIDDEN)
@@ -167,10 +161,7 @@ class PlaceSinglePage(APIView):
 
         LOGGER.info(f'Place with id {place_id} was successfully updated')
 
-        place_serializer.update(
-            single_place,
-            place_serializer.validated_data
-        )
+        place_serializer.update(single_place, place_serializer.validated_data)
         return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, place_id):
@@ -189,14 +180,11 @@ class PlaceSinglePage(APIView):
                            f'with id {user.id}'
             }
             LOGGER.info(access_denied['message'])
-
             return Response(data=access_denied,
                             status=status.HTTP_403_FORBIDDEN)
 
         single_place.delete()
-
         LOGGER.info(f'Place with id {place_id} was deleted')
-
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -232,27 +220,20 @@ class PlacesEditingPermission(APIView):
         requesting_user = get_token_user(request)
         sender = requesting_user.email
         receivers = PlacesEditingPermission.get_staff_users()
+        subject = f'User {sender} requesting place editing permission'
+        message = f'User {sender} requesting editing permission ' \
+                  f'for the place with id of {place_id}'
 
         try:
-            send_mail(
-                f'User {sender} requesting place editing permission',
-                f'User {sender} requesting editing permission for '
-                f'the place with id of {place_id}',
-                sender,
-                receivers
-            )
-            LOGGER.info(
-                f'Place editing permission access mail has been sent'
-            )
-
-            return Response(status=status.HTTP_201_CREATED)
+            send_mail(subject, message, sender, receivers)
         except SMTPException:
-            smtp_error = {
-                'message': 'Error occurred while sending mail'
-            }
-
+            smtp_error = {'message': 'Error occurred while sending mail'}
             return Response(data=smtp_error,
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        LOGGER.info(f'Place editing permission access mail has been sent')
+        return Response(status=status.HTTP_201_CREATED)
+
 
     @staticmethod
     def get_staff_users():
@@ -293,19 +274,23 @@ class CommentsAPI(APIView):
             LOGGER.warning(f'Wrong objects_per_page={objects_per_page}'
                            f' argument.')
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        if int(objects_per_page) == 0:
+
+        objects_per_page = int(objects_per_page)
+        if objects_per_page == 0:
             LOGGER.warning(f"Objects_per_page argument can't be 0")
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         if not page.isdigit():
             LOGGER.warning(f'Wrong page={page} argument.')
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        if int(page) == 0:
+
+        page = int(page)
+        if page == 0:
             LOGGER.warning(f"Page argument can't be 0")
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        paginator = Paginator(all_comments, int(objects_per_page))
-        comments_page = paginator.get_page(int(page))
+        paginator = Paginator(all_comments, objects_per_page)
+        comments_page = paginator.get_page(page)
         comments_for_page = comments_page.object_list
 
         comment_context = {'domain': get_current_site(request), }
@@ -354,16 +339,18 @@ class CommentsAPI(APIView):
         comment_context = {'domain': get_current_site(request), }
         comment_serializer = CommentPlaceSerializer(data=data,
                                                     context=comment_context)
-        if comment_serializer.is_valid():
-            comment_serializer.save()
-            return Response(comment_serializer.data,
-                            status=status.HTTP_201_CREATED)
+        if not comment_serializer.is_valid():
+            LOGGER.warning(
+                f'Comment serialization errors {comment_serializer.errors}')
+            return Response(comment_serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        comment_serializer.save()
+        return Response(comment_serializer.data, status=status.HTTP_201_CREATED)
 
 
 class SingleCommentAPI(APIView):
-    """Update or delet comment for a place"""
+    """Update or delete comment for a place"""
 
     def put(self, request, place_id, comment_id):
         """
@@ -376,8 +363,7 @@ class SingleCommentAPI(APIView):
         """
         data = request.data.copy()
         user = UserAuthentication.get_user(request.data.get('creator'))
-        data.update(creator=user.id)
-        data.update(place=place_id)
+        data.update({'creator': user.id, 'place': place_id})
 
         comment = CommentPlace.objects.filter(pk=comment_id).first()
         if not comment:
@@ -392,14 +378,15 @@ class SingleCommentAPI(APIView):
         comment_serializer = CommentPlaceSerializer(comment,
                                                     data=data,
                                                     context=comment_context)
-        if comment_serializer.is_valid():
-            comment_serializer.save()
-            return Response(comment_serializer.data, status=status.HTTP_200_OK)
+        if not comment_serializer.is_valid():
+            LOGGER.warning(
+                f'Comment serialization errors {comment_serializer.errors}'
+            )
+            return Response(comment_serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        LOGGER.warning(
-            f'Comment serialization errors {comment_serializer.errors}')
-        return Response(comment_serializer.errors,
-                        status=status.HTTP_400_BAD_REQUEST)
+        comment_serializer.save()
+        return Response(comment_serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request, place_id, comment_id):
         """
@@ -409,16 +396,14 @@ class SingleCommentAPI(APIView):
         :param comment_id if of comment being delete
         :return: Response with status
         """
-        token_key = request.META['HTTP_AUTHORIZATION'][6:]
-        user = Token.objects.get(key=token_key).user
-        try:
-            comment = CommentPlace.objects.get(pk=comment_id)
-            if comment.creator != user:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-            comment.delete()
-            return Response(status=status.HTTP_200_OK)
-        except CommentPlace.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        user = get_token_user(request)
+        comment = get_object_or_404(CommentPlace, pk=comment_id)
+        if comment.creator != user:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+
+        comment.delete()
+        return Response(status=status.HTTP_200_OK)
 
 
 class PlaceRatingView(APIView):
@@ -476,11 +461,13 @@ class PlaceRatingView(APIView):
                         'place': place_id,
                         'rating': request.data.get('rating')}
         serializer = PlaceRatingSerializer(data=request_data)
-        if serializer.is_valid():
-            serializer.save()
-            response = {'user': request.data.get('user'),
-                        'place': serializer.data['place'],
-                        'rating': serializer.data['rating']}
-            return Response(response, status=status.HTTP_200_OK)
+        if not serializer.is_valid():
+            LOGGER.warning(f'Comment serialization errors {serializer.errors}')
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        response = {'user': request.data.get('user'),
+                    'place': serializer.data['place'],
+                    'rating': serializer.data['rating']}
+        return Response(response, status=status.HTTP_200_OK)

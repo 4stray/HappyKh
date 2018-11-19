@@ -435,7 +435,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         """Test delete request with wrong comment id"""
         url = self.COMMENT_URL + '/' + str(self.pk + 40)
         response = self.client.delete(url)
-        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        self.assertEqual(status.HTTP_404_NOT_FOUND, response.status_code)
 
     def test_successful_update(self):
         """Test successful put request"""
