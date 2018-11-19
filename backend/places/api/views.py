@@ -451,8 +451,8 @@ class PlaceRatingView(APIView):
         user_id = get_token_user(request)
         user_rating = self.get_user_rating(user_id, place_id)
         place = get_object_or_404(Place, id=place_id)
-        average = place.get_average_rating
-        amount = place.get_rating_amount
+        average = place.average_rating
+        amount = place.rating_amount
         response = {'place': place_id,
                     'data': average,
                     'amount': amount,

@@ -77,7 +77,7 @@ class Place(models.Model):
         )
 
     @property
-    def get_average_rating(self):
+    def average_rating(self):
         """
         Return place's average rating
         :return: float average
@@ -92,7 +92,7 @@ class Place(models.Model):
         return average
 
     @property
-    def get_rating_amount(self):
+    def rating_amount(self):
         """
         Returns amount of place's rating
         :return: int amount

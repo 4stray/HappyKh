@@ -57,8 +57,8 @@ class TestPlaceRating(BaseTestCase, APITestCase):
         Test get request for rating
         """
         response = self.client.get(RATING_URL % self.place.pk)
-        average = self.place.get_average_rating
-        amount = self.place.get_rating_amount
+        average = self.place.average_rating
+        amount = self.place.rating_amount
         expected = {'place': self.place.pk,
                     'data': average,
                     'amount': amount,
