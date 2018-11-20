@@ -232,10 +232,8 @@ class TestUserProfile(BaseTestCase, APITestCase):
         self.assertEqual(expected, response.data)
 
     def test_patch_invalid_profile_image(self):
-        """test update user's password with invalid new password"""
-        incorrect_data = {}
-        for key in CORRECT_DATA:
-            incorrect_data[key] = CORRECT_DATA[key]
+        """test update user's profile image with invalid one"""
+        incorrect_data = CORRECT_DATA.copy()
 
         incorrect_data['profile_image'] = 'not_base64'
         response = self.client.patch(USERS_PROFILE_URL % self.hashed_user_id,
