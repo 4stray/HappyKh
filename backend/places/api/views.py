@@ -18,8 +18,7 @@ from users.backends import UserAuthentication
 
 from utils import (get_changed_uri, get_token_user)
 from .serializers import (PlaceSerializer, AddressSerializer,
-                          CommentPlaceSerializer, PlaceRatingSerializer
-                          )
+                          CommentPlaceSerializer, PlaceRatingSerializer)
 from ..models import (Place, Address, CommentPlace, PlaceRating)
 
 LOGGER = logging.getLogger('happy_logger')
@@ -62,7 +61,7 @@ class PlacePage(APIView):
 
         serializer = PlaceSerializer(data=place_data, context=context)
         if not serializer.is_valid():
-            LOGGER.error(f'Serializer errors: {serializer.errors}')
+            LOGGER.error(f'PlaceSerializer errors: {serializer.errors}')
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -79,7 +78,6 @@ class PlacePage(APIView):
         :return: int address primary key
         """
         address_serializer = AddressSerializer(data=data)
-
         if not address_serializer.is_valid():
             LOGGER.error(f'Serializer errors: {address_serializer.errors}')
             raise ValidationError(detail=address_serializer.errors)

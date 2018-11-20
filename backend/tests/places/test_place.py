@@ -296,6 +296,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.address = Address.objects.create(**TEST_ADDRESS_DATA)
         self.place = Place.objects.create(address=self.address,
                                           **TEST_PLACE_DATA)
+
         self.places = Place.objects.all()
         user_token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {user_token.key}')
@@ -309,9 +310,9 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.comment = CommentPlace.objects.create(**self.comment_info)
         self.pk = CommentPlace.objects.last().pk
         self.comment_count = CommentPlace.objects.count()
-        self.place_pk = self.places.last().pk
 
-        self.COMMENT_URL = f'{PLACE_URL}{self.place.id}/comments'
+        place_pk = self.place.pk
+        self.COMMENT_URL = f'{PLACE_URL}{place_pk}/comments'
         self.SINGLE_COMMENT_URL = f'{self.COMMENT_URL}/{self.pk}'
 
     def test_successful_get(self):
