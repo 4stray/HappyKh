@@ -75,7 +75,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         serializer = PlaceSerializer(self.places, many=True)
         expected = serializer.data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(expected, response.data)
+        self.assertEqual(expected, response.data.get('places'))
 
     def test_post(self):
         """Test post request for places"""
