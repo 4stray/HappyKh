@@ -56,7 +56,8 @@ class PlacePage(APIView):
 
         try:
             objects_limit = int(objects_limit)
-            objects_limit = 1 if objects_limit < 1 else objects_limit
+            if objects_limit < 1:
+                objects_limit = 1
         except ValueError:
             objects_limit = 15
 
@@ -67,7 +68,14 @@ class PlacePage(APIView):
         places = paginator.get_page(page)
 
         serializer = PlaceSerializer(places, many=True, context=context)
-        return Response({"places": serializer.data, "pages": paginator.num_pages},
+
+        response = {"places": serializer.data,
+                    "pages": paginator.num_pages,
+                    "current_page": places.number,
+                    "objects_limit": objects_limit,
+                    "total_number": paginator.count}
+
+        return Response(response,
                         status=status.HTTP_200_OK)
 
     def post(self, request):
