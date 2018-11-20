@@ -5,22 +5,22 @@ import ProfileEditComponent
   from '../../src/components/ProfileEditComponent.vue';
 
 const expect = require('chai').expect;
-const should = require('chai').should();
+
+const localVue = createLocalVue();
+localVue.use(Vuetify);
 
 Cookies.set('token', 'value_');
 Cookies.set('user_id', 'value_');
 
 describe('ProfileEditComponent', () => {
-  let wrapper;
-  beforeEach(() => {
-    const localVue = createLocalVue();
-    localVue.use(Vuetify);
-    wrapper = shallowMount(ProfileEditComponent, {
-      localVue,
-      mocks: {
-        $cookies: Cookies,
-      },
-    });
+  const wrapper = shallowMount(ProfileEditComponent, {
+    localVue,
+    mocks: {
+      $cookies: Cookies,
+    },
+    methods: {
+      fetchFormData: () => {},
+    },
   });
 
   it('has LastName field with "text" type', () => {

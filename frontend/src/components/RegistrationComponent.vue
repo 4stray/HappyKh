@@ -37,7 +37,7 @@ export default {
       userEmail: '',
       userFirstName: '',
       userPassword: '',
-      confirmPassword: '',
+      confirmationPassword: '',
       valid: false,
       userNameRules: [
         value => Boolean(value) || 'This field is required.',

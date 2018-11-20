@@ -1,11 +1,15 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import PlaceFormComponent from '@/components/PlaceFormComponent.vue';
 
 
 const expect = require('chai').expect;
 
+const localVue = createLocalVue();
+localVue.use(Vuetify);
+
 describe('PlaceFormComponent props', () => {
-  const wrapper = shallowMount(PlaceFormComponent);
+  const wrapper = shallowMount(PlaceFormComponent, { localVue });
   it('has place', () => {
     expect(wrapper.props('place')).to.be.an('Object');
   });
@@ -33,24 +37,24 @@ describe('PlaceFormComponent props', () => {
 });
 
 describe('mounted PlaceFormComponent', () => {
-  const wrapper = shallowMount(PlaceFormComponent);
+  const wrapper = shallowMount(PlaceFormComponent, { localVue });
 
   it('has place name field with "text" type', () => {
-    expect(wrapper.find('v-text-field#name').attributes('type'))
+    expect(wrapper.find('#name').attributes('type'))
       .to.be.equal('text');
   });
 
   it('has place description textarea', () => {
-    expect(wrapper.contains('v-textarea#description')).to.be.equal(true);
+    expect(wrapper.contains('#description')).to.be.equal(true);
   });
 
   it('contains default logo initially', () => {
-    expect(wrapper.find('v-img#logoImg').attributes('src'))
+    expect(wrapper.find('#logoImg').attributes('src'))
       .to.be.equal('/img/default_place.f065b10c.png');
   });
 
   it('has address autocomplete component', () => {
-    expect(wrapper.contains('v-text-field#placeAddress')).to.be.equal(true);
+    expect(wrapper.contains('#placeAddress')).to.be.equal(true);
   });
 
   it('has logo input field with "file" type', () => {
@@ -58,7 +62,7 @@ describe('mounted PlaceFormComponent', () => {
   });
 
   it('check save button text', () => {
-    expect(wrapper.find('v-btn').text()).to.be.equal('Save');
+    expect(wrapper.find('[type=submit]').text()).to.be.equal('Save');
   });
 
   it('contains logo with equal src to data()', () => {

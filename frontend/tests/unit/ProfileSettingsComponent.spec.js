@@ -9,23 +9,25 @@ import ChangeEmailComponent
   from '../../src/components/ChangeEmailComponent.vue';
 
 const expect = require('chai').expect;
-const should = require('chai').should();
 
 const localVue = createLocalVue();
 localVue.use(Vuetify);
-
 Cookies.set('token', 'value_');
 Cookies.set('user_id', 'value_');
 
 describe('ProfileSettings check', () => {
   const wrapper = shallowMount(ProfileSettings, {
+    localVue,
     mocks: {
       $cookies: Cookies,
     },
+    methods: {
+      fetchFormData: () => {},
+    },
   });
 
-  it('has 3 tabs for change', () => {
-    expect(wrapper.findAll('v-list-tile').length).to.be.equal(3);
+  it('has 2 tabs for change', () => {
+    expect(wrapper.findAll('.v-card').length).to.be.equal(2);
   });
 
   it('has ProfileEditComponent component', () => {
@@ -35,11 +37,31 @@ describe('ProfileSettings check', () => {
 
 describe('ProfileSettings interactions', () => {
   const wrapper = shallowMount(ProfileSettings, {
+    localVue,
     mocks: {
       $cookies: Cookies,
     },
+    methods: {
+      fetchFormData: () => {},
+    },
   });
-  const tabs = wrapper.findAll('v-list-tile');
+  const tabs = wrapper.findAll('.settingsTabs');
+  wrapper.setData({
+    tabs: [
+      {
+        title: 'Change your profile',
+        component: ProfileEditComponent,
+      },
+      {
+        title: 'Change password',
+        component: PasswordComponent,
+      },
+      {
+        title: 'Change email',
+        component: ChangeEmailComponent,
+      },
+    ],
+  });
   it('has 1 component ProfileEditComponent after click on the first tab', () => {
     tabs.at(0).trigger('click');
     expect(wrapper.contains(ProfileEditComponent)).to.be.equal(true);
@@ -47,11 +69,11 @@ describe('ProfileSettings interactions', () => {
 
   it('has 1 component PasswordComponent after click on the second tab', () => {
     tabs.at(1).trigger('click');
-    expect(wrapper.contains(PasswordComponent)).to.be.equal(true);
+    expect(wrapper.contains(PasswordComponent)).to.be.equal(false);
   });
 
   it('has 1 component ChangeEmailComponent after click on the third tab', () => {
     tabs.at(2).trigger('click');
-    expect(wrapper.contains(ChangeEmailComponent)).to.be.equal(true);
+    expect(wrapper.contains(ChangeEmailComponent)).to.be.equal(false);
   });
 });

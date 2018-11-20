@@ -8,7 +8,6 @@ import { shallowMount, createLocalVue } from '@vue/test-utils';
 const localVue = createLocalVue();
 const router = new VueRouter();
 const expect = require('chai').expect;
-const should = require('chai').should();
 
 localVue.use(VueRouter);
 localVue.use(Vuex);
@@ -21,7 +20,6 @@ Cookies.set('user_id', 'value_');
 describe('PlaceDetail data()', () => {
   it('has place property', () => {
     expect(PlaceDetail.data()).to.have.property('place');
-    // expect(wrapper.props('place')).to.be.an('Object');
   });
 
   it('has default place name property', () => {
@@ -38,6 +36,10 @@ describe('PlaceDetail for empty place', () => {
   const wrapper = shallowMount(PlaceDetail, {
     localVue,
     router,
+    methods: {
+      fetchPlaceEditingPermission: () => {},
+      fetchPlaceData: () => {},
+    },
   });
   wrapper.setData({
     place: {
@@ -66,6 +68,10 @@ describe('PlaceDetail for place with data', () => {
   const wrapper = shallowMount(PlaceDetail, {
     localVue,
     router,
+    methods: {
+      fetchPlaceData: () => {},
+      fetchPlaceEditingPermission: () => {},
+    },
   });
   const testUserData = {
     place: {

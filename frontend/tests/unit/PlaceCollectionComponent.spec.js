@@ -1,12 +1,16 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import PlaceComponent from '../../src/components/PlaceCollectionComponent.vue';
 
 
 const expect = require('chai').expect;
-const should = require('chai').should();
+
+const localVue = createLocalVue();
+localVue.use(Vuetify);
+
 
 describe('PlaceComponent', () => {
-  const wrapper = shallowMount(PlaceComponent);
+  const wrapper = shallowMount(PlaceComponent, { localVue });
 
   it('has attribute for place name', () => {
     expect(wrapper.contains('[name="place-name"]')).to.be.equal(true);

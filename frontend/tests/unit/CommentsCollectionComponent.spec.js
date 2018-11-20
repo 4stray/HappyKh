@@ -1,6 +1,9 @@
-import { config, shallowMount } from '@vue/test-utils';
+import Vuetify from 'vuetify';
+import { config, shallowMount, createLocalVue } from '@vue/test-utils';
 import CommentsCollectionComponent from '../../src/components/CommentsCollectionComponent.vue';
 
+const localVue = createLocalVue();
+localVue.use(Vuetify);
 
 const expect = require('chai').expect;
 
@@ -11,7 +14,7 @@ config.methods = {
 };
 
 describe('CommentsCollectionComponent', () => {
-  const wrapper = shallowMount(CommentsCollectionComponent);
+  const wrapper = shallowMount(CommentsCollectionComponent, { localVue, config });
 
   it('contains textarea element', () => {
     expect(wrapper.contains('#newCommentInput')).to.be.equal(true);

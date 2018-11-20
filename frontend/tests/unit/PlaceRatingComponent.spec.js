@@ -1,10 +1,13 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import Cookies from 'js-cookie';
 import VueRouter from 'vue-router';
 import PlaceRatingComponent from '../../src/components/PlaceRatingComponent.vue';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
+localVue.use(Vuetify);
+
 const router = new VueRouter();
 const expect = require('chai').expect;
 
@@ -16,6 +19,9 @@ describe('PlaceRatingComponent', () => {
     router,
     mocks: {
       $cookies: Cookies,
+    },
+    methods: {
+      fetchRating: () => {},
     },
   });
   it('has attribute for Rating', () => {

@@ -7,7 +7,8 @@
       <v-text-field v-model="email"
                     :rules="emailRules"
                     label="New email"
-                    required></v-text-field>
+                    required
+                    id="emailInput"></v-text-field>
       <v-btn type="submit" :disabled="!valid" color="success" block
       >submit
       </v-btn>

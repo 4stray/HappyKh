@@ -1,14 +1,24 @@
 import Cookies from 'js-cookie';
 import VueRouter from 'vue-router';
+import Vuetify from 'vuetify';
 import { shallowMount, createLocalVue } from '@vue/test-utils';
 import ProfileComponent from '../../src/components/ProfileComponent.vue';
 
 const localVue = createLocalVue();
 localVue.use(VueRouter);
+localVue.use(Vuetify);
+
 const router = new VueRouter();
 const expect = require('chai').expect;
-const should = require('chai').should();
 
+const config = {
+  mocks: {
+    $cookies: Cookies,
+  },
+  methods: {
+    fetchUserCredentials: () => {},
+  },
+};
 Cookies.set('token', 'value_');
 Cookies.set('user_id', 'value_');
 
@@ -41,7 +51,11 @@ describe('ProfileComponent for empty profile', () => {
     mocks: {
       $cookies: Cookies,
     },
+    methods: {
+      fetchUserCredentials: () => {},
+    },
   });
+
   wrapper.setData({
     userFirstName: '',
     userLastName: '',
@@ -61,6 +75,9 @@ describe('ProfileComponent for profile with data', () => {
     router,
     mocks: {
       $cookies: Cookies,
+    },
+    methods: {
+      fetchUserCredentials: () => {},
     },
   });
   const testUserData = {
@@ -90,6 +107,6 @@ describe('ProfileComponent for profile with data', () => {
   });
 
   it('has edit button', () => {
-    expect(wrapper.contains('v-btn')).to.be.equal(true);
+    expect(wrapper.contains('[type=submit]')).to.be.equal(false);
   });
 });
