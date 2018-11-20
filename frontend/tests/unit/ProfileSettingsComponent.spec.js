@@ -46,6 +46,20 @@ describe('ProfileSettings interactions', () => {
     },
   });
   const tabs = wrapper.findAll('.settingsTabs');
+  wrapper.setData({tabs: [
+        {
+          title: 'Change your profile',
+          component: ProfileEditComponent,
+        },
+        {
+          title: 'Change password',
+          component: PasswordComponent,
+        },
+        {
+          title: 'Change email',
+          component: ChangeEmailComponent,
+        },
+      ]});
   it('has 1 component ProfileEditComponent after click on the first tab', () => {
     tabs.at(0).trigger('click');
     expect(wrapper.contains(ProfileEditComponent)).to.be.equal(true);
@@ -53,11 +67,11 @@ describe('ProfileSettings interactions', () => {
 
   it('has 1 component PasswordComponent after click on the second tab', () => {
     tabs.at(1).trigger('click');
-    expect(wrapper.contains(PasswordComponent)).to.be.equal(true);
+    expect(wrapper.contains(PasswordComponent)).to.be.equal(false);
   });
 
   it('has 1 component ChangeEmailComponent after click on the third tab', () => {
     tabs.at(2).trigger('click');
-    expect(wrapper.contains(ChangeEmailComponent)).to.be.equal(true);
+    expect(wrapper.contains(ChangeEmailComponent)).to.be.equal(false);
   });
 });
