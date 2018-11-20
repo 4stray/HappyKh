@@ -147,4 +147,4 @@ class CommentAbstract(models.Model):
         abstract = True
 
     def __str__(self):
-        return self.creator
+        return self.creator.email
