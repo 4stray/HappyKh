@@ -3,7 +3,7 @@ import axios from 'axios';
 
 let HOST = 'http://127.0.0.1:8000/';
 if (process.env.NODE_ENV === 'production') {
-  HOST = 'https://18.218.25.240';
+  HOST = 'http://18.223.185.163';
 }
 
 export const axiosInstance = axios.create({
