@@ -55,7 +55,6 @@ class PlacePage(APIView):
         :return: message, status_code
         """
         place_data = PlacePage.parse_place_address(request.data.copy())
-
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
@@ -159,9 +158,8 @@ class PlaceSinglePage(APIView):
             return Response(data=place_serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
-        LOGGER.info(f'Place with id {place_id} was successfully updated')
-
         place_serializer.update(single_place, place_serializer.validated_data)
+        LOGGER.info(f'Place with id {place_id} was successfully updated')
         return Response(status=status.HTTP_200_OK)
 
     def delete(self, request, place_id):
@@ -221,8 +219,8 @@ class PlacesEditingPermission(APIView):
         sender = requesting_user.email
         receivers = PlacesEditingPermission.get_staff_users()
         subject = f'User {sender} requesting place editing permission'
-        message = f'User {sender} requesting editing permission ' \
-                  f'for the place with id of {place_id}'
+        message = (f'User {sender} requesting editing permission for the place'
+                   'with id of {place_id} ')
 
         try:
             send_mail(subject, message, sender, receivers)
@@ -233,7 +231,6 @@ class PlacesEditingPermission(APIView):
 
         LOGGER.info(f'Place editing permission access mail has been sent')
         return Response(status=status.HTTP_201_CREATED)
-
 
     @staticmethod
     def get_staff_users():
@@ -299,19 +296,14 @@ class CommentsAPI(APIView):
                                                     many=True, )
         next_page_link = None
         if comments_page.has_next():
-            next_page_link = get_changed_uri(
-                request,
-                'page',
-                comments_page.next_page_number()
-            )
+            page_number = comments_page.next_page_number()
+            next_page_link = get_changed_uri(request, 'page', page_number)
 
         previous_page_link = None
         if comments_page.has_previous():
-            previous_page_link = get_changed_uri(
-                request,
-                'page',
-                comments_page.previous_page_number()
-            )
+            page_number = comments_page.previous_page_number()
+            previous_page_link = get_changed_uri(request, 'page', page_number)
+
         response_dict = {
             "count": paginator.count,
             "number_of_pages": paginator.num_pages,
@@ -341,7 +333,8 @@ class CommentsAPI(APIView):
                                                     context=comment_context)
         if not comment_serializer.is_valid():
             LOGGER.warning(
-                f'Comment serialization errors {comment_serializer.errors}')
+                f'Comment serialization errors {comment_serializer.errors}'
+            )
             return Response(comment_serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
 
@@ -420,9 +413,8 @@ class PlaceRatingView(APIView):
         :return: float user_rating or 0 if rating doesn't exist
         """
         try:
-            rating = PlaceRating.objects.get(user=user_id, place=place_id)
-            user_rating = rating.rating
-            return user_rating
+            user_rating = PlaceRating.objects.get(user=user_id, place=place_id)
+            return user_rating.rating
         except PlaceRating.DoesNotExist:
             return 0
 
@@ -436,11 +428,10 @@ class PlaceRatingView(APIView):
         user_id = get_token_user(request)
         user_rating = self.get_user_rating(user_id, place_id)
         place = get_object_or_404(Place, id=place_id)
-        average = place.average_rating
-        amount = place.rating_amount
+
         response = {'place': place_id,
-                    'data': average,
-                    'amount': amount,
+                    'data': place.average_rating,
+                    'amount': place.rating_amount,
                     'rating': user_rating}
         return Response(response, status=status.HTTP_200_OK)
 

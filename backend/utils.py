@@ -11,6 +11,7 @@ from stdimage.models import StdImageFieldFile
 
 PROTOCOL = 'http'
 
+
 def make_media_file_path(model_name, attr_name, original_filename):
     """
     Function which creates path for user's file in media folder using uuid.
@@ -38,12 +39,11 @@ def delete_std_images_from_media(std_image_file, variations):
                         std_image_file
     :return: None
     """
-    if std_image_file and \
-            isinstance(std_image_file, StdImageFieldFile) and \
-            os.path.isfile(std_image_file.path):
+    if std_image_file and (
+            isinstance(std_image_file, StdImageFieldFile) and
+            os.path.isfile(std_image_file.path)):
         path = std_image_file.path.split(settings.MEDIA_DIR + '/')[-1]
-        os.remove(
-            os.path.join(settings.MEDIA_ROOT, path))
+        os.remove(os.path.join(settings.MEDIA_ROOT, path))
         for variant in variations:
             extension = path.split('.')[-1]
             filename = path.split('.')[-2]
@@ -87,9 +87,8 @@ def get_changed_uri(request, param_name, val):
 
 class UploadedImageField(serializers.ImageField):
     """
-    Class which converts a base64 string
-    to a file when input and converts image
-    by path to it into base64 string
+    Class which converts a base64 string to a file when input
+    and converts image by path to it into base64 string
     """
 
     def to_internal_value(self, data):
@@ -97,6 +96,7 @@ class UploadedImageField(serializers.ImageField):
             data = ContentFile(data.read(), name=data.name)
         if data == 'undefined':
             return None
+
         return super(UploadedImageField, self).to_internal_value(data)
 
     def to_representation(self, image_field):
@@ -117,7 +117,6 @@ class UploadedImageField(serializers.ImageField):
         return image_url
 
 
-
 class HashIdField(serializers.Field):
     """
     Field for id for serializer
@@ -130,6 +129,6 @@ class HashIdField(serializers.Field):
         try:
             user_id = settings.HASH_IDS.decode(data)[0]
         except IndexError:
-            self.fail('incorrect_type', message='Invalid hashed_user_id')
+            raise serializers.ValidationError('Invalid hashed_user_id')
 
         return super(HashIdField, self).to_internal_value(user_id)
