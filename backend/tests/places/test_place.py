@@ -2,11 +2,11 @@
 import json
 
 from django.core.paginator import Paginator
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from rest_framework.test import APITestCase
 from places.api.serializers import PlaceSerializer
 from places.models import Place, Address, CommentPlace
+from rest_framework import status
+from rest_framework.authtoken.models import Token
+from rest_framework.test import (APITestCase, APIClient)
 from tests.utils import BaseTestCase
 from users.models import User
 
@@ -82,10 +82,19 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         """
         Test post request for places
         """
-        data = TEST_PLACE_DATA_POST
+        data = TEST_PLACE_DATA_POST.copy()
         data['address'] = json.dumps(TEST_ADDRESS_DATA)
         response = self.client.post(PLACE_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+    def test_invalid_post(self):
+        """
+        Test post request for places with wrong data
+        """
+        data = TEST_PLACE_DATA_POST.copy()
+        data.pop('name')
+        response = self.client.post(PLACE_URL, data)
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
 
     def test_creating_place_with_nonjson_address(self):
         """Test response when creating place with wrong json address format"""
@@ -392,7 +401,7 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         data['creator'] = self.hashed_user_id
         response = self.client.post(self.COMMENT_URL, data)
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
-        self.assertEqual(self.comment_count+1, CommentPlace.objects.count())
+        self.assertEqual(self.comment_count + 1, CommentPlace.objects.count())
 
     def test_post_with_wrong_place(self):
         """Test post request with wrong place id"""
@@ -464,3 +473,19 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         data.update(text='')
         response = self.client.put(self.SINGLE_COMMENT_URL, data)
         self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+
+    def test_update_with_wrong_user(self):
+        """Test put request with user id, who is not a creator of the comment"""
+        new_user_data = CORRECT_USER_DATA.copy()
+        new_user_data.update(email='test2@mail.com')
+        new_user = User.objects.create_user(**new_user_data)
+        new_hashed_user_id = self.HASH_IDS.encode(new_user.pk)
+
+        new_user_token = Token.objects.create(user=new_user)
+        temp_clent = APIClient()
+        temp_clent.credentials(HTTP_AUTHORIZATION='Token ' + new_user_token.key)
+
+        data = self.comment_info.copy()
+        data.update(creator=new_hashed_user_id)
+        response = temp_clent.put(self.SINGLE_COMMENT_URL, data)
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
