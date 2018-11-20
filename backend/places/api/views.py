@@ -5,8 +5,9 @@ from smtplib import SMTPException
 
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import get_user_model
-from django.core.paginator import Paginator
+
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -41,12 +42,41 @@ class PlacePage(APIView):
         order = request.GET.get('order', '')
         order_by = request.GET.get('orderBy', 'name')
         places = Place.objects.order_by(f"{order}{order_by}")
+
         context = {
             'variation': self.variation,
             'domain': get_current_site(request)
         }
+
+        search_option = request.GET.get('s')
+        if search_option is not None:
+            places = places.filter(name__icontains=search_option)
+
+        objects_limit = request.GET.get('lim', 15)
+
+        try:
+            objects_limit = int(objects_limit)
+            if objects_limit < 1:
+                objects_limit = 1
+        except ValueError:
+            objects_limit = 15
+
+        paginator = Paginator(places, objects_limit)
+
+        page = request.GET.get('p', 1)
+
+        places = paginator.get_page(page)
+
         serializer = PlaceSerializer(places, many=True, context=context)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        response = {"places": serializer.data,
+                    "pages": paginator.num_pages,
+                    "current_page": places.number,
+                    "objects_limit": objects_limit,
+                    "total_number": paginator.count}
+
+        return Response(response,
+                        status=status.HTTP_200_OK)
 
     def post(self, request):
         """

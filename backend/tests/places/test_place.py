@@ -12,6 +12,8 @@ from users.models import User
 
 PLACE_URL = '/api/places/'
 SINGLE_PLACE_URL = '/api/places/%d'
+SPECIFYING_PAGINATION_PLACE_URL = '/api/places/?lim={0}&p={1}'
+SPECIFYING_FILTER_PLACE_URL = '/api/places/?s={}'
 
 TEST_ADDRESS_DATA = {
     'latitude': 50,
@@ -76,7 +78,7 @@ class TestPlacePageWithPermission(BaseTestCase, APITestCase):
         serializer = PlaceSerializer(self.places, many=True)
         expected = serializer.data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
-        self.assertEqual(expected, response.data)
+        self.assertEqual(expected, response.data['places'])
 
     def test_post(self):
         """
@@ -281,6 +283,84 @@ class TestPlacePageWithoutEditingPermission(APITestCase):
             f'{PLACE_URL}{self.place.id}/editing_permission'
         )
         self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+
+
+class TestMultiplePlaces(BaseTestCase, APITestCase):
+    """Test places with number of instances"""
+
+    def setUp(self):
+        """Create user and couple place's instances"""
+        super().setUp()
+        self.user = User.objects.create_user(**CORRECT_USER_DATA)
+        self.hashed_user_id = self.HASH_IDS.encode(self.user.pk)
+        self.address = Address.objects.create(**TEST_ADDRESS_DATA)
+        self.default_limit = 15
+
+        Place.objects.create(address=self.address,
+                             name='A first name',
+                             description='description',
+                             logo='')
+
+        Place.objects.create(address=self.address,
+                             name='B second name',
+                             description='description',
+                             logo='')
+
+        self.places = Place.objects.all()
+        user_token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + user_token.key)
+
+    def test_get_multiple_places_specifying_invalid_str_params(self):
+        """
+        Test get request for multiple specifying
+        limit and page params with str values
+        """
+        response = self.client.get(SPECIFYING_PAGINATION_PLACE_URL.format(
+            'bad', 'params'))
+        serializer = PlaceSerializer(self.places, many=True)
+
+        paginator = Paginator(serializer.data, self.default_limit)
+        expected = paginator.get_page(1)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected.object_list, response.data['places'])
+        self.assertEqual(paginator.count, response.data['total_number'])
+        self.assertEqual(expected.number, response.data['current_page'])
+        self.assertEqual(self.default_limit, response.data['objects_limit'])
+
+    def test_get_multiple_places_specifying_invalid_value_params(self):
+        """
+        Test get request for multiple specifying
+        limit and page params with nonpositive values
+        """
+        response = self.client.get(SPECIFYING_PAGINATION_PLACE_URL.format(
+            -1, -1))
+        serializer = PlaceSerializer(self.places, many=True)
+
+        specific_limit = 1  # limit sets 1 if param value is nonpositive
+        paginator = Paginator(serializer.data, specific_limit)
+        expected = paginator.get_page(paginator.num_pages)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(expected.object_list, response.data['places'])
+        self.assertEqual(paginator.count, response.data['total_number'])
+        self.assertEqual(expected.number, response.data['current_page'])
+        self.assertEqual(specific_limit, response.data['objects_limit'])
+
+    def test_get_multiple_places_specifying_filter_param(self):
+        """
+        Test get request for multiple places
+        specifying search param for filtering
+        """
+        filter_param = 'first'
+        response = self.client.get(SPECIFYING_FILTER_PLACE_URL.format(
+            filter_param))
+
+        filtered_places = Place.objects.filter(name__icontains=filter_param)
+        serializer = PlaceSerializer(filtered_places, many=True)
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer.data, response.data['places'])
 
 
 class TestCommentsAPI(BaseTestCase, APITestCase):
