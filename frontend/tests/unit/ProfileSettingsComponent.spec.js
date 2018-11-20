@@ -46,20 +46,22 @@ describe('ProfileSettings interactions', () => {
     },
   });
   const tabs = wrapper.findAll('.settingsTabs');
-  wrapper.setData({tabs: [
-        {
-          title: 'Change your profile',
-          component: ProfileEditComponent,
-        },
-        {
-          title: 'Change password',
-          component: PasswordComponent,
-        },
-        {
-          title: 'Change email',
-          component: ChangeEmailComponent,
-        },
-      ]});
+  wrapper.setData({
+    tabs: [
+      {
+        title: 'Change your profile',
+        component: ProfileEditComponent,
+      },
+      {
+        title: 'Change password',
+        component: PasswordComponent,
+      },
+      {
+        title: 'Change email',
+        component: ChangeEmailComponent,
+      },
+    ],
+  });
   it('has 1 component ProfileEditComponent after click on the first tab', () => {
     tabs.at(0).trigger('click');
     expect(wrapper.contains(ProfileEditComponent)).to.be.equal(true);
