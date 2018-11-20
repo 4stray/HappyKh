@@ -16,6 +16,11 @@ describe('mounted PlaceEditComponent', () => {
   const wrapper = shallowMount(PlaceEditComponent, {
     localVue,
     router,
+    mocks: {
+      $awn: {
+        alert: () => {},
+      },
+    },
     methods: {
       fetchPlaceEditingPermission: () => {},
       fetchPlaceData: () => {},
