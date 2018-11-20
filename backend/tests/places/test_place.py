@@ -315,8 +315,8 @@ class TestMultiplePlaces(BaseTestCase, APITestCase):
         Test get request for multiple specifying
         limit and page params with str values
         """
-        response = self.client.get(SPECIFYING_PAGINATION_PLACE_URL
-                                   .format('bad', 'params'))
+        response = self.client.get(SPECIFYING_PAGINATION_PLACE_URL.format(
+            'bad', 'params'))
         serializer = PlaceSerializer(self.places, many=True)
 
         paginator = Paginator(serializer.data, self.default_limit)
@@ -333,8 +333,8 @@ class TestMultiplePlaces(BaseTestCase, APITestCase):
         Test get request for multiple specifying
         limit and page params with nonpositive values
         """
-        response = self.client.get(SPECIFYING_PAGINATION_PLACE_URL
-                                   .format(-1, -1))
+        response = self.client.get(SPECIFYING_PAGINATION_PLACE_URL.format(
+            -1, -1))
         serializer = PlaceSerializer(self.places, many=True)
 
         specific_limit = 1  # limit sets 1 if param value is nonpositive
@@ -353,8 +353,8 @@ class TestMultiplePlaces(BaseTestCase, APITestCase):
         specifying search param for filtering
         """
         filter_param = 'first'
-        response = self.client.get(SPECIFYING_FILTER_PLACE_URL
-                                   .format(filter_param))
+        response = self.client.get(SPECIFYING_FILTER_PLACE_URL.format(
+            filter_param))
 
         filtered_places = Place.objects.filter(name__icontains=filter_param)
         serializer = PlaceSerializer(filtered_places, many=True)
