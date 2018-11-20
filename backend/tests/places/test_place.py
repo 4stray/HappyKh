@@ -418,12 +418,6 @@ class TestCommentsAPI(BaseTestCase, APITestCase):
         self.assertEqual(paginator.num_pages, response.data['number_of_pages'])
         self.assertEqual(comments_page.number,
                          response.data['current_page_number'])
-        next_link = (f'http://testserver{self.COMMENT_URL}'
-                     f'?page=3&objects_per_page=1')
-        self.assertEqual(next_link, response.data['next'])
-        previous_link = (f'http://testserver{self.COMMENT_URL}'
-                         f'?page=1&objects_per_page=1')
-        self.assertEqual(previous_link, response.data['previous'])
         self.assertEqual(1, len(response.data['comments']))
         self.assertEqual(comment.text, response.data['comments'][0]['text'])
 

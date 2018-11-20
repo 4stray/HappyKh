@@ -3,11 +3,10 @@ import json
 import logging
 from smtplib import SMTPException
 
-from django.core.mail import send_mail
-from django.contrib.sites.shortcuts import get_current_site
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import get_user_model
-
+from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
@@ -15,11 +14,12 @@ from rest_framework.exceptions import (ParseError, ValidationError)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from users.backends import UserAuthentication
-from utils import (get_changed_uri, get_token_user)
+
+from utils import (get_token_user)
 from .serializers import (PlaceSerializer, AddressSerializer,
-                          CommentPlaceSerializer, PlaceRatingSerializer)
+                          CommentPlaceSerializer, PlaceRatingSerializer
+                          )
 from ..models import (Place, Address, CommentPlace, PlaceRating)
 
 LOGGER = logging.getLogger('happy_logger')
@@ -61,11 +61,8 @@ class PlacePage(APIView):
             objects_limit = 15
 
         paginator = Paginator(places, objects_limit)
-
         page = request.GET.get('p', 1)
-
         places = paginator.get_page(page)
-
         serializer = PlaceSerializer(places, many=True, context=context)
 
         response = {"places": serializer.data,
@@ -74,8 +71,7 @@ class PlacePage(APIView):
                     "objects_limit": objects_limit,
                     "total_number": paginator.count}
 
-        return Response(response,
-                        status=status.HTTP_200_OK)
+        return Response(response, status=status.HTTP_200_OK)
 
     def post(self, request):
         """
@@ -129,9 +125,8 @@ class PlacePage(APIView):
             parsing_address_error = {
                 'message': 'Parsing address from Json failed',
             }
-
             LOGGER.error(parsing_address_error['message'])
-            raise ParseError(detail=parsing_address_error['message'])
+            raise ParseError(detail=parsing_address_error)
 
         place_data['address'] = cls.get_address_pk(address_data)
         return place_data
@@ -324,22 +319,10 @@ class CommentsAPI(APIView):
         comment_serializer = CommentPlaceSerializer(comments_for_page,
                                                     context=comment_context,
                                                     many=True, )
-        next_page_link = None
-        if comments_page.has_next():
-            page_number = comments_page.next_page_number()
-            next_page_link = get_changed_uri(request, 'page', page_number)
-
-        previous_page_link = None
-        if comments_page.has_previous():
-            page_number = comments_page.previous_page_number()
-            previous_page_link = get_changed_uri(request, 'page', page_number)
-
         response_dict = {
             "count": paginator.count,
             "number_of_pages": paginator.num_pages,
             "current_page_number": comments_page.number,
-            "next": next_page_link,
-            "previous": previous_page_link,
             "comments": comment_serializer.data,
         }
         return Response(response_dict, status=status.HTTP_200_OK)
