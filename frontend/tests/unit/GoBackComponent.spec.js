@@ -1,19 +1,22 @@
-import { shallowMount } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import GoBackComponent from '@/components/GoBackComponent.vue';
 
 const expect = require('chai').expect;
-const should = require('chai').should();
+
+const localVue = createLocalVue();
+localVue.use(Vuetify);
 
 describe('GoBackComponent', () => {
-  const wrapper = shallowMount(GoBackComponent);
+  const wrapper = mount(GoBackComponent, { localVue });
 
   it('has button', () => {
-    expect(wrapper.contains('v-btn')).to.be.equal(true);
+    expect(wrapper.contains('#goBackButton')).to.be.equal(true);
   });
 
   describe('Go Back Button', () => {
     it('has icon in it', () => {
-      expect(wrapper.find('v-btn').find('v-icon')
+      expect(wrapper.find('#goBackButton').find('#iconBack')
         .text()).to.be.equal('arrow_back');
     });
   });

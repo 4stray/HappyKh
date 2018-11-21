@@ -1,12 +1,14 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
 import RegistrationComponent from '@/components/RegistrationComponent.vue';
+import Vuetify from 'vuetify';
 
 const expect = require('chai').expect;
-const should = require('chai').should();
 
+const localVue = createLocalVue();
+localVue.use(Vuetify);
 
 describe('RegistrationComponent check for vue instance', () => {
-  const wrapper = shallowMount(RegistrationComponent);
+  const wrapper = shallowMount(RegistrationComponent, { localVue });
 
   it('is a vue instance', () => {
     expect(wrapper.isVueInstance()).to.be.equal(true);
@@ -26,13 +28,13 @@ describe('RegistrationComponent data', () => {
   });
 
   it('has default confirmPassword', () => {
-    expect(data).to.have.property('confirmPassword', '');
+    expect(data).to.have.property('confirmationPassword', '');
   });
 });
 
 
 describe('RegistrationComponent contains the correct values', () => {
-  const wrapper = shallowMount(RegistrationComponent);
+  const wrapper = shallowMount(RegistrationComponent, { localVue });
 
 
   it('is a vue instance', () => {
@@ -82,7 +84,7 @@ describe('RegistrationComponent contains the correct values', () => {
 
 
 describe('RegistrationComponent interactions', () => {
-  const wrapper = shallowMount(RegistrationComponent);
+  const wrapper = shallowMount(RegistrationComponent, { localVue });
   const btn = wrapper.find('.btn-submit');
 
   it('button is not active if conditions are not met', () => {

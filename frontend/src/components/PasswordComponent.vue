@@ -3,7 +3,7 @@
     <v-card-title primary-title>
       <h3 class="headline mb-0">Change your password</h3>
     </v-card-title>
-    <v-form ref="form" @submit.prevent="saveNewPassword" v-model="valid">
+    <v-form ref="form" @submit.prevent v-model="valid">
       <v-text-field type="password"
                     v-model="oldPassword"
                     label="Old password"
@@ -17,7 +17,10 @@
                     v-model="confirmationPassword"
                     :rules="passwordRules"
                     label="Confirm new password"></v-text-field>
-      <v-btn type="submit" :disabled="!valid" color="success" block>
+      <v-btn type="submit"
+             v-on:click.native="saveNewPassword"
+             :disabled="!valid"
+             color="success" block>
         submit
       </v-btn>
     </v-form>
@@ -25,12 +28,17 @@
 </template>
 
 <script>
-import axios from 'axios';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users/';
+import { mapGetters } from 'vuex';
+import { axiosInstance } from '../axios-requests';
 
 export default {
   name: 'PasswordComponent',
+  computed: {
+    ...mapGetters({
+      userToken: 'getToken',
+      userID: 'getUserID',
+    }),
+  },
   data() {
     return {
       valid: false,
@@ -48,11 +56,19 @@ export default {
     };
   },
   methods: {
+    signOut() {
+      this.$store.dispatch('signOut').finally(() => {
+        this.$awn.success('You have successfully changed your password.');
+        this.$router.push({ name: 'login' });
+      });
+    },
     saveNewPassword() {
-      if (!this.$refs.form.validate()) {
+      if (!this.$refs.form.validate() || this.oldPassword === this.newPassword) {
         this.$refs.form.reset();
+        this.$awn.warning('Some passwords were invalid');
         return;
-      } else if (this.newPassword !== this.confirmationPassword) {
+      }
+      if (this.newPassword !== this.confirmationPassword) {
         this.$awn.warning('Passwords don\'t match');
         this.$refs.form.reset();
         return;
@@ -61,21 +77,19 @@ export default {
         old_password: this.oldPassword,
         new_password: this.newPassword,
       };
-      axios.patch(
-        `${UserAPI + this.$cookies.get('user_id')}/password`, userCredentials,
-        {
-          headers: { Authorization: `Token ${this.$cookies.get('token')}` },
-        },
-      ).then(() => {
-        this.$awn.success('Password was successfully changed.');
-      }).catch((error) => {
-        if (error.response === undefined) {
-          this.$awn.alert('A server error has occurred, try again later');
-        } else if (error.response.data.message) {
-          this.$awn.warning(error.response.data.message);
-        }
-      });
-      this.$refs.form.reset();
+
+      axiosInstance.patch(`/api/users/${this.userID}/password`, userCredentials)
+        .then(() => {
+          this.signOut();
+        })
+        .catch((error) => {
+          if (error.response === undefined) {
+            this.$awn.alert('A server error has occurred, try again later');
+          } else if (error.response.data.message) {
+            this.$awn.warning(error.response.data.message);
+          }
+          this.$refs.form.reset();
+        });
     },
   },
 };

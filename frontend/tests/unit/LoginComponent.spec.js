@@ -1,11 +1,14 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, createLocalVue } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import LoginComponent from '../../src/components/LoginComponent.vue';
 
 const expect = require('chai').expect;
-const should = require('chai').should();
+
+const localVue = createLocalVue();
+localVue.use(Vuetify);
 
 describe('LoginComonent', () => {
-  const wrapper = shallowMount(LoginComponent);
+  const wrapper = shallowMount(LoginComponent, { localVue });
 
   it('has default userEmail', () => {
     expect(LoginComponent.data()).to.have.property('userEmail');

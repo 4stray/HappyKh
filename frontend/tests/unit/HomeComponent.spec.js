@@ -1,9 +1,15 @@
-import { shallowMount, mount, config } from '@vue/test-utils';
+import { config, RouterLinkStub, createLocalVue } from '@vue/test-utils';
+import Vuetify from 'vuetify';
 import HomeComponent from '@/components/HomeComponent.vue';
 
-const expect = require('chai').expect;
-const should = require('chai').should();
 
+const localVue = createLocalVue();
+localVue.use(Vuetify);
+
+const expect = require('chai').expect;
+
+config.stubs['router-link'] = RouterLinkStub;
+config.stubs.PlacesComponent = '<div/>';
 config.mocks.$store = {
   state: {
     Authenticated: 'test token',
@@ -14,7 +20,6 @@ config.mocks.$store = {
 };
 
 describe('HomeComponent', () => {
-  const wrapper = mount(HomeComponent, config);
   it('has property msg', () => {
     expect(HomeComponent.props).to.have.key('msg');
   });

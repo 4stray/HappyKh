@@ -1,7 +1,7 @@
 <template>
-  <v-btn v-on:click="routeBack" title="Go Back"
+  <v-btn v-on:click="routeBack" title="Go Back" id="goBackButton"
          flat fixed class="transparent custom-position">
-    <v-icon color="blue" x-large>arrow_back</v-icon>
+    <v-icon id="iconBack" color="blue" x-large>arrow_back</v-icon>
   </v-btn>
 </template>
 

@@ -16,10 +16,7 @@
 </template>
 
 <script>
-
-import axios from 'axios';
-
-const UserAPI = 'http://127.0.0.1:8000/api/users';
+import { axiosInstance } from '../axios-requests';
 
 export default {
   name: 'LoginComponent',
@@ -46,11 +43,13 @@ export default {
         user_email: this.userEmail,
         user_password: this.userPassword,
       };
-      axios.post(`${UserAPI}/login`, userCredentials)
+
+      axiosInstance.post('/api/users/login', userCredentials)
         .then((response) => {
           this.$cookies.set('token', response.data.token);
           this.$store.commit('setAuthenticated', response.data.token);
           this.$cookies.set('user_id', response.data.user_id);
+          this.$store.commit('setUserID', response.data.user_id);
           this.$router.push({ name: 'home' });
         }).catch((error) => {
           if (error.response === undefined) {
